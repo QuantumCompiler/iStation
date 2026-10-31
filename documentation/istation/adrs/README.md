@@ -1,0 +1,20 @@
+# Architecture Decision Records — iStation
+
+The standing rules of iStation's architecture, each written once, dated, and kept beside the reasons it exists. An ADR is **append-only history**: a changed decision is a *new* record that names the one it supersedes — never an edit that rewrites the old one. The planning system ([backlog](../backlog/README.md), [MILESTONES](../assistant/MILESTONES.md)) records *what happened when*; an ADR records *what holds now and why*.
+
+**Format.** One file per record, named for the decision alone (`layer-enforcement.md`) — the number lives in the title and this index. Each record carries **Status** (Accepted / Superseded by NNNN), **Date**, **Context** (the evidence that forced the decision), **Decision** (the rule, stated so a change can be judged against it), **Consequences**, and **Enforcement** (where the rule is mechanical — a rule with no teeth is a suggestion).
+
+**Relation to the layer cards.** Each layer root in the source and test trees carries a short `CLAUDE.md` card that states its layer's law and links here. Cards summarize and point; only ADRs carry rationale.
+
+## Index
+
+| ADR | Rule |
+|---|---|
+| [0001](layer-enforcement.md) | Four layers, dependencies point down, regardless of language and framework |
+| [0002](module-map.md) | The module map is the layer law's one declaration |
+| [0003](granular-modules.md) | One concern per module |
+| [0004](tests-mirror-architecture.md) | Tests live in the layer of what they test, and never touch the real home folder |
+| [0005](presentation-mvvm.md) | Presentation modules are MVVM, and share one styles module |
+| [0006](presentation-previews.md) | Every Presentation module stands alone, and every view has its previews |
+| [0007](backwards-compatibility.md) | A library file written by an older iStation keeps loading |
+| [0008](emulators-are-separate-programs.md) | Emulators are separate programs, driven only by their command line; iStation ships none of their code or Sony's files |

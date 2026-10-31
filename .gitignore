@@ -1,1 +1,8 @@
 *.DS_STORE
+.DS_Store
+.build/
+.swiftpm/
+/src/istation/build/
+/src/istation/Packages/
+xcuserdata/
+DerivedData/
