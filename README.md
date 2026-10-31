@@ -8,12 +8,15 @@ iStation ships no BIOS files, PS3 system software or games: you supply your own,
 
 Requires macOS 14 or later, Xcode 16 or later (Swift 6), and DuckStation, PCSX2 and/or RPCS3 installed as `.app` bundles.
 
+In Xcode, open `iStation.xcodeproj` at the root of the repository: the `iStation` scheme runs the app (⌘R) and every test, the architecture checks included (⌘U).
+
+From Terminal:
+
 ```bash
 cd src/istation
-swift run iStation            # build and run from Terminal
+swift run iStation            # build and run
 swift test                    # every module's tests, plus the architecture checks
 ./scripts/build-app.sh        # makes build/iStation.app, ad-hoc signed, for /Applications
-open Package.swift            # or work in Xcode: pick the iStation scheme, then ⌘R
 ```
 
 ## Status

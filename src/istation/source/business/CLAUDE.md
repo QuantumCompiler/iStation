@@ -9,7 +9,7 @@
 **Enforced by:** one SwiftPM target per module, generated from the module map in `src/istation/Package.swift`, and `ArchitectureTests` (`src/istation/tests/architecture/`), run by `swift test`.
 
 **Changing this layer:**
-- A new module: its directory `source/business/<module>/`, its `Module(.business, "<Name>", uses: […])` row in `Package.swift`, its tests in `tests/business/<module>/`, its name on this card and in [ADR 0002](../../../../documentation/istation/adrs/module-map.md)'s table — in the same change.
+- A new module: its directory `source/business/<module>/`, its `Module(.business, "<Name>", uses: […])` row in `Package.swift`, its tests in `tests/business/<module>/` (and in the `iStation` scheme of `iStation.xcodeproj`), its name on this card and in [ADR 0002](../../../../documentation/istation/adrs/module-map.md)'s table — in the same change.
 - One implementation per decision: a rule the views need (which games a place shows, which emulator runs a console) lives here once, never in a view-model.
 - Emulators are reached only through `launching` → `InfrastructureProcess`, by command line and process exit ([ADR 0008](../../../../documentation/istation/adrs/emulators-are-separate-programs.md)).
 

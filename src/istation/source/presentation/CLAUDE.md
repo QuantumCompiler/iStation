@@ -12,6 +12,6 @@
 
 **Enforced by:** one SwiftPM target per module, generated from the module map in `src/istation/Package.swift`, and `ArchitectureTests` (`src/istation/tests/architecture/`), run by `swift test`.
 
-**Changing this layer:** a new place is a module `source/presentation/<place>/` with `Views/` and `ViewModels/`, its `Module(.presentation, "<Name>", uses: […])` row in `Package.swift`, its tests in `tests/presentation/<place>/`, a `SidebarItem` case in `shell` if the sidebar reaches it, its view-model built in `app`, a preview for every view it draws, and its name on this card's Modules line and in [ADR 0002](../../../../documentation/istation/adrs/module-map.md)'s table.
+**Changing this layer:** a new place is a module `source/presentation/<place>/` with `Views/` and `ViewModels/`, its `Module(.presentation, "<Name>", uses: […])` row in `Package.swift`, its tests in `tests/presentation/<place>/` (and in the `iStation` scheme of `iStation.xcodeproj`), a `SidebarItem` case in `shell` if the sidebar reaches it, its view-model built in `app`, a preview for every view it draws, and its name on this card's Modules line and in [ADR 0002](../../../../documentation/istation/adrs/module-map.md)'s table.
 
 **Depth:** [the ADRs](../../../../documentation/istation/adrs/README.md) · [CLAUDE.md](../../../../documentation/istation/assistant/CLAUDE.md) · [DEVELOPER.md](../../../../documentation/istation/assistant/DEVELOPER.md).

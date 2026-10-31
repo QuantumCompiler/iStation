@@ -32,7 +32,7 @@ iStation is a personal, native macOS app that gives DuckStation (PS1), PCSX2 (PS
 ## Stack & environment
 
 - **Language / framework:** Swift 6 in language mode 6 — strict concurrency (the default, taken 2026-10-31) — with SwiftUI and Observation; macOS 14 Sonoma or later.
-- **Build:** Swift Package Manager, `src/istation/Package.swift` (swift-tools-version 6.0): one library target per module, generated from the module map, plus the `iStation` executable. `swift build` from `src/istation/`; `open Package.swift` for Xcode. Whether to move to an Xcode project (app icon, signing, notarization) is a `[user]` call for v1.0.0 — an Xcode app target can depend on this package unchanged.
+- **Build:** Swift Package Manager, `src/istation/Package.swift` (swift-tools-version 6.0): one library target per module, generated from the module map, plus the `iStation` executable. `swift build` from `src/istation/`. In Xcode, open `iStation.xcodeproj` at the repository root (the user's call, 2026-10-31): a thin project with no targets of its own that opens the package, and one shared scheme, `iStation`, that runs the app and tests every test target. It is not the v1.0.0 move: whether iStation gets an Xcode app target (app icon, signing, notarization) is still a `[user]` call — such a target can depend on this package unchanged.
 - **Tests:** Swift Testing (the default, taken 2026-10-31, over the scaffold's XCTest): `swift test` from `src/istation/`, which also runs the architecture checks.
 - **Platforms / devices:** macOS 14+ on Apple Silicon. Development host as of 2026-10-31: macOS 27, Xcode 27.1, Swift 6.4. Intel support: _TODO:_ undecided (no item owns it yet).
 - **Key dependencies:** none beyond Apple's SDK — [ADR 0008](../adrs/emulators-are-separate-programs.md)'s allow-list is empty. The emulators are the user's own installed apps, driven only by their command lines: never edited, linked or bundled before v2.0.0.
@@ -193,7 +193,7 @@ Every change satisfies this before merge:
 - [ ] The strict build is clean: `swift build --explicit-target-dependency-import-check=error` (what CI runs).
 - [ ] Format and lint: _TODO:_ no formatter configured yet — match the surrounding code.
 - [ ] New tests are **hermetic** — no network, files only inside a `Sandbox`, never the real home folder, Launch Services, a real emulator or a real game; real runs are the user's to start.
-- [ ] **The layer law holds**: a new module is a directory in its layer, a `Module` row in `Package.swift`, a line on its layer card, a row in ADR 0002's table and a test directory in `tests/<layer>/<module>/` — all in the same change (the layer-context check fails on any one alone).
+- [ ] **The layer law holds**: a new module is a directory in its layer, a `Module` row in `Package.swift`, a line on its layer card, a row in ADR 0002's table, a test directory in `tests/<layer>/<module>/` and its test target in the `iStation` Xcode scheme — all in the same change (the layer-context check fails on any one alone).
 - [ ] **Emulators stay separate**: launching goes through `BusinessLaunching` → `InfrastructureProcess`; a changed flag updates the launch contract and its tests; no new package without a licence review on ADR 0008's allow-list.
 - [ ] **No game, BIOS or firmware file** is added anywhere, fixtures included.
 - [ ] **The library file stays compatible**: a new persisted field decodes with `decodeIfPresent` and a default; a shape change adds a recording to `RecordedLibraryFileTests`.

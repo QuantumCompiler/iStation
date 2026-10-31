@@ -20,7 +20,7 @@ The docs home is [`documentation/istation/`](../../../documentation/istation/REA
 - **[ROADMAP.md](../../../documentation/istation/assistant/ROADMAP.md)**: shipped lines ticked and linked to their milestone; "Decisions needed" current.
 - **[CLAUDE.md](../../../documentation/istation/assistant/CLAUDE.md)**: the Codebase Map (one concern per row — a row that can't be written that way is a split waiting, ADR 0003); Stack & environment; a newly enforced rule promoted to `⚠`; style rules; the checklist.
 - **[DEVELOPER.md](../../../documentation/istation/assistant/DEVELOPER.md)**: the tree, each changed module's section, the commands, the test table, the recipes.
-- **Layer cards** (`src/istation/source/<layer>/CLAUDE.md`, `src/istation/tests/<layer>/CLAUDE.md`) and **ADR 0002's table** against the `modules` rows in `Package.swift`.
+- **Layer cards** (`src/istation/source/<layer>/CLAUDE.md`, `src/istation/tests/<layer>/CLAUDE.md`), **ADR 0002's table** and the Xcode scheme's test list (`iStation.xcodeproj/xcshareddata/xcschemes/iStation.xcscheme`) against the `modules` rows in `Package.swift`.
 - **[ADRs](../../../documentation/istation/adrs/README.md)**: a new standing rule gets a record; a changed one a superseding record (append-only — the old record's Status line is its only edit); each Enforcement section names the real check.
 - **[reference/](../../../documentation/istation/reference/README.md)** against the shipped contract: the emulators' flags (`LaunchContract.swift`), the library file (`LibraryStore.swift`).
 - **[SPEC.md](../../../documentation/istation/assistant/SPEC.md)** only if scope moved, with a dated note.

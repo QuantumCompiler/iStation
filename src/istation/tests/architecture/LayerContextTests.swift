@@ -96,6 +96,27 @@ import Testing
         #expect(violations.isEmpty, "\(violations.report)")
     }
 
+    @Test("The Xcode project's iStation scheme tests exactly every test target")
+    func theXcodeSchemeTestsEveryTarget() {
+        var violations = Violations()
+        let path = "iStation.xcodeproj/xcshareddata/xcschemes/iStation.xcscheme"
+        guard let scheme = Repository.text(Repository.root.appendingPathComponent(path)) else {
+            violations.add("scheme drift", path, "unreadable")
+            #expect(violations.isEmpty, "\(violations.report)")
+            return
+        }
+        let testables = Pattern.captures(#"<TestableReference[^<]*<BuildableReference[^>]*BlueprintIdentifier = "([A-Za-z0-9]+)""#, in: scheme)
+            .compactMap { $0.first ?? nil }
+        let expected = Set(map.modules.map { $0.target + "Tests" } + ["ArchitectureTests"])
+        for missing in expected.subtracting(testables).sorted() {
+            violations.add("scheme drift", path, "does not test \(missing)")
+        }
+        for extra in Set(testables).subtracting(expected).sorted() {
+            violations.add("scheme drift", path, "tests \(extra), which is not a test target")
+        }
+        #expect(violations.isEmpty, "\(violations.report)")
+    }
+
     @Test("ADR 0001 lists the layers in the map's order")
     func adr0001ListsTheLayersInOrder() {
         let path = "documentation/istation/adrs/layer-enforcement.md"

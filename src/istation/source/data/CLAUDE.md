@@ -9,7 +9,7 @@
 **Enforced by:** one SwiftPM target per module, generated from the module map in `src/istation/Package.swift`, and `ArchitectureTests` (`src/istation/tests/architecture/`), run by `swift test`.
 
 **Changing this layer:**
-- A new module: its directory `source/data/<module>/`, its `Module(.data, "<Name>", uses: […])` row in `Package.swift`, its tests in `tests/data/<module>/`, its name on this card and in [ADR 0002](../../../../documentation/istation/adrs/module-map.md)'s table — in the same change.
+- A new module: its directory `source/data/<module>/`, its `Module(.data, "<Name>", uses: […])` row in `Package.swift`, its tests in `tests/data/<module>/` (and in the `iStation` scheme of `iStation.xcodeproj`), its name on this card and in [ADR 0002](../../../../documentation/istation/adrs/module-map.md)'s table — in the same change.
 - Readers tolerate the unknown: a truncated or foreign file is `nil` or a thrown error, never a trap.
 - `library.json` is read compatibly ([ADR 0007](../../../../documentation/istation/adrs/backwards-compatibility.md)): a new persisted field decodes with `decodeIfPresent` and a default, and a changed shape adds a recorded fixture to `RecordedLibraryFileTests`.
 - The emulators' flags change only against their own sources ([reference/emulator-launch-contract.md](../../../../documentation/istation/reference/emulator-launch-contract.md)), pinned by `LaunchContractTests`.

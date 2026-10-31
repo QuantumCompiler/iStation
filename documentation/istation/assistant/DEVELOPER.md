@@ -7,6 +7,7 @@ The module-by-module reference: the tree, each module's files and interfaces, th
 ```
 CLAUDE.md                      root pointer → documentation/CLAUDE.md
 README.md                      public overview
+iStation.xcodeproj/            opens the package in Xcode: no targets of its own, one shared scheme `iStation`
 .github/workflows/ci.yml       strict build, swift test, docs validator
 scripts/validate_docs.py       the docs validator (backlog index ↔ documents, links)
 documentation/                 the router and this docs home
@@ -39,7 +40,8 @@ All from `src/istation/` unless noted.
 | Build one module alone | `swift build --target PresentationSettings` |
 | Run | `swift run iStation` |
 | App bundle | `./scripts/build-app.sh` → `build/iStation.app` |
-| Xcode | `open Package.swift`, scheme `iStation`, ⌘R |
+| Xcode (repo root) | `open iStation.xcodeproj`, scheme `iStation`: ⌘R runs, ⌘U runs every test |
+| All tests through Xcode (repo root) | `xcodebuild test -project iStation.xcodeproj -scheme iStation -destination 'platform=macOS'` |
 | Docs validator (repo root) | `python3 scripts/validate_docs.py documentation` |
 | Lint / format | _TODO:_ none chosen |
 
@@ -123,7 +125,7 @@ source/presentation/
 1. Decide its layer (the lowest one that can hold it) and its one-phrase concern.
 2. Create `src/istation/source/<layer>/<module>/` and `src/istation/tests/<layer>/<module>/`, each with at least one Swift file.
 3. Add its row to `modules` in `Package.swift`: `Module(.<layer>, "<Name>", uses: [<targets>], testSupport: [<support targets>]),` — on one line; its target is `<Layer><Name>`.
-4. Add its name to its layer card's **Modules** line and a row to [ADR 0002](../adrs/module-map.md)'s table (`| <layer> | \`<module>\` | <uses> |`).
+4. Add its name to its layer card's **Modules** line and a row to [ADR 0002](../adrs/module-map.md)'s table (`| <layer> | \`<module>\` | <uses> |`), and a `<TestableReference>` for its `<Layer><Name>Tests` target to `iStation.xcodeproj/xcshareddata/xcschemes/iStation.xcscheme` (copy a neighbour's block, change the three names).
 5. Add it to the Codebase Map in CLAUDE.md and a section above.
 6. Run `swift test` — the layering and layer-context checks must pass.
 
@@ -133,7 +135,7 @@ source/presentation/
 2. Write the view-model first: `@MainActor @Observable`, intents named for what the person does, reading `Library`; test it over `LibraryHarness`.
 3. Write the views bound to it, every visual from `styles`, each with a named `#Preview` per visible state inside `#if DEBUG`, over a copy of `Previews/PreviewLibrary.swift`.
 4. If the sidebar reaches it: a `SidebarItem` case and its row in `SidebarView`. Build its view-model in `AppViewModel` and mount its view in `MainWindow` or `AppScenes`.
-5. Add it to the Presentation card, ADR 0002's table and the Codebase Map. Run `swift test`.
+5. Add it to the Presentation card, ADR 0002's table, the Xcode scheme's tests and the Codebase Map. Run `swift test`.
 
 ### Adding a view
 

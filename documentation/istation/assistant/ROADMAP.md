@@ -81,7 +81,7 @@ Nothing queued.
 The user's open questions from the Build Roadmap (2026-10-26), each `[user]`:
 
 - **Which metadata source for covers and titles?** It must be keyed by serial and allow personal use. Blocks v0.1.0's first item.
-- **Stay a Swift package, or move to an Xcode project** once an app icon, signing and notarization are wanted? Blocks v1.0.0's first item. (The layered package survives either way: an Xcode app target can depend on it.)
+- **Stay a Swift package, or move to an Xcode project** once an app icon, signing and notarization are wanted? Blocks v1.0.0's first item. (The layered package survives either way: an Xcode app target can depend on it. Since 2026-10-31 a thin `iStation.xcodeproj` at the root opens the package in Xcode; it has no targets of its own, so this question stands.)
 - **Should iStation also read RPCS3's own `games.yml`** list of disc games, so those folders needn't be added twice? Unscheduled.
 - **How should a game's play history follow it when its file is moved or renamed?** Today a game's ID is its console plus its path, so a move starts its history over. Unscheduled; any answer changes the library file's format ([ADR 0007](../adrs/backwards-compatibility.md)).
 
