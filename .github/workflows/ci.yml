@@ -1,8 +1,11 @@
 name: CI
 
+# Only for an open pull request (opened, new commits, reopened) and for a merge into stable;
+# pushes to release branches run nothing (the user's call, 2026-10-31).
 on:
-  push:
   pull_request:
+  push:
+    branches: [stable]
 
 jobs:
   build-and-test:
