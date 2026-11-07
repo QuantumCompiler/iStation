@@ -15,7 +15,7 @@ How we work: features are discussed in chat, written up here (and in [SPEC.md](S
 The brief's first three tasks: prove JIT works under the App Store routine, lay down the packages and both apps with both build routines, then the PS1 milestone — the R3000A interpreter, the memory map and the BIOS boot, passing ps1-tests' CPU tests with a guest-state trace that matches SwanStation's.
 
 - [x] **The scaffold compiles** and **the tests are green** ([Milestone A](MILESTONES.md#milestone-a--the-construction))
-- [ ] **Provenance headers and notices** — SPDX headers, provenance lines, the acknowledgements list and the root licence, with a check ([A2](../backlog/architecture/provenance-headers-and-notices.md))
+- [x] **Provenance headers and notices** — SPDX headers, provenance lines, the acknowledgements list and the root licence, with a check ([Milestone H](MILESTONES.md#milestone-h--provenance-headers-and-notices))
 - [x] **JIT under the App Store routine** — a sandboxed `allow-jit` macOS app that maps one `MAP_JIT` region and runs code it wrote ([Milestone E](MILESTONES.md#milestone-e--jit-under-the-app-store-routine))
 - [x] **The skeleton and both build routines** — the packages, the macOS and iOS apps, App Store and personal routines; the library app removed ([Milestone F](MILESTONES.md#milestone-f--the-skeleton-and-both-build-routines))
 - [x] **TraceKit** — the trace format and the first divergence between two traces ([Milestone G](MILESTONES.md#milestone-g--tracekit))
@@ -56,7 +56,7 @@ The brief's first three tasks: prove JIT works under the App Store routine, lay 
 
 ### v1.0.0 — Release: PS1 on the App Stores
 
-- [ ] The acknowledgements screen in both apps, from A2's list
+- [ ] The acknowledgements screen in both apps, from the acknowledgements list (`src/istation/apps/Acknowledgements.json`, Milestone H)
 - [ ] Check App Review Guidelines section 4.7 for iOS and for the Mac App Store
 - [ ] Remove Sony logos and run a trademark check on "iStation"
 - [ ] App Store Connect, signing and submission (the user's)
@@ -71,7 +71,7 @@ The brief's first three tasks: prove JIT works under the App Store routine, lay 
 
 ## Architecture
 
-- [ ] **Provenance headers and notices** — gates the first ported module ([A2](../backlog/architecture/provenance-headers-and-notices.md))
+- [x] **Provenance headers and notices** — gates the first ported module ([Milestone H](MILESTONES.md#milestone-h--provenance-headers-and-notices))
 
 ## Maintenance
 

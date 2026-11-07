@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
 import Foundation
 
 // The repository on disk as the architecture checks see it: the module map parsed from
@@ -104,6 +107,8 @@ struct MapModule {
     let name: String
     let uses: [String]
     let testSupport: [String]
+    /// `none`, `projectPSX` or `play` (ADR 0014).
+    let derivedFrom: String
 
     var target: String { layer.prefix(1).uppercased() + layer.dropFirst() + name }
     var directory: String { name.lowercased() }
@@ -140,9 +145,9 @@ struct ModuleMap {
         var supports: [MapSupport] = []
         for line in manifest.components(separatedBy: .newlines) {
             if let row = Pattern.captures(
-                #"^\s*Module\(\.([a-z]+), "([A-Za-z0-9]+)"(?:, uses: \[([^\]]*)\])?(?:, testSupport: \[([^\]]*)\])?\),\s*$"#, in: line
+                #"^\s*Module\(\.([a-z]+), "([A-Za-z0-9]+)"(?:, uses: \[([^\]]*)\])?(?:, testSupport: \[([^\]]*)\])?(?:, derivedFrom: \.([A-Za-z]+))?\),\s*$"#, in: line
             ).first, let layer = row[0], let name = row[1] {
-                modules.append(MapModule(layer: layer, name: name, uses: Pattern.names(in: row[2]), testSupport: Pattern.names(in: row[3])))
+                modules.append(MapModule(layer: layer, name: name, uses: Pattern.names(in: row[2]), testSupport: Pattern.names(in: row[3]), derivedFrom: row[4] ?? "none"))
             } else if let row = Pattern.captures(
                 #"^\s*Support\(\.([a-z]+), "([A-Za-z0-9]+)"(?:, uses: \[([^\]]*)\])?\),\s*$"#, in: line
             ).first, let layer = row[0], let name = row[1] {

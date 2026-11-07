@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
 import Testing
 
 /// The layer law (ADR 0001) over the module map (ADR 0002), and the Presentation shape (ADRs 0005, 0006).
@@ -215,7 +218,7 @@ import Testing
                 if file.text.contains("#Preview") && !file.text.contains("#if DEBUG") {
                     violations.add("preview not debug-only", file.path, "has #Preview outside #if DEBUG")
                 }
-                if file.isInside("Previews") && file.lines.first(where: { !$0.isEmpty }) != "#if DEBUG" {
+                if file.isInside("Previews") && file.lines.first(where: { !$0.isEmpty && !$0.hasPrefix("//") }) != "#if DEBUG" {
                     violations.add("preview not debug-only", file.path, "does not open with #if DEBUG")
                 }
             }

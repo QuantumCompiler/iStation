@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
 import Foundation
 import Testing
 
@@ -135,4 +138,90 @@ import Testing
         }
         #expect(violations.isEmpty, "\(violations.report)")
     }
+
+    // MARK: - Provenance (ADR 0014)
+
+    /// Each reference a module may be ported from: its repository, its licence, its entry in the list.
+    static let references: [String: (repository: String, licence: String, acknowledgement: String)] = [
+        "projectPSX": ("BluestormDNA/ProjectPSX/", "MIT", "ProjectPSX"),
+        "play": ("jpd002/Play-/", "BSD-2-Clause", "Play!"),
+    ]
+
+    /// Every Swift file whose header these rules read: the package's and the apps'.
+    static var headedFiles: [SourceFile] {
+        Repository.swiftFiles(under: "source") + Repository.swiftFiles(under: "tests") + Repository.swiftFiles(under: "apps")
+    }
+
+    /// The licence a file's first line names, if it is an SPDX header.
+    static func licence(of file: SourceFile) -> String? {
+        Pattern.captures(#"^// SPDX-License-Identifier: (\S+)$"#, in: file.lines.first ?? "").first?.first ?? nil
+    }
+
+    @Test("Every Swift file opens with its SPDX header, and every licence it names has its text")
+    func everyFileHasItsHeader() {
+        var violations = Violations()
+        for file in Self.headedFiles {
+            guard let licence = Self.licence(of: file) else {
+                violations.add("missing SPDX header", file.path, "line 1 is not `// SPDX-License-Identifier: <id>`")
+                continue
+            }
+            if file.lines.count < 2 || !file.lines[1].hasPrefix("// SPDX-FileCopyrightText: ") {
+                violations.add("missing SPDX header", file.path, "line 2 is not `// SPDX-FileCopyrightText: <holders>`")
+            }
+            if !Repository.exists(Repository.root.appendingPathComponent("LICENSES/\(licence).txt")) {
+                violations.add("unknown licence", file.path, "names \(licence), which has no LICENSES/\(licence).txt")
+            }
+        }
+        #expect(violations.isEmpty, "\(violations.report)")
+    }
+
+    @Test("Every file in a ported module names its source file and carries its reference's licence")
+    func portedModulesNameTheirSources() throws {
+        var violations = Violations()
+        let map = try ModuleMap.load()
+        for module in map.modules where module.derivedFrom != "none" {
+            guard let reference = Self.references[module.derivedFrom] else {
+                violations.add("unknown reference", "Package.swift", "\(module.target) derives from \(module.derivedFrom)")
+                continue
+            }
+            for file in Repository.swiftFiles(under: module.sourcePath) {
+                let provenance = file.lines.first { $0.hasPrefix("// Ported from ") }
+                if provenance.map({ Pattern.matches(#"^// Ported from "# + NSRegularExpression.escapedPattern(for: reference.repository) + #"\S+ — .+$"#, in: $0) }) != true {
+                    violations.add("missing provenance", file.path, "has no `// Ported from \(reference.repository)<path> — <its copyright line>`")
+                }
+                if Self.licence(of: file) != reference.licence {
+                    violations.add("wrong licence", file.path, "a file ported from \(module.derivedFrom) is \(reference.licence)")
+                }
+            }
+        }
+        #expect(violations.isEmpty, "\(violations.report)")
+    }
+
+    @Test("Every licence a header names, and every reference the map names, is in the acknowledgements list")
+    func everyLicenceIsAcknowledged() throws {
+        var violations = Violations()
+        let path = "src/istation/apps/Acknowledgements.json"
+        struct Entry: Decodable { let name: String; let licence: String; let notice: String; let apps: [String] }
+        guard let data = try? Data(contentsOf: Repository.root.appendingPathComponent(path)),
+              let entries = try? JSONDecoder().decode([Entry].self, from: data)
+        else {
+            violations.add("acknowledgements", path, "missing or unreadable")
+            #expect(violations.isEmpty, "\(violations.report)")
+            return
+        }
+        let listed = Set(entries.map(\.licence))
+        for licence in Set(Self.headedFiles.compactMap(Self.licence)) where !listed.contains(licence) {
+            violations.add("unacknowledged licence", path, "no entry carries \(licence), which a header names")
+        }
+        for module in try ModuleMap.load().modules where module.derivedFrom != "none" {
+            if let reference = Self.references[module.derivedFrom], !entries.contains(where: { $0.name == reference.acknowledgement }) {
+                violations.add("unacknowledged reference", path, "no \(reference.acknowledgement) entry for \(module.target)")
+            }
+        }
+        for entry in entries where entry.notice.isEmpty || entry.apps.isEmpty {
+            violations.add("acknowledgements", path, "\(entry.name) has no notice or no app")
+        }
+        #expect(violations.isEmpty, "\(violations.report)")
+    }
 }
+

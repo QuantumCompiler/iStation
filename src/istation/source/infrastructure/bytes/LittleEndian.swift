@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
 /// Little-endian integer reads over a byte buffer.
 ///
 /// A read that runs past either end returns 0, so a truncated header decodes as "absent" instead of

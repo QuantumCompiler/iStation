@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
 import Foundation
 
 /// Builds a tiny single-directory ISO 9660 image, optionally as raw 2352-byte Mode 2 sectors.

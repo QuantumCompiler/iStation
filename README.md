@@ -23,7 +23,7 @@ swift test                              # every module's tests, plus the archite
 
 ## Licence
 
-iStation's own code is MIT. Code ported from ProjectPSX keeps its MIT notice, and code from Play! keeps its BSD notices; each app lists them in its acknowledgements. The licence files arrive with Architecture item A2.
+iStation's own code is MIT ([LICENSE](LICENSE)). Code ported from ProjectPSX keeps its MIT notice, and code from Play! keeps its BSD notices; every source file names its licence in an SPDX header, and each app lists the notices it carries in its acknowledgements ([src/istation/apps/Acknowledgements.json](src/istation/apps/Acknowledgements.json)).
 
 ## Contributing
 

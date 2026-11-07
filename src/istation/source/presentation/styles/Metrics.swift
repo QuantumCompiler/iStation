@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
 import CoreGraphics
 
 /// Every size and spacing the apps lay out with, named for its role.

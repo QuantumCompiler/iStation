@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
 import Foundation
 
 /// What a trace records: one record per instruction, or one per frame.

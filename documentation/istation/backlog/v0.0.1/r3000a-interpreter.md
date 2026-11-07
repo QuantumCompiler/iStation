@@ -7,7 +7,7 @@ Its hot path is shaped by measurement (2026-11-07, iStation's own toy MIPS loop,
 **Core constraint(s).** Shipped code only from permissive sources (⚠ in CLAUDE.md): ProjectPSX's `CPU.cs`, psx-spx and iStation's own code — never a GPL emulator's source; this item is built by a session that hasn't read one ([ADR 0013](../../adrs/shipped-code-derives-only-from-permissive-references.md) §3). Every file carries its SPDX header and provenance line ([ADR 0014](../../adrs/own-code-is-mit-and-derived-code-keeps-its-notice.md)). No UI or Apple framework; hot paths with concrete types — no `any`, no unspecialized generic, no allocation per instruction ([ADR 0015](../../adrs/a-core-is-a-cpu-module-and-a-console-module.md)). Release builds carry no tracing: the tracer is a generic parameter that release builds specialize to nothing. Tests hermetic, over an in-memory bus.
 
 **Seam + files.**
-- New module, Business layer: `Module(.business, "R3000A", derivedFrom: .projectPSX),` — target `BusinessR3000A`, in the `PS1Core` product (A2's field).
+- New module, Business layer: `Module(.business, "R3000A", derivedFrom: .projectPSX),` — target `BusinessR3000A`, in the `PS1Core` product (the `derivedFrom:` field, Milestone H).
 - `src/istation/source/business/r3000a/`: the bus protocol a console conforms to (used only as a generic constraint: fetch, byte/half/word access that can raise a bus error, ticks), the coprocessor-2 hook ("none" raises Coprocessor Unusable, as on the IOP), the state (registers, HI/LO, PC and next PC, the load-delay slot, COP0), decode and execute (`@inlinable`), exceptions and RFE, and the generic tracer hook.
 - `src/istation/tests/business/r3000a/`: per instruction family — ALU and overflow traps, shifts, MULT/DIV with HI/LO, loads with the load-delay slot, LWL/LWR/SWL/SWR, branches and jumps with the delay slot, SYSCALL, BREAK, reserved instructions, address errors, interrupts, RFE, COP0 moves, the cache-isolation bit — with expected results from psx-spx.
 
@@ -26,7 +26,7 @@ Its hot path is shaped by measurement (2026-11-07, iStation's own toy MIPS loop,
 **Acceptance criteria:**
 - [ ] `BusinessR3000A` executes every R3000A instruction with psx-spx's semantics, including both delay slots and every exception the tests name.
 - [ ] It runs over any concrete bus, its hot path `@inlinable` with no `any` in it; tracing off costs nothing measurable.
-- [ ] Every file carries its header and provenance line; A2's check passes.
+- [ ] Every file carries its header and provenance line; the provenance checks pass ([Milestone H](../../assistant/MILESTONES.md#milestone-h--provenance-headers-and-notices)).
 - [ ] Instructions per second on the spike's loop are recorded in MILESTONES.
 
 **Scope note.** v0.0.1, track 3; gated on A2 (headers before the first ported module) and 3c (the tracer's records). 3f gives it the PS1's bus. Out of scope: the GTE (v0.2.0), any code generator, the IOP's differences (v2.x).

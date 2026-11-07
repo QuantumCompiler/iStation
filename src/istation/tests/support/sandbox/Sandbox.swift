@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
 import Foundation
 
 /// A fresh, uniquely named temporary folder, removed when the value is released. Tests write only here.

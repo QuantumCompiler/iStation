@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
 /// One video frame's guest-visible state: what every source — the Swift port, ProjectPSX and
 /// SwanStation recorded from outside — can write (reference/trace-formats.md). 32 bytes after its tag.
 public struct FrameRecord: Equatable, Sendable {

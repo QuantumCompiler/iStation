@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
 import BusinessPS1
 import PresentationAcknowledgements
 import PresentationPlayer
@@ -9,7 +12,7 @@ import SwiftUI
 @main
 struct iStationApp: App {
     @State private var player = PlayerViewModel(console: PS1Console())
-    @State private var acknowledgements = AcknowledgementsViewModel()
+    @State private var acknowledgements = AcknowledgementsViewModel(entries: Acknowledgement.bundled(for: "iOS"))
 
     var body: some Scene {
         WindowGroup {

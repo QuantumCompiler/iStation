@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
 /// The PS1 console the apps play.
 ///
 /// Today a powered-off placeholder: the R3000A (v0.0.1 item 3e) and the memory map and devices

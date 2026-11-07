@@ -25,6 +25,6 @@
 - [ ] `BusinessPS1` wires `BusinessR3000A` to a concrete PS1 bus and runs it.
 - [ ] The memory map, interrupt controller, timers and DMA behave as psx-spx documents, by the tests above.
 - [ ] A PS-EXE built in a test loads and runs, and its TTY output is captured.
-- [ ] Every file carries its header and provenance line; A2's and the layer checks pass.
+- [ ] Every file carries its header and provenance line; the provenance and layer checks pass.
 
 **Scope note.** v0.0.1, track 3; gated on 3e. 3g boots the user's BIOS on it. Out of scope: the GPU's drawing (v0.1.0), the CD-ROM's commands, SPU sound, MDEC and pads (v0.2.0).

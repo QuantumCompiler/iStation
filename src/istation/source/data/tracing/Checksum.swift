@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
 /// FNV-1a, 64-bit: the checksum every trace source computes the same way, over little-endian
 /// bytes (reference/trace-formats.md). Chosen for being trivial to write identically in Swift, C#
 /// and C, not for strength.

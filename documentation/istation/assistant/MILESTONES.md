@@ -235,3 +235,25 @@ The detailed record of finished work: what shipped, how it was built, the trade-
 **Decisions consumed.**
 
 - 2026-11-07: TraceKit is the trace format, recorder and diff, personal builds only (the user's brief); the records and the diff's fields as specified (the defaults, confirmed by the user).
+
+
+## Milestone H — Provenance headers and notices
+
+**Goal.** [ADR 0014](../adrs/own-code-is-mit-and-derived-code-keeps-its-notice.md): iStation's own code is MIT; code ported from ProjectPSX keeps its MIT notice and code from Play! its BSD notices; every app shows every notice it carries — with a check, before the first ported module (Architecture item A2, which gated 3e).
+
+**Built** (A2, 2026-11-07):
+
+- **Licence texts**: the root `LICENSE` (MIT, © 2026 iStation contributors); `LICENSES/MIT.txt` and `LICENSES/BSD-2-Clause.txt` (the REUSE layout).
+- **Headers**: every Swift file under `src/istation/source/`, `tests/` and `apps/` — 41 files when it landed — opens with `// SPDX-License-Identifier: MIT` and `// SPDX-FileCopyrightText: 2026 iStation contributors`.
+- **The module map**: `Module` rows take `derivedFrom:` (`.none` by default, `.projectPSX`, `.play`) on their one line; `Repository.swift`'s parser reads it.
+- **The acknowledgements list**: `src/istation/apps/Acknowledgements.json` — iStation, ProjectPSX (MIT, © 2019 Pedro Cortés, both apps), Play!, Play! Framework, Play! CodeGen and Nuanceur (BSD-2-Clause, © Jean-Philip Desjardins, macOS only), each with its notice as its repository holds it (read through GitHub's API, 2026-11-07: ProjectPSX at `f4dc13aea42d`, Play! at `1f27232772e4`, Play--Framework `3368a5a7d9cb`, Play--CodeGen `a5009f7dca06`, Nuanceur `d96578b5a18e`), its source URL and the apps that carry it. Both app targets bundle it; `Acknowledgement.list(from:for:)` and `bundled(for:)` read it; each app's acknowledgements screen lists its own entries.
+- **The checks** (`ArchitectureTests/ProjectRulesTests.swift`): `everyFileHasItsHeader` (both header lines; the licence has its text in `LICENSES/`), `portedModulesNameTheirSources` (every file in a ported module carries `// Ported from <repository>/<path> — <its copyright line>` and its reference's licence), `everyLicenceIsAcknowledged` (every licence a header names, and every reference the map names, is in the list; no entry without a notice or an app). The `Previews/` rule now skips comment lines before `#if DEBUG`.
+
+**Trade-offs.** The list is one JSON file the apps bundle as a resource, rather than a Swift constant, so a notice is its licence text verbatim and both apps and the checks read the same bytes. It names the Play! libraries now, before any of their code ships, so the PS2 work can't forget them; until then the macOS screen over-acknowledges, which no licence forbids. iStation is its own first entry, so its MIT notice travels in the apps too.
+
+**Verified** (2026-11-07): `swift test` — 72 tests in 10 test runs, green; both apps build with `Acknowledgements.json` in their bundles. **The new rules were seen to fail on planted violations, then restored: 6 plants, 6 caught** — a file without its header; a header naming `Apache-2.0` (no text, no entry); a `.projectPSX` module whose file names no source; a `.play` module whose file is MIT; a ProjectPSX module with ProjectPSX missing from the list; an entry with no notice.
+
+**Decisions consumed.**
+
+- 2026-11-07: iStation's own code is MIT (the user's call); derived code keeps its reference's notice; nothing GPL ships (the user's brief).
+- 2026-11-07: the three-line header, "iStation contributors" as the holder, the list as one JSON file, mixed files MIT with both copyright lines and Play!-derived files BSD-2-Clause (the defaults, confirmed by the user).

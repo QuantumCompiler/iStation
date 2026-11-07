@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
 /// One executed instruction, written after it completes — including any exception it raised
 /// (reference/trace-formats.md). 24 bytes after its tag.
 public struct InstructionRecord: Equatable, Sendable {

@@ -7,12 +7,17 @@ import PackageDescription
 // modules it may import, by target name. A row becomes a library target `<Layer><Name>` built from
 // source/<layer>/<name in lowercase>/, and a test target `<Layer><Name>Tests` built from
 // tests/<layer>/<name in lowercase>/ that may also use the shared fixtures listed in `testSupport:`.
+// `derivedFrom:` names the permissive reference a module is ported from (ADRs 0013, 0014): every file in
+// it then carries that reference's notice and a provenance line; omitted, the module is iStation's own.
 //
 // ArchitectureTests (tests/architecture/) parses these rows: keep each row on one line, in this form.
 // A new module is a new row here, its two directories, its name on its layer's CLAUDE.md card and a
 // row in documentation/istation/adrs/module-map.md, all in the same change.
 
 enum Layer: String, CaseIterable { case infrastructure, data, business, presentation }
+
+/// Where a module's code comes from: iStation's own, ProjectPSX (MIT, PS1) or Play! (BSD-2-Clause, PS2).
+enum Derivation: String { case none, projectPSX, play }
 
 let modules: [Module] = [
     Module(.infrastructure, "Bytes"),
@@ -56,12 +61,14 @@ struct Module {
     let name: String
     let uses: [String]
     let testSupport: [String]
+    let derivedFrom: Derivation
 
-    init(_ layer: Layer, _ name: String, uses: [String] = [], testSupport: [String] = []) {
+    init(_ layer: Layer, _ name: String, uses: [String] = [], testSupport: [String] = [], derivedFrom: Derivation = .none) {
         self.layer = layer
         self.name = name
         self.uses = uses
         self.testSupport = testSupport
+        self.derivedFrom = derivedFrom
     }
 
     var target: String { layer.rawValue.prefix(1).uppercased() + layer.rawValue.dropFirst() + name }

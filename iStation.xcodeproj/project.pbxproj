@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C3B2D6C5CE53145EE65CCF9 /* Acknowledgements.json in Resources */ = {isa = PBXBuildFile; fileRef = 93C35005D98FB9608FCA73A8 /* Acknowledgements.json */; };
 		8853BCB763157DD495AEF6C6 /* EmuKit in Frameworks */ = {isa = PBXBuildFile; productRef = F180DB32BBD1E476C7EB86A7 /* EmuKit */; };
 		9D361C1375329E19DFC9B0DD /* PS1Core in Frameworks */ = {isa = PBXBuildFile; productRef = 464A53AEC5387DAD37DEA6CC /* PS1Core */; };
 		A8A47D305F124FC2CDFA7AB1 /* PS1Core in Frameworks */ = {isa = PBXBuildFile; productRef = 3A343AD98AD8A52E703C834E /* PS1Core */; };
 		B12406A8A0305E1A34B62499 /* EmuKit in Frameworks */ = {isa = PBXBuildFile; productRef = 937A56F8C555619C691D8B69 /* EmuKit */; };
+		F12A7F273B502526FCF8F9A2 /* Acknowledgements.json in Resources */ = {isa = PBXBuildFile; fileRef = 93C35005D98FB9608FCA73A8 /* Acknowledgements.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +22,7 @@
 		810518D886B08192A47FF3ED /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>";};
 		88BD3A181616833AB9BEF9E5 /* Personal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Personal.entitlements; sourceTree = "<group>";};
 		8FD962B3E5E8ADFA2AAFA4B2 /* Personal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Personal.entitlements; sourceTree = "<group>";};
+		93C35005D98FB9608FCA73A8 /* Acknowledgements.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Acknowledgements.json; sourceTree = "<group>";};
 		C93B50687CCA325E43FBE332 /* istation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = istation; path = src/istation; sourceTree = "<group>";};
 		CA40BD3FDD20857ACBA75FC5 /* iStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iStation.app; sourceTree = BUILT_PRODUCTS_DIR;};
 		D1BF349F3CDBE7800DB129C8 /* iStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iStation.app; sourceTree = BUILT_PRODUCTS_DIR;};
@@ -61,6 +64,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		139363E72819083888FDEAE9 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				93C35005D98FB9608FCA73A8 /* Acknowledgements.json */,
+			);
+			name = Shared;
+			path = src/istation/apps;
+			sourceTree = "<group>";
+		};
 		47C9A9AB5FE8344A3E6B47AE /* iOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -88,6 +100,7 @@
 				C93B50687CCA325E43FBE332 /* istation */,
 				AE03C15C0D73E24C7B08CCB2 /* macOS */,
 				47C9A9AB5FE8344A3E6B47AE /* iOS */,
+				139363E72819083888FDEAE9 /* Shared */,
 				6EDE00FA7A261151470098F6 /* Config */,
 				CC0F68FE2D81F9614883F277 /* Products */,
 			);
@@ -199,6 +212,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F12A7F273B502526FCF8F9A2 /* Acknowledgements.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,6 +220,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C3B2D6C5CE53145EE65CCF9 /* Acknowledgements.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

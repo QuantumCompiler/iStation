@@ -7,6 +7,7 @@ The module-by-module reference: the tree, each module's files and interfaces, th
 ```
 CLAUDE.md                      root pointer → documentation/CLAUDE.md
 README.md                      public overview
+LICENSE · LICENSES/            iStation's MIT licence; MIT.txt and BSD-2-Clause.txt for the SPDX headers
 iStation.xcodeproj/            the two apps over the package; four shared schemes (macOS/iOS × Personal/App Store)
 .github/workflows/ci.yml       strict build, swift test, both apps' personal builds, docs validator
 scripts/validate_docs.py       the docs validator (backlog index ↔ documents, links)
@@ -16,6 +17,7 @@ tools/
 src/istation/
   Package.swift                the module map (ADR 0002), the products PS1Core, EmuKit and TraceKit, PERSONAL_BUILD in debug
   apps/
+    Acknowledgements.json      every notice the apps carry, bundled into both
     Config/                    Version.xcconfig · AppStore.xcconfig (Release) · Personal.xcconfig (Debug)
     macos/                     Sources/iStationApp.swift · AppStore.entitlements · Personal.entitlements
     ios/                       Sources/iStationApp.swift · AppStore.entitlements · Personal.entitlements
@@ -115,7 +117,7 @@ source/presentation/
 
 - **`styles`** (`PresentationStyles`) — `Palette` (screen, on-screen text, secondary text), `Symbols`, `Metrics` (the 4:3 screen, the player's minimum size, padding, spacing), `Typography`.
 - **`player`** (`PresentationPlayer`) — `PlayerViewModel(console:)` (`state: .nothingLoaded`, `consoleName`, `message`); `PlayerView` (the screen, preview "Nothing loaded").
-- **`acknowledgements`** (`PresentationAcknowledgements`) — `Acknowledgement` (name, SPDX licence, notice, source URL); `AcknowledgementsViewModel(entries:)` (`state: .empty | .listed`); `AcknowledgementsView` (preview "Empty"). Its entries come from A2's acknowledgements list.
+- **`acknowledgements`** (`PresentationAcknowledgements`) — `Acknowledgement` (name, SPDX licence, notice, source URL); `AcknowledgementsViewModel(entries:)` (`state: .empty | .listed`); `AcknowledgementsView` (preview "Empty"). Its entries come from `apps/Acknowledgements.json` through `Acknowledgement.bundled(for:)`.
 
 ### The apps
 
@@ -128,7 +130,7 @@ source/presentation/
 
 1. Decide its layer (the lowest one that can hold it) and its one-phrase concern.
 2. Create `src/istation/source/<layer>/<module>/` and `src/istation/tests/<layer>/<module>/`, each with at least one Swift file.
-3. Add its row to `modules` in `Package.swift`: `Module(.<layer>, "<Name>", uses: [<targets>], testSupport: [<support targets>]),` — on one line; its target is `<Layer><Name>`. If the apps use it, add the target to a product.
+3. Add its row to `modules` in `Package.swift`: `Module(.<layer>, "<Name>", uses: [<targets>], testSupport: [<support targets>], derivedFrom: .projectPSX),` — on one line, `derivedFrom:` only for a ported module; its target is `<Layer><Name>`. If the apps use it, add the target to a product. Every file opens with its SPDX header (below).
 4. Add its name to its layer card's **Modules** line and a row to [ADR 0002](../adrs/module-map.md)'s table (`| <layer> | \`<module>\` | <uses> |`), and a `<TestableReference>` for its `<Layer><Name>Tests` target to `iStation.xcodeproj/xcshareddata/xcschemes/macOS Personal.xcscheme` (copy a neighbour's block, change the three names).
 5. Add it to the Codebase Map in CLAUDE.md and a section above.
 6. Run `swift test` — the layering and layer-context checks must pass.
@@ -140,6 +142,17 @@ source/presentation/
 3. Write the views bound to it, every visual from `styles`, each with a named `#Preview` per visible state inside `#if DEBUG`, over fakes in `Previews/`.
 4. Build its view-model in each app's `iStationApp.swift` and mount its view.
 5. Add it to the Presentation card, ADR 0002's table, the `macOS Personal` scheme's tests and the Codebase Map. Run `swift test`.
+
+### Headers, provenance and the acknowledgements list
+
+Every Swift file in the package and the apps opens with
+
+```swift
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+```
+
+A file ported from a reference sits in a module whose row says `derivedFrom: .projectPSX` (or `.play`), carries that reference's licence (`MIT` or `BSD-2-Clause`), keeps the reference's copyright line as a `SPDX-FileCopyrightText` line beside iStation's, and names its source: `// Ported from BluestormDNA/ProjectPSX/ProjectPSX/Core/CPU.cs — Copyright (c) 2019 Pedro Cortés`. A component whose notice an app carries gets an entry in `src/istation/apps/Acknowledgements.json` (its name, SPDX licence, source URL, the apps that carry it, its notice verbatim); a new licence also gets its text in `LICENSES/<id>.txt`. `ArchitectureTests` fails on any one missing.
 
 ### Adding a view
 

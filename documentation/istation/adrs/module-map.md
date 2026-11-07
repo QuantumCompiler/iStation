@@ -8,7 +8,7 @@
 
 ## Decision
 
-**The `modules` table at the top of `src/istation/Package.swift` is the one declaration of which module sits in which layer and which modules it may depend on, and this table restates it.** Each `Module(.<layer>, "<Name>", uses: […], testSupport: […])` row generates the library target `<Layer><Name>` from `source/<layer>/<name>/` and the test target `<Layer><Name>Tests` from `tests/<layer>/<name>/`. Within the layer bound, a module may depend on exactly the targets its row lists. Shared test fixtures are `Support(.<layer>, "<Name>")` rows (target `Support<Name>`, `tests/support/<name>/`), placed at the lowest layer whose tests use them. The apps in `iStation.xcodeproj` are the entry points; nothing in the package imports them.
+**The `modules` table at the top of `src/istation/Package.swift` is the one declaration of which module sits in which layer and which modules it may depend on, and this table restates it.** Each `Module(.<layer>, "<Name>", uses: […], testSupport: […], derivedFrom: …)` row (`derivedFrom:` since A2, for a ported module) generates the library target `<Layer><Name>` from `source/<layer>/<name>/` and the test target `<Layer><Name>Tests` from `tests/<layer>/<name>/`. Within the layer bound, a module may depend on exactly the targets its row lists. Shared test fixtures are `Support(.<layer>, "<Name>")` rows (target `Support<Name>`, `tests/support/<name>/`), placed at the lowest layer whose tests use them. The apps in `iStation.xcodeproj` are the entry points; nothing in the package imports them.
 
 The directory naming follows SwiftPM's freedom of `path:`: lowercase module directories, `<Layer><Name>` target names (the default, taken 2026-10-31).
 

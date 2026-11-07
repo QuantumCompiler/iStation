@@ -1,9 +1,12 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
 import Observation
 
 /// The acknowledgements screen: every notice the app carries (ADR 0014).
 ///
-/// A placeholder until the acknowledgements list exists (Architecture item A2); the screen's full
-/// content is v1.0.0's.
+/// Its entries come from the acknowledgements list, `src/istation/apps/Acknowledgements.json`; the
+/// screen's full design is v1.0.0's.
 @MainActor
 @Observable
 public final class AcknowledgementsViewModel {
