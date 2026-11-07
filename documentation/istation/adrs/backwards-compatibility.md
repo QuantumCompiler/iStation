@@ -1,6 +1,6 @@
 # ADR 0007 — A library file written by an older iStation keeps loading
 
-**Status:** Accepted · **Date:** 2026-10-31
+**Status:** Superseded by [ADR 0016](two-build-routines-and-a-fresh-start.md) (2026-11-07): the library file retires with the library app; the rule carries to the new apps' settings and memory cards · **Date:** 2026-10-31
 
 ## Context
 

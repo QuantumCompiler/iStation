@@ -121,7 +121,7 @@ let package = Package(
         .target(name: support.target, dependencies: dependencies(support.uses), path: support.path)
     } + [
         .executableTarget(name: entryPoint.name, dependencies: dependencies(entryPoint.uses), path: "source/main"),
-        // The layering and layer-context checks (ADRs 0001, 0002, 0004, 0005, 0010). Reads files only.
+        // The layering and layer-context checks (ADRs 0001, 0002, 0004, 0005, 0013). Reads files only.
         .testTarget(name: "ArchitectureTests", path: "tests/architecture"),
     ]
 )

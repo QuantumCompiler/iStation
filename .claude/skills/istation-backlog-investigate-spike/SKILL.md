@@ -14,8 +14,8 @@ The docs home is [`documentation/istation/`](../../../documentation/istation/REA
 Read, before probing anything:
 
 1. [The backlog index](../../../documentation/istation/backlog/README.md) — what is queued, and where a split would land (Architecture `A<n>`, Maintenance `M<n>`, or a version table; the ids spent so far are listed there).
-2. [CLAUDE.md](../../../documentation/istation/assistant/CLAUDE.md) — the six `⚠` invariants, the codebase map, the layer law. A design that needs an upward edge, ported code from outside its reference (the current DuckStation above all) or across the licence boundary, an installed emulator linked or loaded, a Sony file in the repository, a UI import in a view-model, an incompatible library-file change, or a test touching the real home folder is colliding with an invariant: that collision is a finding.
-3. [SPEC.md](../../../documentation/istation/assistant/SPEC.md) — scope and **non-goals** (never read the current DuckStation, no GPLv2-only code linked, no PS3 core yet, no Sony files, Apple platforms only, no App Store, no PS2 on iOS, never bundle DuckStation). A collision with a non-goal is itself a finding; changing SPEC is the user's call.
+2. [CLAUDE.md](../../../documentation/istation/assistant/CLAUDE.md) — the six `⚠` invariants, the codebase map, the layer law. A design that needs an upward edge, shipped code from a non-permissive source, any reading of a GPL emulator's source or disassembly, a debug tool reaching an App Store build, a Sony file in the repository, a UI import in a view-model, an incompatible library-file change, or a test touching the real home folder is colliding with an invariant: that collision is a finding.
+3. [SPEC.md](../../../documentation/istation/assistant/SPEC.md) — scope and **non-goals** (no GPL emulator's source read or copied, no Sony files, no PS3 core yet, no PS2 on iOS, no Intel Macs, no launching other emulators, Apple platforms only). A collision with a non-goal is itself a finding; changing SPEC is the user's call.
 4. [ROADMAP.md](../../../documentation/istation/assistant/ROADMAP.md) — the phase the question belongs to and its "Decisions needed".
 5. Precedents: [MILESTONES.md](../../../documentation/istation/assistant/MILESTONES.md), the [ADRs](../../../documentation/istation/adrs/README.md), the [reference contracts](../../../documentation/istation/reference/README.md), and external prior art (the emulators' own sources for any flag or config file).
 
@@ -24,7 +24,7 @@ Read, before probing anything:
 - **Run the actual code**: build it (`cd src/istation && swift build`), drive the module the question touches from a scratch test or script, parse the actual sources (`Package.swift`'s module rows, the import lines), and **measure**.
 - **Sandbox everything.** Probe scripts and files stay in the session's scratchpad. Never read or write the user's real `~/Library/Application Support/iStation/library.json`: build `Locations.sandbox(root:)` over a scratch folder, and to run the app itself, give it a scratch home (`CFFIXED_USER_HOME=<scratch>/home swift run iStation`).
 - **Play the naive outsider** when the question is "can X be driven by Y" (an emulator flag, a metadata service, a controller config file): try it the way a newcomer would and record every wall exactly as it is hit.
-- **Real runs are the user's.** Launching a real emulator, booting a real game, using BIOS files, calling a paid or rate-limited metadata API, or anything with the user's signing identity happens only with the user's say. Read sources instead, or ask.
+- **Real runs are the user's.**\1 A GPL oracle (SwanStation, PCSX2) is only built unmodified and run: never open, read or disassemble its source, and a session that has read one writes no core code (ADR 0013).
 
 ## 3. Frame the findings as walls
 

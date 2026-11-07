@@ -32,7 +32,7 @@ A command not run is listed as not run.
 - **Decisions made on this branch** — dated, attributed.
 - **Documentation updated** — per document.
 - **Verification** — each command and its result; any manual run the user did (an emulator, a game) as they reported it.
-- **Review notes** — where to look first; the riskiest change; anything touching the invariants (the layer law, ported-code provenance and the licence boundary, installed-emulator separation, hot-path types, the library file's compatibility).
+- **Review notes** — where to look first; the riskiest change; anything touching the invariants (the layer law, shipped-code provenance and GPL emulators as black boxes, tools only in personal builds, hot-path types, the user's data staying readable).
 - **Before merging** — required manual steps (a release tag, a version bump via `/istation-maintenance-update-release`).
 - **Open questions** — any `[user]` call still open.
 

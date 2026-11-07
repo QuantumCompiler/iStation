@@ -29,7 +29,7 @@ public enum LaunchError: LocalizedError, Equatable {
     }
 }
 
-/// Starts a game in its emulator, as a separate process driven only by its command line (ADR 0010),
+/// Starts a game in its emulator, as a separate process driven only by its command line (ADR 0013),
 /// and reports how long the session lasted.
 public struct GameLauncher: Sendable {
     private let runner: any ProcessRunning

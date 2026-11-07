@@ -1,5 +1,7 @@
 # The library file
 
+> **Retiring.** The library app is retired (the user's call, 2026-11-07, [ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md)); this file and the code that writes it are removed by v0.0.1's item 3b. No released version ever wrote it.
+
 Everything iStation remembers lives in one JSON file, `~/Library/Application Support/iStation/library.json`, written by `LibraryStore` (`src/istation/source/data/store/LibraryStore.swift`) whenever the folders, the settings or a game's play history change. The file is read compatibly by every later version ([ADR 0007](../adrs/backwards-compatibility.md)).
 
 ## Encoding
@@ -62,4 +64,4 @@ A rescan rebuilds `games` from the folders and copies `lastPlayed` and `playTime
 
 ## Known gap
 
-A file that exists but fails to decode is loaded as an empty library and replaced by the next save (Maintenance item M1).
+A file that exists but fails to decode is loaded as an empty library and replaced by the next save (was Maintenance item M1, cancelled with the library app).

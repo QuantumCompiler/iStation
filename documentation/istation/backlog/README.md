@@ -57,35 +57,35 @@ Every item follows this shape (sections in order; omit one only when it is genui
 
 Rows are in suggested build order. **Gates** name only pending items; an item builds on everything shipped plus its gate chain; no cycles. **Split first** items are groomed into their sub-documents before anyone builds. Moving an item between tables is a `git mv`, its row, its Version cell and its links. Same-table links are bare filenames; cross-table links `../<table-dir>/<file>`; links out of the backlog `../../assistant/…`.
 
-**Ids spent so far:** track 1 (`1a`), track 2 (`2a`–`2e`); `M1`, `M2`; `A1`.
+**Ids spent so far:** track 1 (`1a`), track 2 (`2a`–`2e`, cancelled), track 3 (`3a`–`3g`); `M1`, `M2` (cancelled); `A1` (cancelled), `A2`.
 
 ### Architecture
 
-The structural reshaping queue, claimable by name at any time. The project was constructed in the layered shape (2026-10-31), so there was no carve to queue. A1 came from the re-vision (2026-11-07): [ADR 0011](../adrs/each-module-carries-its-licence.md) puts a licence on every module and forbids an edge to a stricter one, and A1 gives that rule its check before the first GPL-3.0 module (2c) — which it gates.
+The structural reshaping queue, claimable by name at any time. A1 (licence tags for GPL modules) was cancelled the day it was written, 2026-11-07, when the App Store brief made all shipped code permissive. A2 comes from that brief: [ADR 0014](../adrs/own-code-is-mit-and-derived-code-keeps-its-notice.md) makes iStation's own code MIT and requires every ported file to keep its reference's notice; A2 gives that its check before the first ported module (3e), which it gates.
 
 | # | Item | Version | File | Status |
 |---|---|---|---|---|
-| A1 | Each module carries its licence — licence tags on every row, the boundary check, SPDX headers, licence files | arch. | [`architecture/each-module-carries-its-licence.md`](architecture/each-module-carries-its-licence.md) | 🟢 |
+| A2 | Provenance headers and notices — SPDX headers, provenance lines, the acknowledgements list, the root licence, with a check | arch. | [`architecture/provenance-headers-and-notices.md`](architecture/provenance-headers-and-notices.md) | 🟢 |
 
 ### Maintenance
 
-The release-agnostic upkeep queue — bugs, polish, performance, developer ergonomics — claimable by name at any time. M1 and M2 were found while porting the user's Code Scaffold into the layers at construction, 2026-10-31: M1 is inherited from the scaffold, M2 is a behavior the port itself changed.
+The release-agnostic upkeep queue — bugs, polish, performance, developer ergonomics — claimable by name at any time. Empty: M1 (an unreadable library file) and M2 (the emulator chooser's start folder) belonged to the library app and were cancelled with it, 2026-11-07.
 
 | # | Item | Version | File | Status |
 |---|---|---|---|---|
-| M1 | An unreadable library file is silently replaced — keep it aside and tell the user | maint. | [`maintenance/unreadable-library-file.md`](maintenance/unreadable-library-file.md) | 🟢 |
-| M2 | The emulator chooser opens in /Applications again — lost in the move to `.fileImporter` | maint. | [`maintenance/app-chooser-start-folder.md`](maintenance/app-chooser-start-folder.md) | 🟢 |
 
 ### v0.0.1
 
-**The R3000A boots OpenBIOS** — re-scoped 2026-11-07, when the user re-envisioned iStation as native Swift emulators ported from SwanStation (PS1) and PCSX2 (PS2) ([SPEC.md](../assistant/SPEC.md), [ADR 0010](../adrs/cores-are-ports-of-open-references.md)). Construction's first two lines (compile, tests green) shipped with Milestone A. The old gate, 1a — one game per console booting through the installed emulators — was retired the same day (the user's call); its first run is recorded in [Milestone C](../assistant/MILESTONES.md#milestone-c--the-re-vision).
+**JIT verified, both build routines, the R3000A boots the BIOS** — re-scoped 2026-11-07 by the user's brief "PS1 and PS2 emulators in Swift (App Store-eligible)" ([SPEC.md](../assistant/SPEC.md), [ADR 0013](../adrs/shipped-code-derives-only-from-permissive-references.md)). Construction's first two lines shipped with Milestone A. Two earlier plans for this table were retired the same day: 1a (one game per console through the installed emulators; its first run is in [Milestone C](../assistant/MILESTONES.md#milestone-c--the-re-vision)) and track 2 (GPL ports of SwanStation; cancelled when the brief made GPL emulators' source off limits).
 
-Track 2 is the re-vision spike's split (2026-11-07, recorded in Milestone C). It measured, over a scratch clone and build of SwanStation commit `631f0fb3`: a clean provenance (DuckStation's history to 2022-01-11, then libretro's own) and GPLv3-compatible dependencies; a clean arm64 build; OpenBIOS embedded and booted when no BIOS is found; no trace logging in its interpreter; its 13 subsystems in one include cycle; ~6,600 lines of C++ in this milestone's slice; and the Swift hot-path costs behind [ADR 0012](../adrs/cores-shape-and-hot-paths.md). It split into a shared trace format (2a), the reference's trace (2b), the CPU (2c, gated by A1's licence check), the console around it (2d) and the gate (2e). The user's calls of 2026-11-07 — shared infrastructure GPL-2.0-or-later, the gate's bar, `access-time` and `io-access-bitwidth` moved to v0.1.0 — are recorded as decisions in each document; the rest are `[default: …]`. When 2e ships, this table is empty and v0.0.1 is released.
+Track 3 follows the brief's first tasks, in order: the JIT spike (3a), the package skeleton with both build routines and the library app's retirement (3b), then the PS1 milestone — TraceKit (3c), the reference's and the oracle's traces (3d), the R3000A (3e, gated by A2's provenance check), the console (3f) and the gate (3g). The evidence behind it — ProjectPSX's and Play!'s licences and layout, the missing .NET SDK, ps1-tests' four CPU programs and their real-hardware logs, iStation's own Swift hot-path benchmark — is in [Milestone D](../assistant/MILESTONES.md#milestone-d--the-app-store-re-vision). The user's calls of 2026-11-07 (MIT, a fresh start, the brief's milestone) are dated decisions in each document; the rest are `[default: …]`; one `[user]` call remains (3d: the .NET SDK). **Every core item is built by a session that has never read a GPL emulator's source** ([ADR 0013](../adrs/shipped-code-derives-only-from-permissive-references.md) §3). When 3g ships, this table is empty and v0.0.1 is released.
 
 | # | Item | Version | File | Status |
 |---|---|---|---|---|
-| 2a | The trace format — one record per guest instruction, and the first divergence between two traces | v0.0.1 | [`v0.0.1/trace-format.md`](v0.0.1/trace-format.md) | 🟢 |
-| 2b | The reference trace — SwanStation from a pinned commit, tracing every instruction of an OpenBIOS boot | v0.0.1 | [`v0.0.1/reference-trace.md`](v0.0.1/reference-trace.md) | 🔒 2a |
-| 2c | The R3000A interpreter — ported from SwanStation, generic over its bus | v0.0.1 | [`v0.0.1/r3000a-interpreter.md`](v0.0.1/r3000a-interpreter.md) | 🔒 A1, 2a |
-| 2d | The PS1 console — memory map, interrupts, timing, minimal DMA and timers, device stubs | v0.0.1 | [`v0.0.1/ps1-console.md`](v0.0.1/ps1-console.md) | 🔒 2c |
-| 2e | Gate: OpenBIOS boots — BIOS and PS-EXE loading, TTY, open fixtures; the trace identical to SwanStation's | v0.0.1 | [`v0.0.1/openbios-boots.md`](v0.0.1/openbios-boots.md) | 🔒 2b, 2d |
+| 3a | JIT under the App Store routine — a sandboxed `allow-jit` macOS app that maps one `MAP_JIT` region and runs code it wrote | v0.0.1 | [`v0.0.1/jit-under-the-app-store-routine.md`](v0.0.1/jit-under-the-app-store-routine.md) | 🟢 |
+| 3b | The skeleton and both build routines — packages, macOS and iOS apps, App Store and personal routines; the library app removed | v0.0.1 | [`v0.0.1/skeleton-and-build-routines.md`](v0.0.1/skeleton-and-build-routines.md) | 🔒 3a |
+| 3c | TraceKit — the trace format and the first divergence between two traces | v0.0.1 | [`v0.0.1/tracekit.md`](v0.0.1/tracekit.md) | 🔒 3b |
+| 3d | The reference and the oracle — ProjectPSX with trace logging; SwanStation unmodified, recorded from outside | v0.0.1 | [`v0.0.1/reference-and-oracle-traces.md`](v0.0.1/reference-and-oracle-traces.md) | 🔒 3c |
+| 3e | The R3000A interpreter — ported from ProjectPSX, generic over its bus | v0.0.1 | [`v0.0.1/r3000a-interpreter.md`](v0.0.1/r3000a-interpreter.md) | 🔒 A2, 3c |
+| 3f | The PS1 console — memory map, interrupt controller, timers, DMA and the devices the BIOS needs | v0.0.1 | [`v0.0.1/ps1-console.md`](v0.0.1/ps1-console.md) | 🔒 3e |
+| 3g | Gate: the BIOS boots — ps1-tests' CPU tests pass and the guest-state trace matches SwanStation's (the user's run) | v0.0.1 | [`v0.0.1/bios-boots.md`](v0.0.1/bios-boots.md) | 🔒 3d, 3f |

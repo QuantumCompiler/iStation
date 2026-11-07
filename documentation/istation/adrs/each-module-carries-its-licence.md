@@ -1,6 +1,6 @@
 # ADR 0011 — Each module carries its licence, and never depends on a stricter one
 
-**Status:** Accepted · **Date:** 2026-11-07
+**Status:** Superseded by [ADR 0014](own-code-is-mit-and-derived-code-keeps-its-notice.md) (2026-11-07, the same day: the App Store brief) · **Date:** 2026-11-07
 
 ## Context
 

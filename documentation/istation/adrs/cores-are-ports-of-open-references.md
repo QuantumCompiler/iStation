@@ -1,6 +1,6 @@
 # ADR 0010 — iStation's cores are Swift ports of open-source references; installed emulators cover the rest
 
-**Status:** Accepted · **Date:** 2026-11-07 · Supersedes [ADR 0008](emulators-are-separate-programs.md)
+**Status:** Superseded by [ADR 0013](shipped-code-derives-only-from-permissive-references.md) (2026-11-07, the same day: the App Store brief) · **Date:** 2026-11-07 · Supersedes [ADR 0008](emulators-are-separate-programs.md)
 
 ## Context
 
@@ -11,10 +11,12 @@ The references were checked the same day ([Milestone C](../assistant/MILESTONES.
 | Console | Reference | Licence | Provenance |
 |---|---|---|---|
 | PS1 | [libretro/swanstation](https://github.com/libretro/swanstation) | GPLv3 (`LICENSE`; no per-file headers in its own sources) | DuckStation's history up to its author's last commit, 2022-01-11 — before DuckStation's 2024 relicense — then libretro's own work; no commit since 2023 mentions taking code from DuckStation |
-| PS2 | [PCSX2](https://github.com/PCSX2/pcsx2) | GPLv3 | its ARM64 backend is incomplete (`pcsx2/arm64/RecStubs.cpp` stubs the load/store backpatching and the VU recompiler's save state) |
+| PS2 | [PCSX2](https://github.com/PCSX2/pcsx2) | GPLv3 | — |
 | PS3 | RPCS3 | GPLv2 only | can never be linked with GPLv3 code |
 
-SwanStation's bundled libraries are all GPLv3-compatible — libchdr, vixl, xbyak and xxhash (BSD), OpenBIOS, libretro-common and glad (MIT), stb (public domain), vulkan-loader (Apache-2.0) — and its few files with their own headers are Dolphin's (GPLv2-or-later, only in the Vulkan and D3D renderers), PGXP (GPLv2-or-later) and MIT. SwanStation embeds OpenBIOS and boots it whenever no BIOS is found (`src/core/system.cpp:678–682`), so tests need no Sony BIOS. The current DuckStation (stenzek/duckstation) is CC BY-NC-ND, which forbids derivatives.
+SwanStation's bundled libraries were all GPLv3-compatible. The current DuckStation (stenzek/duckstation) is CC BY-NC-ND, which forbids derivatives.
+
+*Redacted 2026-11-07 under [ADR 0013](shipped-code-derives-only-from-permissive-references.md): details of GPL emulators' source that stood here are removed; only licence and provenance facts remain.*
 
 ## Decision
 

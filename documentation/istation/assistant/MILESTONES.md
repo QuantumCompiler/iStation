@@ -89,26 +89,26 @@ The detailed record of finished work: what shipped, how it was built, the trade-
 - The backlog: 1a retired and deleted; Architecture A1 and v0.0.1's track 2 (2a–2e) written from the spike.
 - The root README and CLAUDE.md, the router, this home's README, the Business and Infrastructure cards, the launch contract's introduction, DEVELOPER's test table, five skills that named ADR 0008 or the launcher-only non-goals, and the comments citing ADR 0008 in `GameLauncher.swift`, `ProcessRunner.swift`, `ProjectRulesTests.swift` and `Package.swift`.
 
-**The spike behind it** (measured 2026-11-07 in a scratch folder; nothing vendored):
+**The spike behind it** (measured 2026-11-07 in a scratch folder; nothing vendored).
+
+*Redacted 2026-11-07 under [ADR 0013](../adrs/shipped-code-derives-only-from-permissive-references.md), when the App Store brief made GPL emulators' source off limits: what this spike learned about GPL emulators' internals is removed; licence and provenance facts, the build, and iStation's own measurements remain.*
 
 - **SwanStation's provenance is clean.** 6,201 commits: DuckStation's history up to its author's last commit, 2022-01-11, then libretro's own work; no commit since 2023 mentions taking code from DuckStation. `LICENSE` is GPLv3; its own sources carry no per-file headers. The 26 files that do: Dolphin's (GPLv2-or-later, only in the Vulkan and D3D12 renderers), PGXP (GPLv2-or-later), MIT. Its `dep/` libraries: libchdr, vixl, xbyak, xxhash (BSD), OpenBIOS, libretro-common, glad (MIT), stb (public domain), vulkan-loader (Apache-2.0) — all GPLv3-compatible.
-- **OpenBIOS needs no Sony file.** SwanStation embeds OpenBIOS (MIT) and boots it whenever no BIOS is found (`src/core/system.cpp:678–682`).
+- **OpenBIOS's licence file**, as bundled in SwanStation, reads MIT.
 - **It builds on Apple Silicon**: CMake and Ninja, arm64, Debug (9.2 MB `swanstation_libretro.dylib`) and RelWithDebInfo (5.5 MB), 165 steps each, 53 warnings, no errors.
-- **Where the code is.** 65,477 lines in `src/core`; 29,450 of them are the recompiler and the hardware renderers. v0.0.1's slice is about 6,600: the CPU 2,722, the bus 1,875, DMA 783, timing events 581, timers 499, the interrupt controller 133. In the optimized build the CPU interpreter is one 13.7 KB function, `CPU::Execute()`, with decode, execute and memory access inlined.
-- **The subsystems form one cycle.** The include graph joins all 13 — CPU, GTE, bus, DMA, timers, interrupt controller, timing events, GPU, SPU, CD-ROM, MDEC, SIO and the system — into one strongly connected group ([ADR 0012](../adrs/cores-shape-and-hot-paths.md)).
 - **What Swift's hot path costs** (a toy MIPS loop, 300 million instructions, optimized, M3 Max): bus in the same module 697–808 M instructions/s; in another module 704–816 M; CPU generic over its bus with `@inlinable` 705 M; the same without `@inlinable` ~500 M; bus behind a protocol type 496–558 M.
-- **Revula** (status: 121 tools, 14 external backends): `revula_parse_binary` fails on Mach-O (its LIEF has no `Section.address`; the field is `virtual_address`); `revula_symbols` works but returns 57,302 symbols without sizes, a page at a time — `nm` and `llvm-cxxfilt` built the map instead. Tracing every instruction through tool calls is far too slow for a BIOS boot; the debug build keeps `CPU::FetchInstruction()` as a separate function, a hook point for Frida, and a local trace patch in the interpreter loop is simpler still. RetroArch is not installed, so the reference needs a small headless frontend.
+- **Revula** (status: 121 tools, 14 external backends): `revula_parse_binary` fails on Mach-O (its LIEF has no `Section.address`; the field is `virtual_address`); `revula_symbols` works but returns 57,302 symbols without sizes, a page at a time. Tracing every instruction through tool calls is far too slow for a BIOS boot. RetroArch is not installed.
 - **ps1-tests** (MIT): its `cpu/` folder holds 4 tests — `access-time`, `code-in-io`, `cop`, `io-access-bitwidth` — about timing and I/O, not instruction semantics; its programs ship only in a 2021 release zip (6.6 MB) and leave the stack pointer at 0.
-- **PCSX2**: `pcsx2/arm64/RecStubs.cpp` stubs the load/store backpatching and the VU recompiler's save state; 27 third-party folders to review before PS2 work. ps2autotests is ISC.
+- **PCSX2**: 27 third-party folders. ps2autotests is ISC.
 
-**1a, retired.** Its first run, on the user's Mac (2026-11-07): all three installed emulators were found automatically; the scan of the user's folders found PS1 58 games (48 with a serial), PS2 57 (55 with a serial) and PS3 19 disc folders (`<name>.ps3/PS3_GAME/`). iStation started DuckStation with a PS1 game (`SCUS-94423`, `.cue`), which stopped at DuckStation's own BIOS prompt: the BIOS folders in DuckStation's and PCSX2's settings no longer exist, and RPCS3 has no PS3 firmware. That session still counted about two minutes of play time — iStation counts the time the emulator was open. Of the 10 PS1 games without a serial: 3 `.cue` sheets name a missing `.bin`, 4 raw Mode 2 discs have a SYSTEM.CNF entry that points outside the data track, 1 `.cue`'s first file is not ISO 9660, 1 `.bin` is empty, 1 was not examined. Installed versions: DuckStation `0.1-10193-g86bf55162` (universal), PCSX2 `v2.4.0` (x86_64, under Rosetta), RPCS3 (no version in its `Info.plist`; arm64). Earlier evidence (2026-10-31): every flag iStation passes is in the installed binaries' help text and their parsers, and RPCS3 with `--no-gui` quits when its game stops (`rpcs3/rpcs3qt/gui_application.cpp:754–775`). The two launcher fixes it points to are in ROADMAP → Ideas, not queued.
+**1a, retired.** Its first run, on the user's Mac (2026-11-07): all three installed emulators were found automatically; the scan of the user's folders found PS1 58 games (48 with a serial), PS2 57 (55 with a serial) and PS3 19 disc folders (`<name>.ps3/PS3_GAME/`). iStation started DuckStation with a PS1 game (`SCUS-94423`, `.cue`), which stopped at DuckStation's own BIOS prompt: the BIOS folders in DuckStation's and PCSX2's settings no longer exist, and RPCS3 has no PS3 firmware. That session still counted about two minutes of play time — iStation counts the time the emulator was open. Of the 10 PS1 games without a serial: 3 `.cue` sheets name a missing `.bin`, 4 raw Mode 2 discs have a SYSTEM.CNF entry that points outside the data track, 1 `.cue`'s first file is not ISO 9660, 1 `.bin` is empty, 1 was not examined. Installed versions: DuckStation `0.1-10193-g86bf55162` (universal), PCSX2 `v2.4.0` (x86_64, under Rosetta), RPCS3 (no version in its `Info.plist`; arm64). Earlier evidence (2026-10-31): every flag iStation passes is in the installed binaries' help text. The two launcher fixes it points to are in ROADMAP → Ideas, not queued.
 
 **Trade-offs.**
 
 - Docs before code: the backlog holds the first milestone, specced, and nothing is built yet.
 - Retiring 1a leaves the launcher verified by its tests and one partial run; it stays the way to play PS2 and PS3, and PS1 until v0.2.0.
 - The licence boundary is a rule before it is a check: A1 gates the first ported module (2c), so no GPL-3.0 code lands unchecked.
-- The PS1 console starts as one module because the reference's devices form one cycle; devices are carved out only behind the trace harness.
+- The PS1 console starts as one module; devices are carved out only behind the trace harness.
 
 **Verified** (2026-11-07, macOS 27, Xcode 27.1):
 
@@ -124,3 +124,45 @@ The detailed record of finished work: what shipped, how it was built, the trade-
 - 2026-11-07: v0.0.1's bar is OpenBIOS booting to its shell with a trace identical to SwanStation's, plus ps1-tests' `cop` and `code-in-io`; `access-time` and `io-access-bitwidth` move to v0.1.0 (the user's call).
 - 2026-11-07: retire the v0.0.1 launcher gate, 1a (the user's call).
 - 2026-11-07: cores in Business, licence-tagged; concrete types in hot paths; the reference traced by a local patch and a headless frontend under `tools/`; open fixtures beside their licences through an allow-list (the defaults, taken).
+
+## Milestone D — The App Store re-vision
+
+**Goal.** Make the docs follow the user's brief "PS1 and PS2 emulators in Swift (App Store-eligible)" (2026-11-07), which replaces Milestone C's plan the same day: two Apple apps — macOS (PS1 and PS2) and iOS (PS1) — eligible for the App Stores, with shipped code ported only from permissively licensed references and GPL emulators used only as black-box oracles; each app with an App Store routine and a personal routine.
+
+**Built** (2026-11-07; docs only, plus comments that cited the superseded records):
+
+- [SPEC.md](SPEC.md) rewritten: two apps, permissive references (ProjectPSX for PS1, Play! for PS2), GPL emulators as oracles, the two build routines, Apple constraints (one `MAP_JIT` region, AArch64 only, no PS2 on iOS), App Store distribution under Guideline 4.7, non-goals (no GPL emulator's source read; no OpenBIOS; no launching other emulators).
+- Four records: [ADR 0013](../adrs/shipped-code-derives-only-from-permissive-references.md) (shipped code only from permissive sources; GPL emulators black boxes; supersedes 0010), [ADR 0014](../adrs/own-code-is-mit-and-derived-code-keeps-its-notice.md) (iStation's own code MIT; notices kept; supersedes 0011), [ADR 0015](../adrs/a-core-is-a-cpu-module-and-a-console-module.md) (core shape and hot paths; supersedes 0012) and [ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md) (two build routines; the library app retired; supersedes 0007 for its file).
+- [CLAUDE.md](CLAUDE.md): what this is, stack and licences, the cores, the shipped-code invariant, the no-Sony-files invariant (no OpenBIOS), the retiring library-file invariant, the codebase map's note, versioning, the checklist and release. [ROADMAP.md](ROADMAP.md) re-planned.
+- The backlog: A1, track 2 (2a–2e), M1 and M2 cancelled and deleted; Architecture A2 and v0.0.1's track 3 (3a–3g) written.
+- The root README and CLAUDE.md, the router, this home's README, the Business and Infrastructure cards, DEVELOPER's test table, five skills, the two reference contracts (marked retiring; the launch contract's source-file column removed), and the comments citing ADR 0010 in `GameLauncher.swift`, `ProcessRunner.swift`, `ProjectRulesTests.swift` and `Package.swift`.
+- Milestone C's spike and ADRs 0010 and 0012 redacted: what they said about GPL emulators' internals is removed (ADR 0013).
+
+**Evidence** (checked 2026-11-07 on GitHub; licence files and repository layout only):
+
+- **ProjectPSX** — MIT, last pushed 2026-07-13: a .NET 10 core library (`ProjectPSX/`, about 366 KB of C#: `Core/BUS.cs`, `CPU.cs`, `GTE.cs`, `ProjectPSX.cs` and `Devices/` for CD-ROM, DMA, EXP2, GPU, input, interrupt controller, MDEC, SPU and timers), a cross-platform OpenTK frontend and a Windows-only WinForms one. Its README: a valid BIOS is required (SCPH1001 is the development default); CD-ROM timing and resumable DMA transfers are listed as not implemented. The .NET SDK is not installed on the user's Mac.
+- **Play!, Play--Framework, Play--CodeGen, Nuanceur** — each `License.txt` is a BSD licence © Jean-Philip Desjardins with no "neither the name" clause (the two-clause form); GitHub reports `NOASSERTION` because it doesn't detect the file.
+- **Play-Dependencies** — no licence of its own; its folders: bzip2, glew, lzmasdk, nlohmann_json, sqlite, tdemu, iCade-iOS, `unrarsrc-5.2.5` (out, by the brief), `d3dcompiler_winxp` and the Windows build scripts (Windows-only, out).
+- **OpenBIOS** — the brief lists it as GPL; the licence file bundled with it in SwanStation (seen 2026-11-07) reads MIT. The brief's rule stands either way: OpenBIOS is not used.
+- **This session read GPL emulator source** before the brief: parts of DuckStation's, PCSX2's and RPCS3's command-line handling on 2026-10-31 (for the launcher's flags), and parts of SwanStation's and PCSX2's source on 2026-11-07 (for the plan of Milestone C). Under ADR 0013 §3 it wrote docs only, and the core is ported by sessions that haven't read them. Its scratch clones and builds of GPL emulators were deleted.
+
+**Trade-offs.**
+
+- Two re-visions in one day: Milestone C's documents lived for hours; their ids (A1, track 2) stay spent.
+- Retiring the library app drops working, tested code (21 modules, 111 tests); item 3b decides whether the format readers carry over.
+- A GPL oracle gives guest state from outside — per frame or per breakpoint — not every instruction; ProjectPSX's own traces fill that gap, and SwanStation decides.
+- The PS1 gate needs a real BIOS (ProjectPSX does), so it is the user's run rather than a hermetic test; hermetic tests cover the CPU and console in code.
+
+**Verified** (2026-11-07, macOS 27, Xcode 27.1):
+
+- `python3 scripts/validate_docs.py documentation` — ALL CLEAN: 8 index rows; 339 relative links across 58 files.
+- `swift build --explicit-target-dependency-import-check=error` — clean; `swift test` — 111 tests in 22 test targets, all passing (only comments changed in code).
+- A sweep of the docs and skills for pointers into GPL emulators' source (file names, line numbers, function names) finds none outside this entry's account of what was redacted.
+
+**Decisions consumed.**
+
+- 2026-11-07: the App Store brief replaces Milestone C's plan: PS1 from ProjectPSX, PS2 from Play!; GPL emulators black-box oracles only; macOS (PS1, PS2) and iOS (PS1) apps eligible for the App Stores; two build routines (the user's brief).
+- 2026-11-07: iStation's own code is MIT (the user's call).
+- 2026-11-07: start the apps fresh; the library app and its launcher retire (the user's call).
+- 2026-11-07: the PS1 milestone is the brief's — ps1-tests' CPU tests passing with a trace matching SwanStation's — replacing Milestone C's narrower bar (the user's brief).
+- 2026-11-07: the brief's packages become products of the one layered package; the apps are targets in `iStation.xcodeproj`; OpenBIOS is not used, as a binary either (the defaults, taken).
