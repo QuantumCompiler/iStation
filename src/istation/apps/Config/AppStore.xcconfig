@@ -1,0 +1,15 @@
+// The App Store routine (ADR 0016) — the Release configuration of both apps: App Sandbox,
+// user-selected files and, on macOS, JIT; no tools (PERSONAL_BUILD undefined) and no debugging
+// entitlements. Archive with scripts/archive-appstore.sh.
+#include "Version.xcconfig"
+
+CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = src/istation/apps/macos/AppStore.entitlements
+CODE_SIGN_ENTITLEMENTS[sdk=iphone*] = src/istation/apps/ios/AppStore.entitlements
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited)
+SWIFT_OPTIMIZATION_LEVEL = -O
+SWIFT_COMPILATION_MODE = wholemodule
+ENABLE_TESTABILITY = NO
+DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
+VALIDATE_PRODUCT = YES
+// Local signing would otherwise inject get-task-allow, which an App Store build never carries.
+CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO

@@ -1,6 +1,6 @@
 ---
 name: istation-maintenance-update-release
-description: Advance or correct iStation's live version at a release boundary — check the release is actually done (its backlog table empty), then sweep every carrier of the version number (the release branch, CFBundleShortVersionString in scripts/build-app.sh, ROADMAP, CLAUDE.md, CI) so code, CI and docs agree, and prepare the merge into stable and the tag for the user. Use when the user says "cut the release", "release v0.0.1", "bump to v0.1.0", "we're done with this version", "start the next version", or "the version number is wrong".
+description: Advance or correct iStation's live version at a release boundary — check the release is actually done (its backlog table empty), then sweep every carrier of the version number (the release branch, MARKETING_VERSION in src/istation/apps/Config/Version.xcconfig, ROADMAP, CLAUDE.md, CI) so code, CI and docs agree, and prepare the merge into stable and the tag for the user. Use when the user says "cut the release", "release v0.0.1", "bump to v0.1.0", "we're done with this version", "start the next version", or "the version number is wrong".
 ---
 
 # Update the release — iStation
@@ -12,7 +12,7 @@ The release model (the user's call, 2026-10-31): each version is built on its ow
 - The live branch: `git branch --show-current` (a `v<x.y.z>` branch).
 - The carriers of the live number:
   - the branch name;
-  - `CFBundleShortVersionString` (and `CFBundleVersion`) in `src/istation/scripts/build-app.sh`;
+  - `MARKETING_VERSION` (and `CURRENT_PROJECT_VERSION`) in `src/istation/apps/Config/Version.xcconfig`;
   - [ROADMAP.md](../../../documentation/istation/assistant/ROADMAP.md)'s "In progress" heading and its Version scheme line;
   - [CLAUDE.md](../../../documentation/istation/assistant/CLAUDE.md)'s Versioning section ("`v0.0.1` today") and the root `CLAUDE.md` ("today `v0.0.1`");
   - `.github/workflows/ci.yml` if it names a branch.
@@ -30,7 +30,7 @@ For a release: the version's table retired from the index; ROADMAP's section mov
 
 - `python3 scripts/validate_docs.py documentation` (from the repository root).
 - `cd src/istation && swift build --explicit-target-dependency-import-check=error && swift test`
-- `cd src/istation && ./scripts/build-app.sh` builds, and `defaults read "$PWD/build/iStation.app/Contents/Info.plist" CFBundleShortVersionString` prints the new number.
+- `cd src/istation && ./scripts/archive-appstore.sh macOS` archives, and `defaults read "$PWD/build/macOS/iStation.xcarchive/Products/Applications/iStation.app/Contents/Info.plist" CFBundleShortVersionString` prints the new number.
 
 ## 5. Prepare, then hand over
 

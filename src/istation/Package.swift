@@ -16,29 +16,16 @@ enum Layer: String, CaseIterable { case infrastructure, data, business, presenta
 
 let modules: [Module] = [
     Module(.infrastructure, "Bytes"),
-    Module(.infrastructure, "Locations"),
-    Module(.infrastructure, "Bundles", testSupport: ["SupportSandbox"]),
-    Module(.infrastructure, "Process"),
 
-    Module(.data, "Catalog"),
     Module(.data, "ISO9660", uses: ["InfrastructureBytes"], testSupport: ["SupportSandbox", "SupportDiscFixtures"]),
-    Module(.data, "SystemCNF", uses: ["DataCatalog"]),
-    Module(.data, "ParamSFO", uses: ["InfrastructureBytes"], testSupport: ["SupportDiscFixtures"]),
+    Module(.data, "SystemCNF"),
     Module(.data, "Playlists", testSupport: ["SupportSandbox"]),
-    Module(.data, "Emulators", uses: ["DataCatalog"]),
-    Module(.data, "Store", uses: ["DataCatalog", "DataEmulators"], testSupport: ["SupportSandbox"]),
 
-    Module(.business, "Identification", uses: ["DataCatalog", "DataISO9660", "DataParamSFO", "DataPlaylists", "DataSystemCNF"], testSupport: ["SupportSandbox", "SupportDiscFixtures"]),
-    Module(.business, "Scanning", uses: ["BusinessIdentification", "DataCatalog", "DataParamSFO", "DataPlaylists"], testSupport: ["SupportSandbox", "SupportDiscFixtures"]),
-    Module(.business, "Discovery", uses: ["DataEmulators", "InfrastructureBundles", "InfrastructureLocations"], testSupport: ["SupportSandbox"]),
-    Module(.business, "Launching", uses: ["DataCatalog", "DataEmulators", "InfrastructureBundles", "InfrastructureProcess"], testSupport: ["SupportSandbox"]),
-    Module(.business, "Library", uses: ["BusinessDiscovery", "BusinessIdentification", "BusinessLaunching", "BusinessScanning", "DataCatalog", "DataEmulators", "DataStore"], testSupport: ["SupportLibraryFakes"]),
+    Module(.business, "PS1"),
 
-    Module(.presentation, "Styles", uses: ["DataCatalog"]),
-    Module(.presentation, "Shell", uses: ["BusinessLibrary", "DataCatalog", "DataEmulators", "DataStore", "PresentationStyles"], testSupport: ["SupportLibraryFakes"]),
-    Module(.presentation, "Library", uses: ["BusinessLibrary", "DataCatalog", "DataEmulators", "DataStore", "PresentationStyles"], testSupport: ["SupportLibraryFakes"]),
-    Module(.presentation, "Settings", uses: ["BusinessLibrary", "DataCatalog", "DataEmulators", "DataStore", "PresentationStyles"], testSupport: ["SupportLibraryFakes"]),
-    Module(.presentation, "App", uses: ["BusinessDiscovery", "BusinessLaunching", "BusinessLibrary", "BusinessScanning", "DataEmulators", "DataStore", "InfrastructureBundles", "InfrastructureLocations", "InfrastructureProcess", "PresentationLibrary", "PresentationSettings", "PresentationShell", "PresentationStyles"], testSupport: ["SupportSandbox"]),
+    Module(.presentation, "Styles"),
+    Module(.presentation, "Player", uses: ["BusinessPS1", "PresentationStyles"]),
+    Module(.presentation, "Acknowledgements", uses: ["PresentationStyles"]),
 ]
 
 /// Shared test fixtures and fakes, each at the lowest layer whose tests use it (ADR 0004).
@@ -46,12 +33,18 @@ let modules: [Module] = [
 let testSupport: [Support] = [
     Support(.infrastructure, "Sandbox"),
     Support(.data, "DiscFixtures"),
-    Support(.business, "LibraryFakes", uses: ["BusinessLibrary", "DataCatalog", "DataEmulators", "DataStore"]),
 ]
 
-/// The `@main` entry point: it starts PresentationApp with the real user's folders and holds no logic.
-/// It is not a module, and nothing imports it.
-let entryPoint = EntryPoint("iStation", uses: ["InfrastructureLocations", "PresentationApp"])
+/// The library products the apps in iStation.xcodeproj link (ADR 0016). The apps are the entry
+/// points: nothing in the package is an executable, and nothing imports an app.
+let products: [Product] = [
+    .library(name: "PS1Core", targets: ["BusinessPS1"]),
+    .library(name: "EmuKit", targets: ["PresentationStyles", "PresentationPlayer", "PresentationAcknowledgements"]),
+]
+
+/// `PERSONAL_BUILD` guards every tool and debug view (ADR 0016). The personal routine builds the
+/// package in its debug configuration, the App Store routine in release, so release code never sees it.
+let settings: [SwiftSetting] = [.define("PERSONAL_BUILD", .when(configuration: .debug))]
 
 // MARK: - Targets, generated from the map
 
@@ -88,40 +81,28 @@ struct Support {
     var path: String { "tests/support/\(name.lowercased())" }
 }
 
-struct EntryPoint {
-    let name: String
-    let uses: [String]
-
-    init(_ name: String, uses: [String]) {
-        self.name = name
-        self.uses = uses
-    }
-}
-
 func dependencies(_ names: [String]) -> [Target.Dependency] {
     names.map { .target(name: $0) }
 }
 
 let package = Package(
     name: "iStation",
-    platforms: [.macOS(.v14)],
-    products: [
-        .executable(name: entryPoint.name, targets: [entryPoint.name]),
-    ],
+    platforms: [.macOS(.v14), .iOS(.v17)],
+    products: products,
     targets: modules.flatMap { module -> [Target] in
         [
-            .target(name: module.target, dependencies: dependencies(module.uses), path: module.path),
+            .target(name: module.target, dependencies: dependencies(module.uses), path: module.path, swiftSettings: settings),
             .testTarget(
                 name: module.target + "Tests",
                 dependencies: dependencies([module.target] + module.testSupport),
-                path: module.testPath
+                path: module.testPath,
+                swiftSettings: settings
             ),
         ]
     } + testSupport.map { support in
-        .target(name: support.target, dependencies: dependencies(support.uses), path: support.path)
+        .target(name: support.target, dependencies: dependencies(support.uses), path: support.path, swiftSettings: settings)
     } + [
-        .executableTarget(name: entryPoint.name, dependencies: dependencies(entryPoint.uses), path: "source/main"),
-        // The layering and layer-context checks (ADRs 0001, 0002, 0004, 0005, 0013). Reads files only.
+        // The layering, layer-context and project-rule checks (ADRs 0001, 0002, 0004, 0005, 0013, 0016). Reads files only.
         .testTarget(name: "ArchitectureTests", path: "tests/architecture"),
     ]
 )

@@ -96,10 +96,10 @@ import Testing
         #expect(violations.isEmpty, "\(violations.report)")
     }
 
-    @Test("The Xcode project's iStation scheme tests exactly every test target")
+    @Test("The Xcode project's macOS Personal scheme tests exactly every test target")
     func theXcodeSchemeTestsEveryTarget() {
         var violations = Violations()
-        let path = "iStation.xcodeproj/xcshareddata/xcschemes/iStation.xcscheme"
+        let path = "iStation.xcodeproj/xcshareddata/xcschemes/macOS Personal.xcscheme"
         guard let scheme = Repository.text(Repository.root.appendingPathComponent(path)) else {
             violations.add("scheme drift", path, "unreadable")
             #expect(violations.isEmpty, "\(violations.report)")

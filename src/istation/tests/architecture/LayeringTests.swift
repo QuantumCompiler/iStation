@@ -14,7 +14,6 @@ import Testing
         var violations = Violations()
         if map.layers.isEmpty { violations.add("empty map", "Package.swift", "no Layer cases parsed") }
         if map.modules.isEmpty { violations.add("empty map", "Package.swift", "no Module rows parsed") }
-        if map.entryPoint.isEmpty { violations.add("empty map", "Package.swift", "no entryPoint parsed") }
         for layer in map.layers where map.modules(in: layer).isEmpty {
             violations.add("empty map", "Package.swift", "layer \(layer) has no module")
         }
@@ -31,8 +30,8 @@ import Testing
             violations.add("missing module", module.sourcePath, "\(module.target) has no Swift files")
         }
         let source = Repository.package.appendingPathComponent("source")
-        for directory in Repository.subdirectories(of: source) where !map.layers.contains(directory) && directory != "main" {
-            violations.add("unknown directory", "source/\(directory)", "is neither a layer nor the entry point")
+        for directory in Repository.subdirectories(of: source) where !map.layers.contains(directory) {
+            violations.add("unknown directory", "source/\(directory)", "is not a layer")
         }
         for layer in map.layers {
             let mapped = Set(map.modules(in: layer).map(\.directory))
@@ -63,7 +62,7 @@ import Testing
         #expect(violations.isEmpty, "\(violations.report)")
     }
 
-    @Test("Every import of a package module is declared, points down, and never names the entry point")
+    @Test("Every import of a package module is declared, points down, and never names test code")
     func importsAreDeclared() {
         var violations = Violations()
         let targets = map.packageTargets
@@ -71,9 +70,7 @@ import Testing
             let rank = map.rank(ofLayer: module.layer) ?? 0
             for file in Repository.swiftFiles(under: module.sourcePath) {
                 for imported in file.imports where targets.contains(imported) && imported != module.target {
-                    if imported == map.entryPoint {
-                        violations.add("imports the entry point", file.path, "imports \(imported)")
-                    } else if map.support(imported) != nil || imported.hasSuffix("Tests") {
+                    if map.support(imported) != nil || imported.hasSuffix("Tests") {
                         violations.add("imports test code", file.path, "imports \(imported)")
                     } else if let importedRank = map.rank(of: imported), importedRank > rank {
                         violations.add("upward import", file.path, "\(module.target) (\(module.layer)) imports \(imported)")
@@ -81,11 +78,6 @@ import Testing
                         violations.add("undeclared import", file.path, "\(module.target) imports \(imported), not in its uses")
                     }
                 }
-            }
-        }
-        for file in Repository.swiftFiles(under: "source/main") {
-            for imported in file.imports where targets.contains(imported) && !map.entryPointUses.contains(imported) {
-                violations.add("undeclared import", file.path, "the entry point imports \(imported), not in its uses")
             }
         }
         #expect(violations.isEmpty, "\(violations.report)")
@@ -153,7 +145,7 @@ import Testing
         for module in map.modules(in: "presentation") {
             let root = Repository.package.appendingPathComponent(module.sourcePath)
             let isStyles = module.name == "Styles"
-            let admitted: Set<String> = isStyles ? ["Components", "Previews"] : ["Views", "ViewModels", "Components", "Models", "Previews"]
+            let admitted: Set<String> = isStyles ? ["Components", "Previews"] : ["Views", "ViewModels", "Components", "Models", "Previews", "Debug"]
             let directories = Repository.subdirectories(of: root)
             for directory in directories where !admitted.contains(directory) {
                 violations.add("MVVM shape", "\(module.sourcePath)/\(directory)", "is not an admitted directory (\(admitted.sorted().joined(separator: ", ")))")

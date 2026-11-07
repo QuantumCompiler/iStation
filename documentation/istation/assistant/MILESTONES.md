@@ -186,3 +186,33 @@ The detailed record of finished work: what shipped, how it was built, the trade-
 **Decisions consumed.**
 
 - 2026-11-07: verify JIT under the App Store routine first (the user's brief); three runs, (2) and (3) the user's; a failure raises the PS2 decision (the defaults, confirmed by the user).
+
+
+## Milestone F — The skeleton and both build routines
+
+**Goal.** The brief's second task: the package's new shape and both build routines, producing empty macOS and iOS apps — and the library app's retirement (v0.0.1 item 3b; the user's call to start fresh, 2026-11-07).
+
+**Built** (3b, 2026-11-07):
+
+- **Retired**: the library app's 17 other modules (`locations`, `bundles`, `process`; `catalog`, `paramsfo`, `emulators`, `store`; `identification`, `scanning`, `discovery`, `launching`, `library`; the old `styles`, `shell`, `library`, `settings`, `app`), their tests and `SupportLibraryFakes`, the entry point `source/main/`, `scripts/build-app.sh`, and the two contracts (`reference/emulator-launch-contract.md`, `reference/library-file.md`). Kept, by the default confirmed 2026-11-07: `bytes`, `iso9660`, `playlists`, `systemcnf` with their tests, `SupportSandbox` and `SupportDiscFixtures` (`makeSFO` and `Sandbox.makeApp`, now unused, removed). `SystemCNF` reports its own `Console` (`.ps1`, `.ps2`) instead of the retired `Platform`.
+- **The package** (`src/istation/Package.swift`): platforms macOS 14 and iOS 17; the products `PS1Core` (`BusinessPS1`) and `EmuKit` (`PresentationStyles`, `PresentationPlayer`, `PresentationAcknowledgements`); `PERSONAL_BUILD` defined for every target in debug. New modules: `BusinessPS1` (`PS1Console`, a powered-off placeholder), `PresentationStyles` (palette, symbols, metrics, typography for the player), `PresentationPlayer` (`PlayerView`, `PlayerViewModel`, preview "Nothing loaded"), `PresentationAcknowledgements` (`Acknowledgement`, `AcknowledgementsViewModel`, `AcknowledgementsView`, preview "Empty"), each with its tests.
+- **The apps** (`src/istation/apps/`): `iStation macOS` (the player window; "Acknowledgements…" in the app menu) and `iStation iOS` (the player in a navigation stack; an acknowledgements sheet), placeholder identifiers `local.istation.macos` and `local.istation.ios`. Each personal build titles itself "iStation — Personal build".
+- **The routines**: `apps/Config/Version.xcconfig` (`MARKETING_VERSION = 0.0.1`), `Personal.xcconfig` (the Debug configuration: `DEBUG PERSONAL_BUILD`), `AppStore.xcconfig` (the Release configuration; `CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO`, because local signing otherwise injects `get-task-allow`); per app, `AppStore.entitlements` (macOS: App Sandbox, read-only user-selected files, `allow-jit`; iOS: none) and `Personal.entitlements` (`get-task-allow`; macOS also `allow-jit`); four shared schemes (`macOS Personal`, `macOS App Store`, `iOS Personal`, `iOS App Store`), the package's test targets in `macOS Personal`; `scripts/build-personal.sh` and `scripts/archive-appstore.sh` (`ISTATION_TEAM_ID` signs and exports — the user's).
+- **`iStation.xcodeproj`**: two app targets over the package, which sits in the project as a folder reference — a package reference alone exposes only its products, and Xcode then finds no test bundles (measured 2026-11-07).
+- **The checks** (`ArchitectureTests`): `toolsArePersonalOnly` (an import of a tool module — `DataTracing`, from 3c — outside `#if PERSONAL_BUILD`, or a file under a `Debug/` directory that doesn't open with it, in the package or the apps); `appStoreEntitlementsAreClean` (every `AppStore.entitlements` free of `allow-unsigned-executable-memory` and `get-task-allow` in either spelling; every app with both routines' files); the process rule widened to the whole package and the apps (its `system(` pattern narrowed so `Font.system(size:)` isn't a match); the real-home rule now without an exception; the entry-point rules removed; the scheme check moved to `macOS Personal`; `Debug/` admitted in a Presentation module.
+- **CI** (`.github/workflows/ci.yml`): also builds both apps' personal routine unsigned.
+- **Docs**: the eight layer cards, ADR 0002's table, CLAUDE.md (what this is, build, the UI, the cores' rules, the invariants — the library-file invariant retired, the real-home one rewritten, the release-build one added — the Codebase Map, versioning, the checklist, release, CI), DEVELOPER.md (rewritten), the root README, the reference index, four skills, and the dead links in ADRs 0007, 0008 and 0010 turned to text.
+
+**Trade-offs.** The routines are the standard Debug and Release configurations rather than custom ones, so the package's `PERSONAL_BUILD` can key off `.when(configuration: .debug)` and Swift packages build in their usual modes. The placeholder console and empty player are deliberate thin seams that 3e, 3f and v0.1.0 fill. The project file was generated once by a script outside the repository and is maintained in Xcode from here.
+
+**Verified** (2026-11-07, Xcode 27.1, macOS 27.0.1):
+
+- `swift build --explicit-target-dependency-import-check=error` — clean; `swift test` — 44 tests in 9 test runs, all passing (18 module tests, 26 architecture checks); `xcodebuild test -scheme "macOS Personal"` — the same 44, **TEST SUCCEEDED**.
+- All four schemes build (macOS for `generic/platform=macOS`, iOS for the Simulator), signed and as CI builds them unsigned; `archive-appstore.sh macOS` and `iOS` each produce an archive; the macOS archive's entitlements are exactly App Sandbox, read-only user-selected files and `allow-jit`; the personal builds carry `get-task-allow` and the "Personal build" title, the App Store builds neither.
+- The personal macOS app launched and stayed up.
+- **The new rules were seen to fail on planted violations, then restored: 10 plants, 10 caught** — a `DataTracing` import under `#if false` in a core and under `#if !PERSONAL_BUILD` in an app; an unguarded `Debug/` view; `com.apple.security.get-task-allow` in the macOS App Store file and `get-task-allow` in the iOS one; `allow-unsigned-executable-memory`; a missing `Personal.entitlements`; scheme drift in `macOS Personal`; `Process()` in an app; `NSHomeDirectory()` in a test.
+
+**Decisions consumed.**
+
+- 2026-11-07: start the apps fresh; the library app retires (the user's call). Two routines per app, `PERSONAL_BUILD`, xcconfig and entitlements per routine, a scheme or script per routine (the user's brief). The packages are products of the one layered package; the apps are targets in `iStation.xcodeproj` (the re-vision's default).
+- 2026-11-07: keep the four format readers; iOS 17; `PS2Core` with the PS2 work; placeholder bundle identifiers (the defaults, confirmed by the user).

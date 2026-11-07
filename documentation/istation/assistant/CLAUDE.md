@@ -15,7 +15,7 @@ Project context for coding agents working on **iStation**. Read this before maki
 | [**MILESTONES.md**](MILESTONES.md) | The record of finished work — what shipped and how it was built. |
 | [**DEVELOPER.md**](DEVELOPER.md) | The module-by-module reference: directories, files, interfaces, build/test commands, recipes. |
 | [**adrs/**](../adrs/README.md) | The standing architecture rules, each with its reason and its enforcement. |
-| [**reference/**](../reference/README.md) | The contracts iStation builds against: the emulators' command lines, the library file. |
+| [**reference/**](../reference/README.md) | The contracts iStation builds against and writes: TraceKit's trace formats, from item 3c. |
 
 **How work flows:** discussed in chat → a line in ROADMAP.md (and SPEC.md if product shape changes) → its own backlog document once specced → an agent builds it straight from that document → folded into MILESTONES.md, and the backlog document deleted. There is no separate TODO file.
 
@@ -29,12 +29,12 @@ Project context for coding agents working on **iStation**. Read this before maki
 
 iStation is two native Apple apps with PlayStation emulators written in Swift — macOS (PS1 and PS2) and iOS (PS1) — eligible for Apple's App Stores. **Re-envisioned 2026-11-07 (the user's call)** by the brief "PS1 and PS2 emulators in Swift (App Store-eligible)": shipped code is ported only from permissively licensed references — PS1 from ProjectPSX (MIT), PS2 from Play! (BSD) — while the more accurate GPL emulators, SwanStation and PCSX2, are black-box oracles whose guest-visible behaviour is recorded and compared ([ADR 0013](../adrs/shipped-code-derives-only-from-permissive-references.md)). Every app has an App Store release routine and a personal routine with debugging and tracing tools ([ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md)). iStation's own code is MIT.
 
-What the repository holds today is the retired library app (21 modules: folder scanning, disc identification, launching DuckStation, PCSX2 and RPCS3), which v0.0.1's item 3b removes while it lays down the new packages and both build routines; no emulator code exists yet. See [SPEC.md](SPEC.md) for scope and [MILESTONES.md](MILESTONES.md) for what has shipped.
+The repository holds the package's first shape (since v0.0.1's item 3b, 2026-11-07): the four disc-format readers kept for v0.2.0, a powered-off PS1 console, EmuKit's player and acknowledgements views, and the macOS and iOS apps with both build routines. No emulator code exists yet: the R3000A and the PS1 console arrive with items 3e and 3f. See [SPEC.md](SPEC.md) for scope and [MILESTONES.md](MILESTONES.md) for what has shipped.
 
 ## Stack & environment
 
 - **Language / framework:** Swift 6 in language mode 6 — strict concurrency (the default, taken 2026-10-31) — with SwiftUI and Observation; macOS 14 Sonoma or later.
-- **Build:** Swift Package Manager, `src/istation/Package.swift` (swift-tools-version 6.0): one library target per module, generated from the module map, plus the `iStation` executable. `swift build` from `src/istation/`. In Xcode, open `iStation.xcodeproj` at the repository root: a thin project with no targets of its own today. From item 3b it holds the macOS and iOS app targets, each with an App Store and a personal routine (xcconfig, entitlements, scheme), and the package's products `PS1Core`, `PS2Core`, `EmuKit` and `TraceKit` ([ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md)).
+- **Build:** Swift Package Manager, `src/istation/Package.swift` (swift-tools-version 6.0; macOS 14 and iOS 17): one library target per module, generated from the module map, grouped into the library products `PS1Core` and `EmuKit` (`TraceKit` from item 3c; `PS2Core` with the PS2 work). The apps are two targets in `iStation.xcodeproj` at the repository root — `iStation macOS` and `iStation iOS`, sources in `src/istation/apps/` — each with two routines ([ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md)): **Personal** is the Debug configuration (`apps/Config/Personal.xcconfig`, `PERSONAL_BUILD`, `get-task-allow`, JIT on) and **App Store** the Release configuration (`apps/Config/AppStore.xcconfig`, App Sandbox, read-only user-selected files, `allow-jit` on macOS). One shared scheme per app per routine: `macOS Personal`, `macOS App Store`, `iOS Personal`, `iOS App Store`. `swift build` from `src/istation/` builds the package alone. Bundle identifiers are placeholders (`local.istation.macos`, `local.istation.ios`) until the user's App Store Connect identifiers exist (v1.0.0).
 - **Tests:** Swift Testing (the default, taken 2026-10-31, over the scaffold's XCTest): `swift test` from `src/istation/`, which also runs the architecture checks.
 - **Platforms / devices:** macOS 14+ on Apple Silicon (PS1 and PS2) and iOS (PS1, interpreter only). AArch64 only: Intel Macs aren't supported. Development host as of 2026-11-07: macOS 27, Xcode 27.1, Swift 6.4.
 - **Key dependencies:** none beyond Apple's SDK — [ADR 0013](../adrs/shipped-code-derives-only-from-permissive-references.md)'s allow-list is empty; every dependency is audited first, and Apple frameworks and Swift packages are preferred. The references — [ProjectPSX](https://github.com/BluestormDNA/ProjectPSX) (PS1, MIT, C#/.NET 10) and [Play!](https://github.com/jpd002/Play-) (PS2, BSD, C++) — are read and built locally, never vendored. The oracles — SwanStation and PCSX2 — are only built unmodified and run.
@@ -55,7 +55,7 @@ A core lives in Business and imports no UI or Apple framework: one module per CP
 
 ### The UI: MVVM, one styles module
 
-Presentation is one module per user-facing place, each **`Views/` + `ViewModels/`** ([ADR 0005](../adrs/presentation-mvvm.md)): views lay out and bind; view-models (`@MainActor @Observable` classes) hold state and intents, read Business's `Library` (whose services are injected protocols), and never import SwiftUI, AppKit, UIKit or Cocoa. **`styles`** is the only source of colors, symbols, sizes and fonts and of shared components; **`shell`** owns the chrome and the route (`SidebarItem`); **`app`** composes the services and view-models. Every view has named previews per visible state over in-module fakes, and every module builds and tests alone ([ADR 0006](../adrs/presentation-previews.md)). The Presentation layer card has the module list and the recipe.
+Presentation is EmuKit: one module per user-facing place, each **`Views/` + `ViewModels/`** ([ADR 0005](../adrs/presentation-mvvm.md)): views lay out and bind; view-models (`@MainActor @Observable` classes) hold state and intents, read the core they are given, and never import SwiftUI, AppKit, UIKit or Cocoa. **`styles`** is the only source of colors, symbols, sizes and fonts and of shared components. The apps' targets are the composition roots: each builds the console and the view-models and holds no logic. Every view has named previews per visible state over in-module fakes, and every module builds and tests alone ([ADR 0006](../adrs/presentation-previews.md)). Debug views live in a module's `Debug/`, inside `#if PERSONAL_BUILD`. The Presentation layer card has the module list and the recipe.
 
 ---
 
@@ -83,9 +83,9 @@ Presentation is one module per user-facing place, each **`Views/` + `ViewModels/
 - A session or person that has read a GPL emulator's source writes no core code. The session that wrote the re-vision on 2026-11-07 had, under the earlier plans, so it wrote docs only.
 - Recording an oracle uses its built-in debugger, trace and logging features first, else LLDB or Frida for guest state only; `revula_disassemble` and `revula_decompile` are never pointed at a GPL emulator.
 - Every third-party dependency is audited before it is ported or linked (unrarsrc and Windows-only libraries stay out); an external package joins only on ADR 0013's allow-list.
-- Only `InfrastructureProcess` starts a process (the retiring launcher's rule, kept until item 3b removes it).
+- Nothing in the package or the apps starts a process or loads code at runtime.
 
-**Enforcement.** `ArchitectureTests/ProjectRulesTests.swift` — any package or binary target not on the allow-list, and process spawning or `dlopen` outside `source/infrastructure/process/`, fail the run. Provenance headers gain their check with Architecture item A2, which gates the first ported module. What someone read has no mechanical check: review holds it, by each ported file's provenance line.
+**Enforcement.** `ArchitectureTests/ProjectRulesTests.swift` — any package or binary target not on the allow-list, and process spawning or `dlopen` anywhere in the package's sources or the apps', fail the run. Provenance headers gain their check with Architecture item A2, which gates the first ported module. What someone read has no mechanical check: review holds it, by each ported file's provenance line.
 
 ### ⚠ iStation never ships, downloads or commits Sony's files or games
 
@@ -112,25 +112,30 @@ Presentation is one module per user-facing place, each **`Views/` + `ViewModels/
 
 **Enforcement.** `ArchitectureTests/LayeringTests.swift` (`viewModelsImportNoUIFramework`).
 
-### ⚠ A library file written by an older iStation keeps loading
+### ⚠ Release builds carry no tools and no debugging entitlements
 
-**Rule.** `library.json` from any released version loads with its meaning intact, or is migrated by a named, tested step. *Retiring with the library app (item 3b): no version was released, so no user's file must keep loading; the rule carries to the new apps' settings and memory cards, and save states carry a version and are refused rather than misread when old ([ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md) §5).*
+**Rule.** TraceKit, every debug view and every tool compile only into personal builds, under `#if PERSONAL_BUILD`; an App Store build's entitlements never carry `com.apple.security.cs.allow-unsigned-executable-memory` or `get-task-allow`.
 
-**Why.** Play history cannot be rebuilt by a rescan; losing the file loses it ([ADR 0007](../adrs/backwards-compatibility.md)).
+**Why.** App Review rejects debugging and unrestricted executable memory, and a shipped trace recorder or memory viewer is a tool the store build must not contain ([ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md)).
 
-**Enforcement.** `DataStoreTests/RecordedLibraryFileTests.swift` and `LibraryStoreTests`, until item 3b removes them with the code they test.
+**Sub-rules.**
+- The personal routine is the Debug configuration, the App Store routine the Release configuration; the package defines `PERSONAL_BUILD` only in debug.
+- A debug view lives in its module's `Debug/` and opens with `#if PERSONAL_BUILD`; a core reaches TraceKit only through a generic tracer that release builds specialize to nothing.
+- `CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO` stays in `apps/Config/AppStore.xcconfig`.
+
+**Enforcement.** `ArchitectureTests/ProjectRulesTests.swift` (`toolsArePersonalOnly`, `appStoreEntitlementsAreClean`).
 
 ### ⚠ Tests and previews never touch the real home folder
 
-**Rule.** The real home and Application Support folders are reached only through `Locations.user()`, and only the entry point calls it. Tests write only inside a `Sandbox`; previews write nowhere.
+**Rule.** Nothing in the package — sources, tests or previews — reaches the real home or Application Support folders. Tests write only inside a `Sandbox`; previews write nowhere. Only the apps' targets may reach the user's folders, through the system's file picker and their own containers.
 
-**Why.** A test or preview that reads or writes `~/Library/Application Support/iStation/library.json` would read or destroy the user's real library and play history.
+**Why.** A test or preview that reads or writes the user's real files could read or destroy their BIOS dumps, memory cards and settings.
 
 **Sub-rules.**
-- Everything that needs a folder takes a `Locations` (or a URL derived from one).
-- Never call Launch Services, a real emulator or a real game from a test or preview; inject `AppLookup`, `ProcessRunning` or the `Library` service fakes.
+- Everything in the package that needs a file takes a URL or the file's bytes from its caller.
+- Never run a real BIOS or game from a test or preview; build programs and memory images in code.
 
-**Enforcement.** `ArchitectureTests/ProjectRulesTests.swift` (`onlyLocationsReachesTheRealHome`).
+**Enforcement.** `ArchitectureTests/ProjectRulesTests.swift` (`noRealHome`).
 
 ---
 
@@ -139,28 +144,15 @@ Presentation is one module per user-facing place, each **`Views/` + `ViewModels/
 | Layer | Module | Concern |
 |---|---|---|
 | Infrastructure | `bytes` | little-endian integer reads over byte buffers |
-| Infrastructure | `locations` | the user's standard folders, as one injectable value |
-| Infrastructure | `bundles` | .app bundles: their binary; an installed app by bundle identifier |
-| Infrastructure | `process` | start a child process, report its exit status and duration |
-| Data | `catalog` | the library's record types: Platform, Game, BootTarget, LibraryFolder |
 | Data | `iso9660` | cooked/raw CD sectors and the ISO 9660 directory tree |
 | Data | `systemcnf` | SYSTEM.CNF: the boot key's console and serial |
-| Data | `paramsfo` | PARAM.SFO key/value metadata |
 | Data | `playlists` | .cue track files and .m3u disc entries |
-| Data | `emulators` | each emulator's identity, app names and command line |
-| Data | `store` | library.json: folders, games, settings |
-| Business | `identification` | what one disc image or folder is: console, serial, title |
-| Business | `scanning` | library folders into games |
-| Business | `discovery` | find the installed emulator apps |
-| Business | `launching` | start a game in its emulator and time the session |
-| Business | `library` | the library's state and rules: folders, rescans, play history, the one running game |
+| Business | `ps1` | the PS1 console (a powered-off placeholder until items 3e and 3f) |
 | Presentation | `styles` | the visual tokens: palette, symbols, metrics, typography |
-| Presentation | `shell` | the main window's chrome: sidebar route, search, toolbar, menus, alert |
-| Presentation | `library` | the game grid, its tiles and empty state |
-| Presentation | `settings` | the Settings window |
-| Presentation | `app` | the composition root and the scenes |
+| Presentation | `player` | the player's screen |
+| Presentation | `acknowledgements` | every notice the app carries |
 
-The entry point `src/istation/source/main/iStationApp.swift` (the `@main` app) starts the composition over the real user's folders; it is not a module. **Every module above belongs to the retired library app** and is removed by v0.0.1's item 3b, which decides whether any format reader (`bytes`, `iso9660`, `playlists`, `systemcnf`) carries over; the new modules — the products `PS1Core`, `PS2Core`, `EmuKit`, `TraceKit` — arrive with items 3b to 3f.
+The products: `PS1Core` (`ps1`) and `EmuKit` (`styles`, `player`, `acknowledgements`); the format readers join a product with v0.2.0's discs. The apps' targets in `iStation.xcodeproj` (`src/istation/apps/macos/`, `src/istation/apps/ios/`) are the entry points and composition roots, not modules. Detail per module lives in the layer cards and [DEVELOPER.md](DEVELOPER.md).
 
 ---
 
@@ -194,7 +186,7 @@ Every task ends with a commit and a push (the user's call, 2026-11-07): a shippe
 
 ### Versioning
 
-One version per roadmap phase (the user's call, 2026-10-31; re-planned 2026-11-07 with the App Store brief): **v0.0.1** JIT verified, both build routines, the R3000A boots the BIOS · **v0.1.0** the first picture · **v0.2.0** PS1 games boot · **v0.3.0** Metal, audio and input · **v0.4.0** the iOS app · **v1.0.0** the PS1 release on the App Stores · **v2.x** PS2. A fix between releases is a patch, `v0.x.y`. Each release is built on a branch named for it (`v0.0.1` today) and, when its backlog table is empty, merged into `stable` and tagged `v<x.y.z>` (the user's call, 2026-10-31). The live number is carried by the branch name, `CFBundleShortVersionString` in `src/istation/scripts/build-app.sh` (from item 3b, the apps' xcconfig files), and ROADMAP's "In progress" heading — `/istation-maintenance-update-release` moves them together.
+One version per roadmap phase (the user's call, 2026-10-31; re-planned 2026-11-07 with the App Store brief): **v0.0.1** JIT verified, both build routines, the R3000A boots the BIOS · **v0.1.0** the first picture · **v0.2.0** PS1 games boot · **v0.3.0** Metal, audio and input · **v0.4.0** the iOS app · **v1.0.0** the PS1 release on the App Stores · **v2.x** PS2. A fix between releases is a patch, `v0.x.y`. Each release is built on a branch named for it (`v0.0.1` today) and, when its backlog table is empty, merged into `stable` and tagged `v<x.y.z>` (the user's call, 2026-10-31). The live number is carried by the branch name, `MARKETING_VERSION` in `src/istation/apps/Config/Version.xcconfig`, and ROADMAP's "In progress" heading — `/istation-maintenance-update-release` moves them together.
 
 ---
 
@@ -210,12 +202,11 @@ Every change satisfies this before merge:
 - [ ] **Shipped code is clean**: it comes only from a permissive source (ProjectPSX, Play!, iStation's own, public documentation) — never from a GPL emulator's source or disassembly — and each ported file names its source file and keeps its notice, with the acknowledgements list updated ([ADR 0013](../adrs/shipped-code-derives-only-from-permissive-references.md), [ADR 0014](../adrs/own-code-is-mit-and-derived-code-keeps-its-notice.md)).
 - [ ] **Hot paths use concrete types**: no protocol-typed value, unspecialized generic or allocation in per-instruction, per-pixel or per-sample code ([ADR 0015](../adrs/a-core-is-a-cpu-module-and-a-console-module.md)).
 - [ ] **Release builds carry no tools**: TraceKit and every debug view sit under `#if PERSONAL_BUILD`; the release entitlements carry neither `allow-unsigned-executable-memory` nor `get-task-allow` ([ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md)).
-- [ ] **No new launcher work**: the library app and its launcher are retiring (item 3b); only `InfrastructureProcess` starts a process until then.
 - [ ] **No game, BIOS or firmware file** is added anywhere, fixtures included — open test suites only beside their licence, through the allow-list; never OpenBIOS.
 - [ ] **The user's data stays readable**: a new persisted field (settings, memory cards) decodes with a default; a save state carries its version ([ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md) §5).
-- [ ] **A view has its view-model and its previews**: new UI logic lives in a view-model or in `Library` (tested over fakes, every named state), not the view; every new or changed view has a named `#Preview` per visible state, debug-only, over the module's own fakes and the sample games — never data from the user's own library ([ADR 0006](../adrs/presentation-previews.md), [ADR 0009](../adrs/previews-never-carry-the-users-library.md)).
+- [ ] **A view has its view-model and its previews**: new UI logic lives in a view-model or in `Library` (tested over fakes, every named state), not the view; every new or changed view has a named `#Preview` per visible state, debug-only, over the module's own fakes — never data from the user's own library ([ADR 0006](../adrs/presentation-previews.md), [ADR 0009](../adrs/previews-never-carry-the-users-library.md)).
 - [ ] **Visuals come from `styles`**: no literal color, font or size in a feature view — a new need is a token; a component a second module wants is promoted to `styles`, never copied ([ADR 0005](../adrs/presentation-mvvm.md)).
-- [ ] **A new place is a module**: `Views/` + `ViewModels/`, its `Module` row, its test directory, its `SidebarItem` in `shell` if the sidebar reaches it, its view-model in `app`, its name on the Presentation card and in ADR 0002's table — in the same change.
+- [ ] **A new place is a module**: `Views/` + `ViewModels/`, its `Module` row, its test directory, its place in the `EmuKit` product, its view-model built by the apps, its name on the Presentation card and in ADR 0002's table — in the same change.
 - [ ] The docs validator is clean: `python3 scripts/validate_docs.py documentation` (from the repository root).
 - [ ] The affected docs are updated in the same change (see **Documentation and Status**) — run `/istation-maintenance-update-documents` before opening a pull request.
 - [ ] **Committed and pushed**: one commit for the task, its message exactly `v<x.y.z> : Title Case Summary`, pushed to `origin/v<x.y.z>` (Working process → **Committing and pushing**).
@@ -223,10 +214,10 @@ Every change satisfies this before merge:
 ## Code Style
 
 - Every public type and function carries a `///` comment saying what it is for, in plain words; comments explain why, not what (the scaffold's convention).
-- Messages a person sees say what happened and what to do, in plain words with typographic apostrophes: "PCSX2 isn’t set up yet. Choose its app in Settings (⌘,)."
+- Messages a person sees say what happened and what to do, in plain words with typographic apostrophes: "The BIOS couldn’t be read. Choose another file."
 - Readers tolerate bad input: a truncated, foreign or corrupt file is `nil` or a thrown error, never a trap — check lengths before indexing.
-- No singletons or global lookups: dependencies arrive through initializers; only `PresentationApp` constructs the real services, and only the entry point calls `Locations.user()`.
-- Value types are `Sendable`; `Library` and every view-model are `@MainActor`; work that must leave the main actor runs in a `Task.detached` inside the service that owns it.
+- No singletons or global lookups: dependencies arrive through initializers; only the apps' targets construct the console and the view-models.
+- Value types are `Sendable`; every view-model is `@MainActor`; work that must leave the main actor runs in a `Task.detached` inside the service that owns it.
 - Match the surrounding code's conventions; when in doubt, find the closest existing analogue and follow it.
 
 ## Documentation and Status
@@ -246,7 +237,7 @@ When a work item ships, in the same change:
 
 ## Release and Install
 
-- **Today (v0.0.1):** `./scripts/build-app.sh` (from `src/istation/`) builds the retiring library app as `build/iStation.app`, ad-hoc signed. From item 3b: one scheme or script per routine — the App Store archive (`xcodebuild archive` with export options) and the personal build — for each of the macOS and iOS apps.
+- **Today (v0.0.1):** one script per routine, from `src/istation/`: `./scripts/build-personal.sh macOS|iOS` builds the personal routine (macOS signed to run locally, iOS for the Simulator) into `build/DerivedData`; `./scripts/archive-appstore.sh macOS|iOS` archives the App Store routine into `build/<platform>/iStation.xcarchive` — unsigned or ad-hoc, or, with `ISTATION_TEAM_ID` set, signed with the user's team and exported for App Store Connect. Signing for distribution, uploading and submitting are the user's.
 - **A release** is its branch merged into `stable` and tagged `v<x.y.z>`; the tag, the merge and any publishing are the user's to do (`/istation-maintenance-update-release` prepares them). Pushing the release branch after each task is the agent's (Working process → **Committing and pushing**).
 - **From v1.0.0:** App Store submission of each app, after checking App Review Guidelines section 4.7 (retro game console emulators) — see [SPEC.md → Distribution](SPEC.md#distribution). The signing identity, App Store Connect and every submission are the user's.
-- **CI:** `.github/workflows/ci.yml` runs the strict build, `swift test` (with the architecture checks) and the docs validator on a macOS runner, **only for an open pull request and for a merge into `stable`** — a push to a release branch runs nothing (the user's call, 2026-10-31). Between pull requests, the local `swift test` in the checklist above is the only guard.
+- **CI:** `.github/workflows/ci.yml` runs the strict build, `swift test` (with the architecture checks), both apps' personal routine unsigned, and the docs validator on a macOS runner, **only for an open pull request and for a merge into `stable`** — a push to a release branch runs nothing (the user's call, 2026-10-31). Between pull requests, the local `swift test` in the checklist above is the only guard.

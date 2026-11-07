@@ -1,17 +1,15 @@
 # The Business layer
 
-**Position.** Third of the four ([ADR 0001](../../../../documentation/istation/adrs/layer-enforcement.md)): what iStation does — decide what a disc is, find the games in a folder, find the installed emulators, launch one game at a time, and keep the library with its play history. The one place behavior lives.
+**Position.** Third of the four ([ADR 0001](../../../../documentation/istation/adrs/layer-enforcement.md)): the cores — what a console does. Today the PS1 console as a powered-off placeholder; the R3000A (item 3e) and the memory map and devices (3f) fill it in.
 
-**Modules:** `identification` (what one disc image or folder is: console, serial, title), `scanning` (library folders into games), `discovery` (find installed emulator apps), `launching` (start a game in its emulator and time the session), `library` (the library's state and rules: folders, rescans, play history, the one running game)
+**Modules:** `ps1` (the PS1 console)
 
-**May depend on:** Business, Data and Infrastructure — and no UI framework. `library`'s services are protocols (`LibraryPersisting`, `LibraryScanning`, `EmulatorDetecting`, `GameStarting`); the live conformances sit beside them in `Services.swift`, and only PresentationApp constructs them.
+**May depend on:** Business, Data and Infrastructure — and no UI or Apple framework: the Swift standard library, and nothing else without a recorded reason ([ADR 0015](../../../../documentation/istation/adrs/a-core-is-a-cpu-module-and-a-console-module.md)). A CPU family is one module generic over its bus; a console is one module owning its memory map; hot paths use concrete types or `@inlinable` generics, never protocol-typed values. Shipped code comes only from permissive sources, with its notice ([ADR 0013](../../../../documentation/istation/adrs/shipped-code-derives-only-from-permissive-references.md), [ADR 0014](../../../../documentation/istation/adrs/own-code-is-mit-and-derived-code-keeps-its-notice.md)).
 
 **Enforced by:** one SwiftPM target per module, generated from the module map in `src/istation/Package.swift`, and `ArchitectureTests` (`src/istation/tests/architecture/`), run by `swift test`.
 
 **Changing this layer:**
-- A new module: its directory `source/business/<module>/`, its `Module(.business, "<Name>", uses: […])` row in `Package.swift`, its tests in `tests/business/<module>/` (and in the `iStation` scheme of `iStation.xcodeproj`), its name on this card and in [ADR 0002](../../../../documentation/istation/adrs/module-map.md)'s table — in the same change.
-- One implementation per decision: a rule the views need (which games a place shows, which emulator runs a console) lives here once, never in a view-model.
-- Installed emulators are reached only through `launching` → `InfrastructureProcess`, by command line and process exit — the retiring library app's rule, until v0.0.1's item 3b removes it.
-- Cores (from v0.0.1) live here: one module per CPU family, generic over its bus, and one per console; no UI or Apple frameworks; ported only from ProjectPSX or Play!, each file naming its source and keeping its notice; hot paths use concrete types ([ADR 0013](../../../../documentation/istation/adrs/shipped-code-derives-only-from-permissive-references.md), [ADR 0015](../../../../documentation/istation/adrs/a-core-is-a-cpu-module-and-a-console-module.md)).
+- A new module: its directory `source/business/<module>/`, its `Module(.business, "<Name>", uses: […])` row in `Package.swift`, its tests in `tests/business/<module>/` (and in the `macOS Personal` scheme of `iStation.xcodeproj`), its name on this card and in [ADR 0002](../../../../documentation/istation/adrs/module-map.md)'s table — in the same change.
+- A core reaches TraceKit only through a generic tracer a release build specializes to nothing, its imports under `#if PERSONAL_BUILD` ([ADR 0016](../../../../documentation/istation/adrs/two-build-routines-and-a-fresh-start.md)).
 
 **Depth:** [the ADRs](../../../../documentation/istation/adrs/README.md) · [CLAUDE.md](../../../../documentation/istation/assistant/CLAUDE.md) · [DEVELOPER.md](../../../../documentation/istation/assistant/DEVELOPER.md).

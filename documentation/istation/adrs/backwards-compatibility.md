@@ -4,7 +4,7 @@
 
 ## Context
 
-iStation persists state its user owns — `~/Library/Application Support/iStation/library.json`: the library folders and their console hints, every game with its last-played date and total play time, and the settings ([reference/library-file.md](../reference/library-file.md)). Play history cannot be rebuilt by a rescan; an upgrade that cannot read the file, or silently rewrites it, costs the user their history. The scaffold already decoded settings field by field "so adding a setting later doesn't wipe an existing library file" (the user's design, 2026-10-26).
+iStation persists state its user owns — `~/Library/Application Support/iStation/library.json`: the library folders and their console hints, every game with its last-played date and total play time, and the settings (reference/library-file.md (retired with v0.0.1's item 3b; in the git history)). Play history cannot be rebuilt by a rescan; an upgrade that cannot read the file, or silently rewrites it, costs the user their history. The scaffold already decoded settings field by field "so adding a setting later doesn't wipe an existing library file" (the user's design, 2026-10-26).
 
 ## Decision
 

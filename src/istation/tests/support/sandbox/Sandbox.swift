@@ -38,12 +38,4 @@ public final class Sandbox {
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
         return url
     }
-
-    /// A minimal `.app` bundle at `path` whose binary is `Contents/MacOS/<binary>`.
-    @discardableResult
-    public func makeApp(_ path: String, binary: String) throws -> URL {
-        let app = try makeFolder(path)
-        try write(Data(), to: "\(path)/Contents/MacOS/\(binary)")
-        return app
-    }
 }

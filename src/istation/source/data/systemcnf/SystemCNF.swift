@@ -1,4 +1,3 @@
-import DataCatalog
 import Foundation
 
 /// SYSTEM.CNF from the root of a PS1 or PS2 disc.
@@ -6,7 +5,12 @@ import Foundation
 /// PS2 discs boot with `BOOT2 = cdrom0:\SLUS_200.62;1`, PS1 discs with `BOOT = cdrom:\SLUS_005.94;1`.
 /// That one key is the reliable way to tell the two consoles apart, since both use the same serial prefixes.
 public struct SystemCNF: Equatable, Sendable {
-    public let platform: Platform
+    /// The console a boot key belongs to.
+    public enum Console: String, Sendable {
+        case ps1, ps2
+    }
+
+    public let console: Console
     public let serial: String?
 
     public init?(text: String) {
@@ -22,10 +26,10 @@ public struct SystemCNF: Equatable, Sendable {
         }
 
         if let boot2 {
-            platform = .ps2
+            console = .ps2
             serial = Self.serial(fromBootPath: boot2)
         } else if let boot {
-            platform = .ps1
+            console = .ps1
             serial = Self.serial(fromBootPath: boot)
         } else {
             return nil

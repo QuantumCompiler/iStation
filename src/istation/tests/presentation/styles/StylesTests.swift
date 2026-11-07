@@ -1,20 +1,13 @@
-import DataCatalog
 import PresentationStyles
 import Testing
 
 @Suite struct StylesTests {
-    @Test func everyConsoleHasItsOwnSymbol() {
-        let symbols = Platform.allCases.map(Symbols.console)
-        #expect(Set(symbols).count == Platform.allCases.count)
+    @Test func theScreenIsFourByThree() {
+        #expect(abs(Metrics.screenAspectRatio * 3 - 4) < 1e-9)
+        #expect(abs(Metrics.playerMinWidth * 3 - Metrics.playerMinHeight * 4) < 1e-9)
     }
 
-    @Test func everyConsoleHasItsOwnTint() {
-        let tints = Platform.allCases.map { Palette.tint(for: $0).description }
-        #expect(Set(tints).count == Platform.allCases.count)
-    }
-
-    @Test func tilesFitTheirGrid() {
-        #expect(Metrics.tileMinWidth <= Metrics.tileMaxWidth)
-        #expect(Metrics.coverAspectRatio < 1) // a game case is taller than wide
+    @Test func symbolsAreDistinct() {
+        #expect(Symbols.nothingToPlay != Symbols.acknowledgements)
     }
 }

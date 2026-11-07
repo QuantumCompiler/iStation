@@ -27,7 +27,7 @@ Measured, not guessed (2026-11-07): tracing through Revula's tool calls (one rou
 **Acceptance criteria:**
 - [ ] `reference/trace-formats.md` specifies both record kinds and the checkpoints, byte by byte.
 - [ ] `DataTracing` writes and reads both, finds the first divergence by field, and reduces a trace to checkpoints; its tests pass.
-- [ ] No App Store build links it — checked by 3b's rule.
+- [ ] No App Store build links it — checked by `ProjectRulesTests.toolsArePersonalOnly` ([Milestone F](../../assistant/MILESTONES.md#milestone-f--the-skeleton-and-both-build-routines)).
 - [ ] Writing and reading 100 million instruction records is measured, and the number recorded in MILESTONES.
 
 **Scope note.** v0.0.1, track 3; gated on 3b (the package's new shape). 3d writes these formats from outside the package; 3e and 3f emit them from Swift; 3g compares. Out of scope: VU and GS formats (v2.x).

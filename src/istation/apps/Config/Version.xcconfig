@@ -1,0 +1,4 @@
+// The live version (documentation/istation/assistant/CLAUDE.md → Versioning), moved with the release
+// branch by /istation-maintenance-update-release.
+MARKETING_VERSION = 0.0.1
+CURRENT_PROJECT_VERSION = 1

@@ -22,7 +22,7 @@ The docs home is [`documentation/istation/`](../../../documentation/istation/REA
 - **[DEVELOPER.md](../../../documentation/istation/assistant/DEVELOPER.md)**: the tree, each changed module's section, the commands, the test table, the recipes.
 - **Layer cards** (`src/istation/source/<layer>/CLAUDE.md`, `src/istation/tests/<layer>/CLAUDE.md`), **ADR 0002's table** and the Xcode scheme's test list (`iStation.xcodeproj/xcshareddata/xcschemes/iStation.xcscheme`) against the `modules` rows in `Package.swift`.
 - **[ADRs](../../../documentation/istation/adrs/README.md)**: a new standing rule gets a record; a changed one a superseding record (append-only — the old record's Status line is its only edit); each Enforcement section names the real check.
-- **[reference/](../../../documentation/istation/reference/README.md)** against the shipped contract: the emulators' flags (`LaunchContract.swift`), the library file (`LibraryStore.swift`).
+- **[reference/](../../../documentation/istation/reference/README.md)** against the shipped contract: TraceKit's trace formats (`source/data/tracing/`, from item 3c), and any persisted format the apps write.
 - **[SPEC.md](../../../documentation/istation/assistant/SPEC.md)** only if scope moved, with a dated note.
 - **The root `README.md`** if building, running or installing changed.
 

@@ -6,17 +6,19 @@ iStation ships no BIOS files or games: you import your own.
 
 ## Status
 
-v0.0.1, re-envisioned on 2026-11-07. What the repository holds today is the retired first design — a library and launcher for installed emulators — which v0.0.1 replaces with the new packages (`PS1Core`, `PS2Core`, `EmuKit`, `TraceKit`), the two apps and their two build routines (App Store and personal), then the PS1's R3000A booting the BIOS. See [the roadmap](documentation/istation/assistant/ROADMAP.md).
+v0.0.1, re-envisioned on 2026-11-07. JIT is verified under the App Store routine, and the skeleton is in place: the packages `PS1Core` and `EmuKit`, and the macOS and iOS apps, each in two build routines (App Store and personal). Both apps open to an empty player; the PS1's R3000A and the BIOS boot come next. See [the roadmap](documentation/istation/assistant/ROADMAP.md).
 
 ## Build and run
 
 Requires macOS 14 or later on Apple Silicon and Xcode 16 or later (Swift 6).
 
-In Xcode, open `iStation.xcodeproj` at the root of the repository. From Terminal:
+In Xcode, open `iStation.xcodeproj` at the root of the repository and pick a scheme: `macOS Personal` or `iOS Personal` to run and debug (⌘R; ⌘U runs every test from `macOS Personal`), `macOS App Store` or `iOS App Store` to archive. From Terminal:
 
 ```bash
 cd src/istation
-swift test                    # every module's tests, plus the architecture checks
+swift test                              # every module's tests, plus the architecture checks
+./scripts/build-personal.sh macOS       # the personal routine (or iOS, for the Simulator)
+./scripts/archive-appstore.sh macOS     # an App Store archive; signing and uploading are yours
 ```
 
 ## Licence

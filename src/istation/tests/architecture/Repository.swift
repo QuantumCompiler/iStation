@@ -125,8 +125,6 @@ struct ModuleMap {
     let layers: [String]
     let modules: [MapModule]
     let supports: [MapSupport]
-    let entryPoint: String
-    let entryPointUses: [String]
 
     static let uiFrameworks: Set<String> = ["SwiftUI", "AppKit", "UIKit", "Cocoa"]
 
@@ -140,8 +138,6 @@ struct ModuleMap {
 
         var modules: [MapModule] = []
         var supports: [MapSupport] = []
-        var entryPoint = ""
-        var entryPointUses: [String] = []
         for line in manifest.components(separatedBy: .newlines) {
             if let row = Pattern.captures(
                 #"^\s*Module\(\.([a-z]+), "([A-Za-z0-9]+)"(?:, uses: \[([^\]]*)\])?(?:, testSupport: \[([^\]]*)\])?\),\s*$"#, in: line
@@ -151,13 +147,9 @@ struct ModuleMap {
                 #"^\s*Support\(\.([a-z]+), "([A-Za-z0-9]+)"(?:, uses: \[([^\]]*)\])?\),\s*$"#, in: line
             ).first, let layer = row[0], let name = row[1] {
                 supports.append(MapSupport(layer: layer, name: name, uses: Pattern.names(in: row[2])))
-            } else if let row = Pattern.captures(#"^let entryPoint = EntryPoint\("([A-Za-z0-9]+)", uses: \[([^\]]*)\]\)"#, in: line).first,
-                      let name = row[0] {
-                entryPoint = name
-                entryPointUses = Pattern.names(in: row[1])
             }
         }
-        return ModuleMap(layers: layers, modules: modules, supports: supports, entryPoint: entryPoint, entryPointUses: entryPointUses)
+        return ModuleMap(layers: layers, modules: modules, supports: supports)
     }
 
     func module(_ target: String) -> MapModule? { modules.first { $0.target == target } }
@@ -177,7 +169,7 @@ struct ModuleMap {
 
     /// Every target name the package defines, so imports of system modules can be told apart.
     var packageTargets: Set<String> {
-        Set(modules.map(\.target) + modules.map { $0.target + "Tests" } + supports.map(\.target) + [entryPoint, "ArchitectureTests"])
+        Set(modules.map(\.target) + modules.map { $0.target + "Tests" } + supports.map(\.target) + ["ArchitectureTests"])
     }
 }
 

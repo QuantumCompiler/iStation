@@ -1,27 +1,5 @@
 import Foundation
 
-/// Builds a PARAM.SFO containing UTF-8 string values.
-public func makeSFO(_ entries: [(String, String)]) -> [UInt8] {
-    func le16(_ v: Int) -> [UInt8] { [UInt8(v & 0xFF), UInt8(v >> 8 & 0xFF)] }
-    func le32(_ v: Int) -> [UInt8] { le16(v & 0xFFFF) + le16(v >> 16) }
-
-    var keys: [UInt8] = []
-    var data: [UInt8] = []
-    var index: [UInt8] = []
-    for (key, value) in entries {
-        let valueBytes = Array(value.utf8) + [0]
-        let maxLength = (valueBytes.count + 3) / 4 * 4
-        index += le16(keys.count) + le16(0x0204) + le32(valueBytes.count) + le32(maxLength) + le32(data.count)
-        keys += Array(key.utf8) + [0]
-        data += valueBytes + Array(repeating: 0, count: maxLength - valueBytes.count)
-    }
-    while keys.count % 4 != 0 { keys.append(0) }
-
-    let keyTable = 20 + index.count
-    let header: [UInt8] = [0x00, 0x50, 0x53, 0x46] + le32(0x0101) + le32(keyTable) + le32(keyTable + keys.count) + le32(entries.count)
-    return header + index + keys + data
-}
-
 /// Builds a tiny single-directory ISO 9660 image, optionally as raw 2352-byte Mode 2 sectors.
 public func makeISO(files: [String: [UInt8]], raw: Bool = false) -> Data {
     let sectorSize = 2048

@@ -27,6 +27,12 @@ jobs:
       - name: Tests, including the layering and layer-context checks
         run: swift test
 
+      - name: Both apps, personal routine, unsigned
+        working-directory: .
+        run: |
+          xcodebuild build -project iStation.xcodeproj -scheme "macOS Personal" -destination generic/platform=macOS CODE_SIGNING_ALLOWED=NO
+          xcodebuild build -project iStation.xcodeproj -scheme "iOS Personal" -destination "generic/platform=iOS Simulator" CODE_SIGNING_ALLOWED=NO
+
       - name: Docs validator
         working-directory: .
         run: python3 scripts/validate_docs.py documentation

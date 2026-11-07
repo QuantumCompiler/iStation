@@ -13,7 +13,7 @@ A PR description written from evidence, delivered as text for the user to paste.
 - MILESTONES entries added on the branch: `git diff stable...HEAD -- documentation/istation/assistant/MILESTONES.md`.
 - Backlog documents deleted on the branch (their ids and titles): `git diff --name-status stable...HEAD -- documentation/istation/backlog/`.
 - Decisions recorded on the branch: new dated lines in backlog documents, ADRs, SPEC, ROADMAP.
-- ADRs added or superseded; reference contracts changed (`LaunchContract.swift`, `LibraryStore.swift`).
+- ADRs added or superseded; reference contracts changed (TraceKit's trace formats, from item 3c).
 
 ## 2. Verify, don't claim
 

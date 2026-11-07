@@ -17,7 +17,7 @@ Keeping them separate also lets emulator updates arrive the normal way. Separate
 
 ## Decision
 
-1. **iStation talks to an emulator only through its command line and its process exit** — never by linking, embedding, loading (`dlopen`) or modifying its code. The flags are each emulator's own ([reference/emulator-launch-contract.md](../reference/emulator-launch-contract.md)).
+1. **iStation talks to an emulator only through its command line and its process exit** — never by linking, embedding, loading (`dlopen`) or modifying its code. The flags are each emulator's own (reference/emulator-launch-contract.md (retired with v0.0.1's item 3b; in the git history)).
 2. **One module starts processes**: `InfrastructureProcess`. Business reaches it only through `BusinessLaunching`.
 3. **The package links no external code** unless it is on this record's allow-list, each entry licence-reviewed first. The allow-list is empty today. Expected entries: Sparkle (MIT, v1.0.0) and libchdr (BSD, v0.2.0) — each added by a superseding record or an "Accepted, with the allow-list extended" note, with its licence obligation.
 4. **The repository holds no disc images, BIOS or system-software files.** Tests build their discs in memory, in a temporary folder.

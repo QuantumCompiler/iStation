@@ -14,7 +14,7 @@ Release notes in the house format, delivered as a draft. Publishing (a GitHub re
    - **Title and theme** — `iStation v<x.y.z> — <the phase's theme>`.
    - **Intro** — two sentences, in plain words for someone who plays games, not someone who builds them.
    - **Highlights** — what a person can now do.
-   - **Install** — how to get it (today: build from source with `./scripts/build-app.sh`; from v1.0.0: the notarized `.dmg`), the App Store or the personal build, and which consoles each app plays.
+   - **Install** — how to get it (today: build from source with `./scripts/build-personal.sh` or archive with `./scripts/archive-appstore.sh`; from v1.0.0: the notarized `.dmg`), the App Store or the personal build, and which consoles each app plays.
    - **Platforms** — macOS 14+, Apple Silicon.
    - **Known limitations** — from the open Maintenance items and ROADMAP; honest.
    - **Reference** — the licences (iStation's own MIT; ProjectPSX's MIT and Play!'s BSD notices it carries) and the source tag.

@@ -1,10 +1,9 @@
 import SwiftUI
 
-/// Every font the app sets text in, named for its role.
+/// Every font the apps set text in, named for its role.
 public enum Typography {
-    /// The title printed on a placeholder case.
-    public static let coverTitle = Font.headline
-    public static let tileTitle = Font.callout.weight(.medium)
-    public static let tileDetail = Font.caption
-    public static let badge = Font.caption2.weight(.bold)
+    public static let title = Font.title2.weight(.semibold)
+    public static let body = Font.body
+    /// The large symbol on an empty screen.
+    public static let screenSymbol = Font.system(size: 48)
 }

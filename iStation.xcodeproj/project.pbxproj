@@ -6,74 +6,392 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		8853BCB763157DD495AEF6C6 /* EmuKit in Frameworks */ = {isa = PBXBuildFile; productRef = F180DB32BBD1E476C7EB86A7 /* EmuKit */; };
+		9D361C1375329E19DFC9B0DD /* PS1Core in Frameworks */ = {isa = PBXBuildFile; productRef = 464A53AEC5387DAD37DEA6CC /* PS1Core */; };
+		A8A47D305F124FC2CDFA7AB1 /* PS1Core in Frameworks */ = {isa = PBXBuildFile; productRef = 3A343AD98AD8A52E703C834E /* PS1Core */; };
+		B12406A8A0305E1A34B62499 /* EmuKit in Frameworks */ = {isa = PBXBuildFile; productRef = 937A56F8C555619C691D8B69 /* EmuKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
-		4A0000000000000000000002 /* istation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = istation; path = src/istation; sourceTree = "<group>"; };
+		37E2B4C2DF614925F6F0F02E /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>";};
+		709E55BF70A90526914A009D /* AppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppStore.xcconfig; sourceTree = "<group>";};
+		793F257C7B9F24D70B6489A5 /* Personal.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Personal.xcconfig; sourceTree = "<group>";};
+		810518D886B08192A47FF3ED /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>";};
+		88BD3A181616833AB9BEF9E5 /* Personal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Personal.entitlements; sourceTree = "<group>";};
+		8FD962B3E5E8ADFA2AAFA4B2 /* Personal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Personal.entitlements; sourceTree = "<group>";};
+		C93B50687CCA325E43FBE332 /* istation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = istation; path = src/istation; sourceTree = "<group>";};
+		CA40BD3FDD20857ACBA75FC5 /* iStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iStation.app; sourceTree = BUILT_PRODUCTS_DIR;};
+		D1BF349F3CDBE7800DB129C8 /* iStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iStation.app; sourceTree = BUILT_PRODUCTS_DIR;};
+		F9CE25CE884AB8737F0AA626 /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>";};
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		02CF4A6A559AF871FADAF192 /* Sources */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		19DDCC91D00C7D8512A88928 /* Sources */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Sources;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		076F7A723E1A258AA78541CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9D361C1375329E19DFC9B0DD /* PS1Core in Frameworks */,
+				8853BCB763157DD495AEF6C6 /* EmuKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		135CB5A010C597A02E5A8169 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A8A47D305F124FC2CDFA7AB1 /* PS1Core in Frameworks */,
+				B12406A8A0305E1A34B62499 /* EmuKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
-		4A0000000000000000000001 = {
+		47C9A9AB5FE8344A3E6B47AE /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				4A0000000000000000000002 /* istation */,
+				19DDCC91D00C7D8512A88928 /* Sources */,
+				F9CE25CE884AB8737F0AA626 /* AppStore.entitlements */,
+				8FD962B3E5E8ADFA2AAFA4B2 /* Personal.entitlements */,
 			);
+			name = iOS;
+			path = src/istation/apps/ios;
+			sourceTree = "<group>";
+		};
+		6EDE00FA7A261151470098F6 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				37E2B4C2DF614925F6F0F02E /* Version.xcconfig */,
+				709E55BF70A90526914A009D /* AppStore.xcconfig */,
+				793F257C7B9F24D70B6489A5 /* Personal.xcconfig */,
+			);
+			path = src/istation/apps/Config;
+			sourceTree = "<group>";
+		};
+		956934E60556FDCE0710C957 = {
+			isa = PBXGroup;
+			children = (
+				C93B50687CCA325E43FBE332 /* istation */,
+				AE03C15C0D73E24C7B08CCB2 /* macOS */,
+				47C9A9AB5FE8344A3E6B47AE /* iOS */,
+				6EDE00FA7A261151470098F6 /* Config */,
+				CC0F68FE2D81F9614883F277 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AE03C15C0D73E24C7B08CCB2 /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				02CF4A6A559AF871FADAF192 /* Sources */,
+				810518D886B08192A47FF3ED /* AppStore.entitlements */,
+				88BD3A181616833AB9BEF9E5 /* Personal.entitlements */,
+			);
+			name = macOS;
+			path = src/istation/apps/macos;
+			sourceTree = "<group>";
+		};
+		CC0F68FE2D81F9614883F277 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CA40BD3FDD20857ACBA75FC5 /* iStation.app */,
+				D1BF349F3CDBE7800DB129C8 /* iStation.app */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
+/* Begin PBXNativeTarget section */
+		5D1D20C540B3325DB95D55A4 /* iStation iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8C50DBDDEBA2E3C541B5EF1B /* Build configuration list for PBXNativeTarget "iStation iOS" */;
+			buildPhases = (
+				8644BC3F978A351B213C959A /* Sources */,
+				076F7A723E1A258AA78541CD /* Frameworks */,
+				DB025EF9D59BF56D18704371 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				19DDCC91D00C7D8512A88928 /* Sources */,
+			);
+			name = "iStation iOS";
+			packageProductDependencies = (
+				464A53AEC5387DAD37DEA6CC /* PS1Core */,
+				F180DB32BBD1E476C7EB86A7 /* EmuKit */,
+			);
+			productName = iStation;
+			productReference = D1BF349F3CDBE7800DB129C8 /* iStation.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B806710A481F978F97249349 /* iStation macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2BCF355E930E761BBA86AF93 /* Build configuration list for PBXNativeTarget "iStation macOS" */;
+			buildPhases = (
+				8B369ED96E87263FE91E8E52 /* Sources */,
+				135CB5A010C597A02E5A8169 /* Frameworks */,
+				D9A35D6A9A1F59293BADF432 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				02CF4A6A559AF871FADAF192 /* Sources */,
+			);
+			name = "iStation macOS";
+			packageProductDependencies = (
+				3A343AD98AD8A52E703C834E /* PS1Core */,
+				937A56F8C555619C691D8B69 /* EmuKit */,
+			);
+			productName = iStation;
+			productReference = CA40BD3FDD20857ACBA75FC5 /* iStation.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
 /* Begin PBXProject section */
-		4A0000000000000000000000 /* Project object */ = {
+		46F86FAA6BBF9AC94A7E4595 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2710;
 				LastUpgradeCheck = 2710;
 			};
-			buildConfigurationList = 4A0000000000000000000003 /* Build configuration list for PBXProject "iStation" */;
+			buildConfigurationList = 01076EBF22530E406F54B419 /* Build configuration list for PBXProject "iStation" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 4A0000000000000000000001;
+			mainGroup = 956934E60556FDCE0710C957;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
+			productRefGroup = CC0F68FE2D81F9614883F277 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				B806710A481F978F97249349 /* iStation macOS */,
+				5D1D20C540B3325DB95D55A4 /* iStation iOS */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		D9A35D6A9A1F59293BADF432 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB025EF9D59BF56D18704371 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8644BC3F978A351B213C959A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8B369ED96E87263FE91E8E52 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
 /* Begin XCBuildConfiguration section */
-		4A0000000000000000000004 /* Debug */ = {
+		4A747F3EC4CB34D6E081B4ED /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 709E55BF70A90526914A009D /* AppStore.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				SDKROOT = macosx;
+				CODE_SIGN_STYLE = Automatic;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = iStation;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = local.istation.ios;
+				PRODUCT_NAME = iStation;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		5047AEF86AC65375CB67B3AA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 793F257C7B9F24D70B6489A5 /* Personal.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = iStation;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = local.istation.ios;
+				PRODUCT_NAME = iStation;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		4A0000000000000000000005 /* Release */ = {
+		AE82809AE8459650F58A4A53 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		E5D230981F3C5D44C6AD4B05 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 793F257C7B9F24D70B6489A5 /* Personal.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = iStation;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = local.istation.macos;
+				PRODUCT_NAME = iStation;
 				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		EEF2F1627136560C386029B6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		FECAA519EFA39D38C638BFC1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 709E55BF70A90526914A009D /* AppStore.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = iStation;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = local.istation.macos;
+				PRODUCT_NAME = iStation;
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4A0000000000000000000003 /* Build configuration list for PBXProject "iStation" */ = {
+		01076EBF22530E406F54B419 /* Build configuration list for PBXProject "iStation" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4A0000000000000000000004 /* Debug */,
-				4A0000000000000000000005 /* Release */,
+				EEF2F1627136560C386029B6 /* Debug */,
+				AE82809AE8459650F58A4A53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2BCF355E930E761BBA86AF93 /* Build configuration list for PBXNativeTarget "iStation macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E5D230981F3C5D44C6AD4B05 /* Debug */,
+				FECAA519EFA39D38C638BFC1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8C50DBDDEBA2E3C541B5EF1B /* Build configuration list for PBXNativeTarget "iStation iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5047AEF86AC65375CB67B3AA /* Debug */,
+				4A747F3EC4CB34D6E081B4ED /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3A343AD98AD8A52E703C834E /* PS1Core */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PS1Core;
+		};
+		464A53AEC5387DAD37DEA6CC /* PS1Core */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PS1Core;
+		};
+		937A56F8C555619C691D8B69 /* EmuKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EmuKit;
+		};
+		F180DB32BBD1E476C7EB86A7 /* EmuKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EmuKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+
 	};
-	rootObject = 4A0000000000000000000000 /* Project object */;
+	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
 }

@@ -1,0 +1,12 @@
+// The personal routine (ADR 0016) — the Debug configuration of both apps: development signing,
+// get-task-allow so LLDB and Frida can attach, JIT on, and PERSONAL_BUILD for TraceKit and the debug
+// views. Never distributed. Build with scripts/build-personal.sh.
+#include "Version.xcconfig"
+
+CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = src/istation/apps/macos/Personal.entitlements
+CODE_SIGN_ENTITLEMENTS[sdk=iphone*] = src/istation/apps/ios/Personal.entitlements
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) DEBUG PERSONAL_BUILD
+SWIFT_OPTIMIZATION_LEVEL = -Onone
+ONLY_ACTIVE_ARCH = YES
+ENABLE_TESTABILITY = YES
+DEBUG_INFORMATION_FORMAT = dwarf
