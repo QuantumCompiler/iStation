@@ -15,7 +15,7 @@ Project context for coding agents working on **iStation**. Read this before maki
 | [**MILESTONES.md**](MILESTONES.md) | The record of finished work — what shipped and how it was built. |
 | [**DEVELOPER.md**](DEVELOPER.md) | The module-by-module reference: directories, files, interfaces, build/test commands, recipes. |
 | [**adrs/**](../adrs/README.md) | The standing architecture rules, each with its reason and its enforcement. |
-| [**reference/**](../reference/README.md) | The contracts iStation builds against and writes: TraceKit's trace formats, from item 3c. |
+| [**reference/**](../reference/README.md) | The contracts iStation builds against and writes: TraceKit's trace formats. |
 
 **How work flows:** discussed in chat → a line in ROADMAP.md (and SPEC.md if product shape changes) → its own backlog document once specced → an agent builds it straight from that document → folded into MILESTONES.md, and the backlog document deleted. There is no separate TODO file.
 
@@ -34,7 +34,7 @@ The repository holds the package's first shape (since v0.0.1's item 3b, 2026-11-
 ## Stack & environment
 
 - **Language / framework:** Swift 6 in language mode 6 — strict concurrency (the default, taken 2026-10-31) — with SwiftUI and Observation; macOS 14 Sonoma or later.
-- **Build:** Swift Package Manager, `src/istation/Package.swift` (swift-tools-version 6.0; macOS 14 and iOS 17): one library target per module, generated from the module map, grouped into the library products `PS1Core` and `EmuKit` (`TraceKit` from item 3c; `PS2Core` with the PS2 work). The apps are two targets in `iStation.xcodeproj` at the repository root — `iStation macOS` and `iStation iOS`, sources in `src/istation/apps/` — each with two routines ([ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md)): **Personal** is the Debug configuration (`apps/Config/Personal.xcconfig`, `PERSONAL_BUILD`, `get-task-allow`, JIT on) and **App Store** the Release configuration (`apps/Config/AppStore.xcconfig`, App Sandbox, read-only user-selected files, `allow-jit` on macOS). One shared scheme per app per routine: `macOS Personal`, `macOS App Store`, `iOS Personal`, `iOS App Store`. `swift build` from `src/istation/` builds the package alone. Bundle identifiers are placeholders (`local.istation.macos`, `local.istation.ios`) until the user's App Store Connect identifiers exist (v1.0.0).
+- **Build:** Swift Package Manager, `src/istation/Package.swift` (swift-tools-version 6.0; macOS 14 and iOS 17): one library target per module, generated from the module map, grouped into the library products `PS1Core`, `EmuKit` and `TraceKit` (personal builds only; `PS2Core` with the PS2 work). The apps are two targets in `iStation.xcodeproj` at the repository root — `iStation macOS` and `iStation iOS`, sources in `src/istation/apps/` — each with two routines ([ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md)): **Personal** is the Debug configuration (`apps/Config/Personal.xcconfig`, `PERSONAL_BUILD`, `get-task-allow`, JIT on) and **App Store** the Release configuration (`apps/Config/AppStore.xcconfig`, App Sandbox, read-only user-selected files, `allow-jit` on macOS). One shared scheme per app per routine: `macOS Personal`, `macOS App Store`, `iOS Personal`, `iOS App Store`. `swift build` from `src/istation/` builds the package alone. Bundle identifiers are placeholders (`local.istation.macos`, `local.istation.ios`) until the user's App Store Connect identifiers exist (v1.0.0).
 - **Tests:** Swift Testing (the default, taken 2026-10-31, over the scaffold's XCTest): `swift test` from `src/istation/`, which also runs the architecture checks.
 - **Platforms / devices:** macOS 14+ on Apple Silicon (PS1 and PS2) and iOS (PS1, interpreter only). AArch64 only: Intel Macs aren't supported. Development host as of 2026-11-07: macOS 27, Xcode 27.1, Swift 6.4.
 - **Key dependencies:** none beyond Apple's SDK — [ADR 0013](../adrs/shipped-code-derives-only-from-permissive-references.md)'s allow-list is empty; every dependency is audited first, and Apple frameworks and Swift packages are preferred. The references — [ProjectPSX](https://github.com/BluestormDNA/ProjectPSX) (PS1, MIT, C#/.NET 10) and [Play!](https://github.com/jpd002/Play-) (PS2, BSD, C++) — are read and built locally, never vendored. The oracles — SwanStation and PCSX2 — are only built unmodified and run.
@@ -147,12 +147,13 @@ Presentation is EmuKit: one module per user-facing place, each **`Views/` + `Vie
 | Data | `iso9660` | cooked/raw CD sectors and the ISO 9660 directory tree |
 | Data | `systemcnf` | SYSTEM.CNF: the boot key's console and serial |
 | Data | `playlists` | .cue track files and .m3u disc entries |
+| Data | `tracing` | TraceKit: trace records, files, the first divergence and checkpoints (personal builds only) |
 | Business | `ps1` | the PS1 console (a powered-off placeholder until items 3e and 3f) |
 | Presentation | `styles` | the visual tokens: palette, symbols, metrics, typography |
 | Presentation | `player` | the player's screen |
 | Presentation | `acknowledgements` | every notice the app carries |
 
-The products: `PS1Core` (`ps1`) and `EmuKit` (`styles`, `player`, `acknowledgements`); the format readers join a product with v0.2.0's discs. The apps' targets in `iStation.xcodeproj` (`src/istation/apps/macos/`, `src/istation/apps/ios/`) are the entry points and composition roots, not modules. Detail per module lives in the layer cards and [DEVELOPER.md](DEVELOPER.md).
+The products: `PS1Core` (`ps1`), `EmuKit` (`styles`, `player`, `acknowledgements`) and `TraceKit` (`tracing`, personal builds only); the format readers join a product with v0.2.0's discs. The apps' targets in `iStation.xcodeproj` (`src/istation/apps/macos/`, `src/istation/apps/ios/`) are the entry points and composition roots, not modules. Detail per module lives in the layer cards and [DEVELOPER.md](DEVELOPER.md).
 
 ---
 

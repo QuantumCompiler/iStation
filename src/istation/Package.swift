@@ -20,6 +20,7 @@ let modules: [Module] = [
     Module(.data, "ISO9660", uses: ["InfrastructureBytes"], testSupport: ["SupportSandbox", "SupportDiscFixtures"]),
     Module(.data, "SystemCNF"),
     Module(.data, "Playlists", testSupport: ["SupportSandbox"]),
+    Module(.data, "Tracing", testSupport: ["SupportSandbox"]),
 
     Module(.business, "PS1"),
 
@@ -40,6 +41,8 @@ let testSupport: [Support] = [
 let products: [Product] = [
     .library(name: "PS1Core", targets: ["BusinessPS1"]),
     .library(name: "EmuKit", targets: ["PresentationStyles", "PresentationPlayer", "PresentationAcknowledgements"]),
+    // Personal builds only: no app links it in its App Store routine (ADR 0016).
+    .library(name: "TraceKit", targets: ["DataTracing"]),
 ]
 
 /// `PERSONAL_BUILD` guards every tool and debug view (ADR 0016). The personal routine builds the

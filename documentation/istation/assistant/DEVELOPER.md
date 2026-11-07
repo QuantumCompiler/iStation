@@ -14,7 +14,7 @@ documentation/                 the router and this docs home
 tools/
   jit-probe/                   the JIT probe (3a): one sandboxed allow-jit app, build.sh, results in README.md
 src/istation/
-  Package.swift                the module map (ADR 0002), the products PS1Core and EmuKit, PERSONAL_BUILD in debug
+  Package.swift                the module map (ADR 0002), the products PS1Core, EmuKit and TraceKit, PERSONAL_BUILD in debug
   apps/
     Config/                    Version.xcconfig · AppStore.xcconfig (Release) · Personal.xcconfig (Debug)
     macos/                     Sources/iStationApp.swift · AppStore.entitlements · Personal.entitlements
@@ -24,7 +24,7 @@ src/istation/
     archive-appstore.sh        the App Store routine: one app, Release, archived into build/<platform>/
   source/
     infrastructure/            CLAUDE.md · bytes/
-    data/                      CLAUDE.md · iso9660/ systemcnf/ playlists/
+    data/                      CLAUDE.md · iso9660/ systemcnf/ playlists/ tracing/
     business/                  CLAUDE.md · ps1/
     presentation/              CLAUDE.md · styles/ player/ acknowledgements/
   tests/
@@ -51,6 +51,7 @@ From `src/istation/` unless noted.
 | App Store archive of an app | `./scripts/archive-appstore.sh macOS` (or `iOS`); `ISTATION_TEAM_ID=<team> …` also signs and exports — yours |
 | Xcode (repo root) | `open iStation.xcodeproj`; scheme `macOS Personal`: ⌘R runs, ⌘U runs every package test |
 | All tests through Xcode (repo root) | `xcodebuild test -project iStation.xcodeproj -scheme "macOS Personal" -destination 'platform=macOS'` |
+| TraceKit's throughput (2.5 GB in a temporary folder) | `ISTATION_BENCHMARK=1 swift test -c release --filter ThroughputTests` |
 | Docs validator (repo root) | `python3 scripts/validate_docs.py documentation` |
 | Lint / format | _TODO:_ none chosen |
 
@@ -79,6 +80,7 @@ Every test target is Swift Testing, named `<Layer><Module>Tests`, at `tests/<lay
 | `DataISO9660Tests` | Data | find and read a file in cooked and raw images; reject non-ISO |
 | `DataSystemCNFTests` | Data | PS1/PS2 boot keys, serials, PSX.EXE, no boot key |
 | `DataPlaylistsTests` | Data | cue files quoted and unquoted; m3u comments; unreadable files |
+| `DataTracingTests` | Data | the trace formats byte for byte; round trips across the buffer; truncated, foreign, newer and unknown input; FNV-1a vectors and the register checksum; the first divergence by field; checkpoints; throughput (off by default) |
 | `BusinessPS1Tests` | Business | a new console is powered off |
 | `PresentationStylesTests` | Presentation | the screen's 4:3 shape; distinct symbols |
 | `PresentationPlayerTests` | Presentation | a new player has nothing loaded |
@@ -96,6 +98,7 @@ Every test target is Swift Testing, named `<Layer><Module>Tests`, at `tests/<lay
 - **`iso9660`** (`DataISO9660`) — `ISO9660.swift`: `SectorReader` (internal; detects raw 2352-byte sectors by the sync pattern), `ISO9660(url:)`, `entries(in:)`, `find(_:)`, `read(_:maxBytes:)`, `close()`, `DiscError`.
 - **`systemcnf`** (`DataSystemCNF`) — `SystemCNF.swift`: `SystemCNF(text:)` → `console` (`.ps1`, `.ps2`), `serial`; `BOOT2` means PS2, `BOOT` PS1.
 - **`playlists`** (`DataPlaylists`) — `Playlists.swift`: `Playlists.cueTracks(_:)`, `Playlists.m3uEntries(_:)`.
+- **`tracing`** (`DataTracing`, product `TraceKit`, personal builds only) — [reference/trace-formats.md](../reference/trace-formats.md). `Checksum.swift`: `FNV1a64`, `RegisterChecksum.of(gpr:hi:lo:sr:cause:epc:)`; `InstructionRecord.swift` (and `FullStateRecord`); `FrameRecord.swift`; `TraceFile.swift`: `TraceHeader`, `TraceGranularity`, `TraceRecord`, `TraceError`, `TraceWriter` (1 MB buffer; `append`, `finish()`), `TraceReader` (streaming `next()`, `readAll()`); `TraceDiff.swift`: `TraceDiff.firstDivergence(_:_:ignoringCycles:)` → `TraceDivergence` (index, both records, the differing fields); `Checkpoints.swift`: `Checkpoints.reduce(_:window:)`, `firstDivergentWindow`, `write`, `read`.
 
 ### Business
 
@@ -144,7 +147,7 @@ In its module's `Views/`, one top-level view per file, bound to that module's vi
 
 ### Adding a debug view or a tool
 
-A debug view goes in its module's `Debug/` and opens with `#if PERSONAL_BUILD`; an import of TraceKit (`DataTracing`, from 3c) sits inside `#if PERSONAL_BUILD`. `ArchitectureTests` fails on either outside the guard.
+A debug view goes in its module's `Debug/` and opens with `#if PERSONAL_BUILD`; an import of TraceKit (`DataTracing`) sits inside `#if PERSONAL_BUILD`. `ArchitectureTests` fails on either outside the guard.
 
 ### Adding or promoting a shared component
 

@@ -12,7 +12,7 @@ Checked 2026-11-07: ps1-tests (MIT) has four CPU tests — `access-time`, `code-
 - `tools/gate/run.sh`: runs the boot and the four CPU tests, diffs per-frame traces against SwanStation's and per-instruction traces against ProjectPSX's (3d), compares each test's TTY with its `psx.log` where one exists, and writes a report.
 - MILESTONES: the report's numbers.
 
-**Reference.** [ps1-tests](https://github.com/JaCzekanski/ps1-tests) `cpu/` (sources and `psx.log`, MIT). 3c's formats and diff; 3d's tools.
+**Reference.** [ps1-tests](https://github.com/JaCzekanski/ps1-tests) `cpu/` (sources and `psx.log`, MIT). the trace format ([reference/trace-formats.md](../../reference/trace-formats.md), shipped with 3c)s and diff; 3d's tools.
 
 **Decisions made** (dated):
 - 2026-11-07: the milestone is the brief's — all of ps1-tests' CPU tests and a trace matching SwanStation's — replacing Milestone C's narrower bar (the user's brief).

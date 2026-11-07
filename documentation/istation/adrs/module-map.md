@@ -18,12 +18,13 @@ The directory naming follows SwiftPM's freedom of `path:`: lowercase module dire
 | data | `iso9660` | `InfrastructureBytes` |
 | data | `systemcnf` | — |
 | data | `playlists` | — |
+| data | `tracing` | — |
 | business | `ps1` | — |
 | presentation | `styles` | — |
 | presentation | `player` | `BusinessPS1`, `PresentationStyles` |
 | presentation | `acknowledgements` | `PresentationStyles` |
 
-The table as of 2026-11-07, after v0.0.1's item 3b retired the library app's 17 other modules ([Milestone F](../assistant/MILESTONES.md#milestone-f--the-skeleton-and-both-build-routines)). The library products the apps link are `PS1Core` (`BusinessPS1`) and `EmuKit` (the three Presentation modules).
+The table as of 2026-11-07, after v0.0.1's item 3b retired the library app's 17 other modules ([Milestone F](../assistant/MILESTONES.md#milestone-f--the-skeleton-and-both-build-routines)). The library products the apps link are `PS1Core` (`BusinessPS1`) and `EmuKit` (the three Presentation modules); `TraceKit` (`DataTracing`, item 3c) is for personal builds only.
 
 ## Consequences
 

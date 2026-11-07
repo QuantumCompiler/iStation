@@ -18,7 +18,7 @@ The brief's first three tasks: prove JIT works under the App Store routine, lay 
 - [ ] **Provenance headers and notices** — SPDX headers, provenance lines, the acknowledgements list and the root licence, with a check ([A2](../backlog/architecture/provenance-headers-and-notices.md))
 - [x] **JIT under the App Store routine** — a sandboxed `allow-jit` macOS app that maps one `MAP_JIT` region and runs code it wrote ([Milestone E](MILESTONES.md#milestone-e--jit-under-the-app-store-routine))
 - [x] **The skeleton and both build routines** — the packages, the macOS and iOS apps, App Store and personal routines; the library app removed ([Milestone F](MILESTONES.md#milestone-f--the-skeleton-and-both-build-routines))
-- [ ] **TraceKit** — the trace format and the first divergence between two traces ([3c](../backlog/v0.0.1/tracekit.md))
+- [x] **TraceKit** — the trace format and the first divergence between two traces ([Milestone G](MILESTONES.md#milestone-g--tracekit))
 - [ ] **The reference and the oracle** — ProjectPSX with trace logging; SwanStation unmodified, recorded from outside ([3d](../backlog/v0.0.1/reference-and-oracle-traces.md))
 - [ ] **The R3000A interpreter** — ported from ProjectPSX, generic over its bus ([3e](../backlog/v0.0.1/r3000a-interpreter.md))
 - [ ] **The PS1 console** — memory map, interrupt controller, timers, DMA and the devices the BIOS needs ([3f](../backlog/v0.0.1/ps1-console.md))

@@ -216,3 +216,22 @@ The detailed record of finished work: what shipped, how it was built, the trade-
 
 - 2026-11-07: start the apps fresh; the library app retires (the user's call). Two routines per app, `PERSONAL_BUILD`, xcconfig and entitlements per routine, a scheme or script per routine (the user's brief). The packages are products of the one layered package; the apps are targets in `iStation.xcodeproj` (the re-vision's default).
 - 2026-11-07: keep the four format readers; iOS 17; `PS2Core` with the PS2 work; placeholder bundle identifiers (the defaults, confirmed by the user).
+
+
+## Milestone G — TraceKit
+
+**Goal.** "The oracle decides": a ported subsystem is right when its guest-visible behaviour matches, and the first divergence is the bug. Three sources must write comparable traces — the Swift port, ProjectPSX with trace logging and SwanStation recorded from outside — so the format, a recorder, a reader and the diff come first (v0.0.1 item 3c).
+
+**Built** (3c, 2026-11-07): `DataTracing` (Data layer, product `TraceKit`, personal builds only; iStation's own code, MIT) in `src/istation/source/data/tracing/` — `Checksum.swift` (`FNV1a64`; `RegisterChecksum` over the 32 general registers, HI, LO and COP0 SR, CAUSE, EPC), `InstructionRecord.swift` (24 bytes, and `FullStateRecord`, 160), `FrameRecord.swift` (32), `TraceFile.swift` (the 16-byte `ISTR` header, `TraceWriter` with a 1 MB buffer, the streaming `TraceReader`, `TraceError`), `TraceDiff.swift` (the first divergence with its differing fields by name; a cycles-off flag no gate uses), `Checkpoints.swift` (an `ISCK` file of one FNV-1a checksum per window). Its contract, byte by byte: [reference/trace-formats.md](../reference/trace-formats.md). Tests in `tests/data/tracing/`; the `macOS Personal` scheme tests them.
+
+**Trade-offs.** FNV-1a 64 over little-endian bytes, chosen because ProjectPSX's C# patch and SwanStation's C frontend (3d) can write it identically in a few lines, not for strength. Tagged, fixed-size records keep the reader simple and let full-state records interleave with instruction records; the tag costs one byte in 25. The image and audio checksums are carried now and compared only once v0.1.0 and v0.2.0 fix their sample formats; RAM is the gate's measure. No app links `TraceKit` yet; a core will reach it only through a generic tracer that release builds specialize to nothing (3e).
+
+**Verified** (2026-11-07, M3 Max, macOS 27.0.1):
+
+- Both encodings pinned byte for byte against hand-written bytes; FNV-1a 64's published vectors (`""`, `"a"`, `"foobar"`) and two register checksums computed independently in Python; round trips across the buffer boundary (100,000 records); truncated, empty, foreign, newer-version and unknown-tag input each a named error; the first divergence by index and field, the end of a shorter trace, ignored cycles; checkpoint reduction (one changed record changes exactly its window) and its file round trip — 22 tests.
+- **Throughput** (`ISTATION_BENCHMARK=1 swift test -c release --filter ThroughputTests`): 100 million instruction records, 2,500,000,016 bytes, **written in 3.96 s (25 M records/s) and read in 1.90 s (53 M records/s)**.
+- `swift test` — 66 tests in 10 test runs, green; `xcodebuild test -scheme "macOS Personal"` — TEST SUCCEEDED; the strict build clean; `toolsArePersonalOnly` already guards `DataTracing` (Milestone F).
+
+**Decisions consumed.**
+
+- 2026-11-07: TraceKit is the trace format, recorder and diff, personal builds only (the user's brief); the records and the diff's fields as specified (the defaults, confirmed by the user).
