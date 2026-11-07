@@ -4,7 +4,7 @@
 
 **Modules:** `bytes` (little-endian reads over byte buffers), `locations` (the user's standard folders, as one injectable value), `bundles` (.app bundles: their binary, an app by bundle identifier), `process` (start a child process, report its exit and duration)
 
-**May depend on:** Infrastructure only, and system frameworks that draw nothing (Foundation, CoreServices) — never SwiftUI or AppKit. Two finer rules ([ADR 0008](../../../../documentation/istation/adrs/emulators-are-separate-programs.md), [ADR 0004](../../../../documentation/istation/adrs/tests-mirror-architecture.md)): `process` is the only module in the app that starts a process, and `locations` is the only one that reaches the real home folder — through `Locations.user()`, which only the entry point calls.
+**May depend on:** Infrastructure only, and system frameworks that draw nothing (Foundation, CoreServices) — never SwiftUI or AppKit. Two finer rules ([ADR 0010](../../../../documentation/istation/adrs/cores-are-ports-of-open-references.md), [ADR 0004](../../../../documentation/istation/adrs/tests-mirror-architecture.md)): `process` is the only module in the app that starts a process, and `locations` is the only one that reaches the real home folder — through `Locations.user()`, which only the entry point calls.
 
 **Enforced by:** one SwiftPM target per module, generated from the module map in `src/istation/Package.swift` (an undeclared import fails `swift build --explicit-target-dependency-import-check=error`), and `ArchitectureTests` (`src/istation/tests/architecture/`), which runs inside `swift test`.
 

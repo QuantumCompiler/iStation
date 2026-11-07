@@ -11,6 +11,7 @@
 **Changing this layer:**
 - A new module: its directory `source/business/<module>/`, its `Module(.business, "<Name>", uses: […])` row in `Package.swift`, its tests in `tests/business/<module>/` (and in the `iStation` scheme of `iStation.xcodeproj`), its name on this card and in [ADR 0002](../../../../documentation/istation/adrs/module-map.md)'s table — in the same change.
 - One implementation per decision: a rule the views need (which games a place shows, which emulator runs a console) lives here once, never in a view-model.
-- Emulators are reached only through `launching` → `InfrastructureProcess`, by command line and process exit ([ADR 0008](../../../../documentation/istation/adrs/emulators-are-separate-programs.md)).
+- Installed emulators are reached only through `launching` → `InfrastructureProcess`, by command line and process exit ([ADR 0010](../../../../documentation/istation/adrs/cores-are-ports-of-open-references.md) §5).
+- Cores (from v0.0.1) live here: one module per CPU family, generic over its bus, and one per console; GPL-3.0, never imported by shared infrastructure; hot paths use concrete types ([ADR 0011](../../../../documentation/istation/adrs/each-module-carries-its-licence.md), [ADR 0012](../../../../documentation/istation/adrs/cores-shape-and-hot-paths.md)).
 
 **Depth:** [the ADRs](../../../../documentation/istation/adrs/README.md) · [CLAUDE.md](../../../../documentation/istation/assistant/CLAUDE.md) · [DEVELOPER.md](../../../../documentation/istation/assistant/DEVELOPER.md).

@@ -2,44 +2,63 @@
 
 The product spec: what iStation is, what it is for, and the principles that shape it. The plan is in [ROADMAP.md](ROADMAP.md); the work queue is [`backlog/`](../backlog/README.md); shipped work is in [MILESTONES.md](MILESTONES.md).
 
-*Source: the user's design documents of 2026-10-26 (Overview & Architecture, Build Roadmap, Code Scaffold), carried into this home at construction, 2026-10-31.*
+*Source: the user's design documents of 2026-10-26 (Overview & Architecture, Build Roadmap, Code Scaffold), carried into this home at construction, 2026-10-31. **Re-envisioned 2026-11-07 (the user's call)** by the user's brief "Port PS1 and PS2 emulators to Swift": iStation stops being only a launcher and becomes native Swift emulators ported from open-source references, with the library app as their frontend. The evidence behind the re-vision is in [Milestone C](MILESTONES.md#milestone-c--the-re-vision).*
 
 ---
 
 ## One-liner
 
-**iStation** is a personal, native macOS app that gives DuckStation, PCSX2 and RPCS3 one shared game library and one Play button.
+**iStation** is a personal, native Apple-platform app that plays PS1 and PS2 games in its own Swift emulators — ports of SwanStation and PCSX2 — behind one game library and one Play button.
 
 ## Background
 
-Playing PS1, PS2 and PS3 games on a Mac means three emulators, three libraries, three sets of folders and three UIs. iStation puts one library in front of them: each emulator still does the emulation; iStation finds the games, works out which console each belongs to, and launches the right emulator with the right flags.
+Playing PS1, PS2 and PS3 games on a Mac means three emulators, three libraries, three sets of folders and three UIs. iStation began (2026-10-26) as one library in front of the user's installed DuckStation, PCSX2 and RPCS3. On 2026-11-07 the user re-envisioned it: iStation ports the emulators themselves to Swift, using open-source C++ emulators as reference implementations, so the library, the emulation, the picture, the sound and the controls are one native app. A console without a native core yet is still played through the user's installed emulator.
 
-Foundational choices (the user's design, 2026-10-26):
+Foundational choices:
 
-1. **A launcher, not a merged emulator.** The three consoles share almost no hardware (MIPS R3000A; the Emotion Engine with VU0/VU1; the Cell's PPU and six SPUs), and the three licences cannot be combined into one program: DuckStation is CC BY-NC-ND 4.0, PCSX2 GPLv3, RPCS3 GPLv2 only. Each emulator runs as a separate process, driven by its own command line ([ADR 0008](../adrs/emulators-are-separate-programs.md)). Emulator updates then arrive the normal way.
+1. **Swift ports of open-source references.** *(Revised 2026-11-07, the user's call; it replaces "a launcher, not a merged emulator".)* Each console's core is a Swift port of one reference implementation — PS1 from [SwanStation](https://github.com/libretro/swanstation), PS2 from [PCSX2](https://github.com/PCSX2/pcsx2), both GPLv3. The reference's C++ source is the primary reference, and its compiled build is traced to check the port. The PS2's I/O processor is the PS1's CPU, so the Swift R3000A serves both ([ADR 0010](../adrs/cores-are-ports-of-open-references.md)).
 2. **Identify games by the disc, not the file name.** PS1 and PS2 share serial prefixes like SLUS; only the boot key in SYSTEM.CNF tells them apart reliably.
-3. **A Mac app by choice.** Swift and SwiftUI, macOS 14+.
-4. **Free, GPLv3, a notarized direct download** — not the Mac App Store, whose terms conflict with the GPL.
+3. **An Apple-platform app by choice.** Swift and SwiftUI; macOS 14+ on Apple Silicon first. iOS later, for PS1 only: iOS apps can't generate code at run time, and only the PS1 is playable with an interpreter. *(Revised 2026-11-07.)*
+4. **Free, GPLv3, distributed outside the App Store**, signed with a Developer ID and notarized. The app is GPLv3 as a whole because its cores are; whether the App Store's terms fit the GPL is contested, and the project doesn't own the copyright needed to grant an exception. *(Revised 2026-11-07.)*
+5. **A licence boundary inside the app.** Shared infrastructure — the library, the frontend, the renderer layer, audio, input and the trace harness — is written from scratch under GPL-2.0-or-later and never contains emulator code, so a later GPLv2-only core could use it ([ADR 0011](../adrs/each-module-carries-its-licence.md)). *(2026-11-07, the user's call.)*
 
 And at construction (2026-10-31): the four-layer architecture with mechanical checks, carving the scaffold's two targets into 21 modules (the user's call); one version per roadmap phase (the user's call).
 
 ## Surfaces
 
-1. **The main window** — a sidebar (All Games, Recently Played, one place per console with its count), a search field over titles and serials, and a grid of game tiles: double-click (or Play) to launch, Show in Finder from the context menu. An empty library offers Add Library Folder….
-2. **The File menu** — Add Library Folder… (⌘O) and Rescan Library (⌘R).
-3. **The Settings window** (⌘,) — each emulator's app (Choose…, Detect Installed Emulators), launch options (fullscreen; skip the BIOS intro), library folders with a per-folder console hint, and RPCS3's installed games.
-4. **Its files** — `~/Library/Application Support/iStation/library.json` ([reference/library-file.md](../reference/library-file.md)).
-5. **The emulators' command lines** — what iStation passes, not a surface of its own ([reference/emulator-launch-contract.md](../reference/emulator-launch-contract.md)).
+1. **The main window** — a sidebar (All Games, Recently Played, one place per console with its count), a search field over titles and serials, and a grid of game tiles: double-click (or Play) to play, Show in Finder from the context menu. An empty library offers Add Library Folder….
+2. **The game view** (from v0.1.0) — a native core's picture, sound and controls inside iStation.
+3. **The File menu** — Add Library Folder… (⌘O) and Rescan Library (⌘R).
+4. **The Settings window** (⌘,) — each installed emulator's app (Choose…, Detect Installed Emulators) for the consoles without a native core, launch options, library folders with a per-folder console hint, RPCS3's installed games, and (from v0.2.0) the user's own BIOS file for each native core.
+5. **Its files** — `~/Library/Application Support/iStation/library.json` ([reference/library-file.md](../reference/library-file.md)).
+6. **The installed emulators' command lines** — for consoles without a native core; what iStation passes, not a surface of its own ([reference/emulator-launch-contract.md](../reference/emulator-launch-contract.md)).
 
 ## Scope
 
 ### Goals
 
-- One library across PS1, PS2 and PS3, with search and a console sidebar.
+- Play PS1 games in iStation's own Swift emulator, ported from SwanStation and checked against it by trace.
+- Then PS2, ported from PCSX2, reusing the Swift R3000A for the PS2's I/O processor.
+- One library across consoles, with search and a console sidebar.
 - Identify games by reading the disc itself, not the file name.
-- Launch with one double-click, fullscreen, and return to iStation when the game closes.
 - Track last played and total play time.
-- Pick up upstream emulator updates with no changes to iStation.
+- macOS on Apple Silicon first; iOS for PS1 later.
+- Keep every console playable meanwhile: one without a native core launches the user's installed emulator.
+
+### Consoles and references
+
+| Console | Native core | Reference | Reference's licence | Until the native core plays games |
+|---|---|---|---|---|
+| PS1 | first (v0.x) | [libretro/swanstation](https://github.com/libretro/swanstation) — DuckStation's history up to 2022-01-11, before DuckStation's relicense | GPLv3 | the user's installed DuckStation |
+| PS2 | second (v2.x) | [PCSX2](https://github.com/PCSX2/pcsx2) | GPLv3 | the user's installed PCSX2 |
+| PS3 | out of scope | RPCS3 | GPLv2 only | the user's installed RPCS3 |
+
+### Porting
+
+- **Order inside a core:** the CPU interpreter, the memory map and the BIOS boot first; then the devices a picture needs; the software renderer before the Metal renderer; the interpreter before any recompiler. A recompiler is macOS-only, emits AArch64, and needs the `com.apple.security.cs.allow-jit` entitlement, `MAP_JIT` memory and `pthread_jit_write_protect_np` toggling.
+- **Checked against the reference by trace.** The reference is built locally (never vendored) and made to write the guest's state — per instruction for a CPU, per frame or per command for a device — while it runs test content; the Swift port writes the same format, and the first divergence is the bug. The reverse-engineering MCP server Revula maps and profiles the compiled reference; it never decompiles, because the sources are open.
+- **Test content** is open: OpenBIOS (MIT, an open replacement BIOS that SwanStation itself boots when no BIOS is found), homebrew, and open suites such as [ps1-tests](https://github.com/JaCzekanski/ps1-tests) (MIT) and [ps2autotests](https://github.com/unknownbrackets/ps2autotests) (ISC). The user's own BIOS dumps are used only on the user's Mac.
+- **Hot paths** use concrete types, never protocol-typed values ([ADR 0012](../adrs/cores-shape-and-hot-paths.md)).
 
 ### Game identification
 
@@ -61,11 +80,13 @@ The console is decided by what is on the disc. A folder hint (the folder's Conso
 
 Titles come from PARAM.SFO for PS3 and from cleaned file names otherwise: `Final Fantasy VII (USA) (Disc 1).cue` becomes `Final Fantasy VII`.
 
-### Launching
+### Playing
 
-- iStation runs the binary inside each emulator's `.app` with that emulator's own flags ([reference/emulator-launch-contract.md](../reference/emulator-launch-contract.md)). PS1 runs in DuckStation, PS2 in PCSX2, PS3 in RPCS3.
-- Emulators are found in /Applications, ~/Applications, or by bundle identifier; the user can choose any app in Settings.
-- **Only one game runs at a time.** When its process exits, iStation adds the session to the game's play time and comes back to the front.
+*(Revised 2026-11-07: "Launching" becomes "Playing".)*
+
+- A console with a native core plays inside iStation, in the game view.
+- A console without one runs the binary inside its installed emulator's `.app` with that emulator's own flags ([reference/emulator-launch-contract.md](../reference/emulator-launch-contract.md)): PS1 in DuckStation until the native core plays games, PS2 in PCSX2, PS3 in RPCS3. Installed emulators are found in /Applications, ~/Applications, or by bundle identifier; the user can choose any app in Settings.
+- **Only one game runs at a time.** When it ends, iStation adds the session to the game's play time and comes back to the front.
 
 ### Persistence
 
@@ -75,42 +96,51 @@ Titles come from PARAM.SFO for PS3 and from cleaned file names otherwise: `Final
 
 ### Distribution
 
-Free and notarized, as a direct download, in two stages:
+*(Rewritten 2026-11-07, the user's call: the bundled-emulators plan is replaced by native cores.)*
 
-| Release | Emulators | What ships | Effort |
-|---|---|---|---|
-| v1.0.0 Launcher | User-installed: DuckStation or PCSX-Redux, PCSX2, RPCS3 | `iStation.app` only | Sign and notarize one app |
-| v2.0.0 Bundled | PCSX-Redux, PCSX2, RPCS3 inside the app | `iStation.app` with 3 helper apps, plus published source | Build, sign and notarize all four |
+A free GPLv3 app, signed with a Developer ID, notarized, and offered as a direct download (a notarized `.dmg`) — not the Mac App Store.
 
-- **Licensing.** iStation is GPLv3. Each bundled emulator stays a separate program (`Contents/Helpers/<Emulator>.app`), which the GPL treats as aggregation, so each keeps its own licence: PCSX-Redux GPL-2.0, PCSX2 GPL-3.0-or-later, RPCS3 GPL-2.0 only (never linked with PCSX2). DuckStation is never bundled; v1 only launches the user's own install. Each release ships each licence text (`Resources/Licenses/`) and the exact source of what it ships: emulator sources are pinned git submodules, so each release tag holds them. An Acknowledgements screen lists each component, its licence and a link to its source. *This is a plan, not legal advice: get a legal review before charging money or heavily modifying an emulator.*
-- **BIOS and system software.** A first-run screen (v2.0.0) asks for a PS1 BIOS, a PS2 BIOS and the PS3 system software update file, each optional; they are copied to `~/Library/Application Support/iStation/BIOS` and each emulator is pointed at them through its own config (RPCS3 installs its file through its firmware-install option). iStation never bundles or downloads them, and the screen says so.
-- **Signing.** A Developer ID Application certificate (paid Apple Developer Program). Sign inside-out — each helper's nested code, each helper, then `iStation.app` — with hardened runtime and a secure timestamp, never `get-task-allow`. No App Sandbox, no Mac App Store. Entitlements: iStation none beyond hardened runtime; PCSX2 `allow-jit`, `allow-unsigned-executable-memory`, `disable-library-validation`, `device.audio-input`, `device.camera` (its `PCSX2.entitlements`); RPCS3 and PCSX-Redux _TODO:_ to confirm (RPCS3's recompilers likely need `allow-jit` and `allow-unsigned-executable-memory`).
-- **Updates.** Sparkle (MIT) from a signed appcast. An emulator update means bumping its submodule, rebuilding, re-running the phase-1 gate, signing and notarizing a new release.
+- **Licensing.** Each core is a derivative work of its GPLv3 reference: it is released under GPLv3, keeps the reference's copyright notices and credits, and its source is published. The shared infrastructure is GPL-2.0-or-later ([ADR 0011](../adrs/each-module-carries-its-licence.md)). The app as a whole is GPLv3, and the repository goes public with v1.0.0. DuckStation is never bundled, ported or read. Every third-party library in a reference is licence-checked before it is ported or linked. *This is a plan, not legal advice: get a legal review before charging money.*
+- **PS3, later.** RPCS3 is GPLv2-only, so its code can never be linked into this GPLv3 program. A PS3 core would ship as a separate executable inside the app bundle that the frontend starts and talks to over XPC, pipes or sockets — which is why the frontend-to-core interface stays narrow and serializable: video frames, audio buffers, input state, save states and settings. Nothing PS3-specific is built.
+- **BIOS and system software.** Never bundled, mirrored or downloaded. The user supplies their own dumps and iStation reads them where they are. Whether the app also ships OpenBIOS as a fallback is a decision for v0.2.0 (ROADMAP).
+- **Signing.** A Developer ID Application certificate (paid Apple Developer Program) with hardened runtime and a secure timestamp, never `get-task-allow`; no App Sandbox. Entitlements: none until a recompiler exists, then `com.apple.security.cs.allow-jit` (macOS only).
+- **Updates.** Sparkle (MIT) from a signed appcast, after a licence review onto [ADR 0010](../adrs/cores-are-ports-of-open-references.md)'s allow-list.
+- **iOS** (PS1 only): the channel outside the App Store is a decision for v0.4.0 (ROADMAP).
 - **Branding.** No Sony logos or artwork; describe compatibility only ("plays PS2 games"). Run a trademark check on "iStation" before a public launch.
-- **The release pipeline**, every release (v1 skips 2 and 3): 1. tag the source, with pinned submodules, pushed to the public repo; 2. build the emulators from the submodules for Apple Silicon; 3. assemble the bundle (helpers into `Contents/Helpers`, licences into `Resources/Licenses`); 4. archive iStation; 5. sign every executable inside-out; 6. notarize and staple the app, then package, notarize and staple the `.dmg`; 7. publish the `.dmg` as a GitHub release next to the source tag, and update the appcast.
+- **The release pipeline**, every release: 1. tag the source and push it to the public repository; 2. archive iStation; 3. sign every executable inside-out; 4. notarize and staple the app, then package, notarize and staple the `.dmg`; 5. publish the `.dmg` as a GitHub release next to the source tag, and update the appcast.
 
 ## Non-goals
 
-- **Emulating any hardware, or embedding emulator code.** iStation is a launcher; the emulators do the emulating ([ADR 0008](../adrs/emulators-are-separate-programs.md)).
-- **Shipping Sony BIOS files, PS3 system software or games.** Users supply their own; iStation never bundles or downloads them.
-- **Cross-platform support.** This is a Mac app by choice.
-- **The Mac App Store.** Its terms conflict with the GPL.
-- **Bundling DuckStation.** Its licence forbids redistribution with modification or embedding; v1 launches the user's own copy, v2 bundles PCSX-Redux instead.
+*(Revised 2026-11-07, the user's call: "emulating any hardware, or embedding emulator code" is no longer a non-goal.)*
+
+- **Reading or copying the current DuckStation** (stenzek/duckstation, CC BY-NC-ND since its 2024 relicense, which forbids derivatives). PS1 code comes only from SwanStation.
+- **Linking GPLv2-only code** (RPCS3) into the app.
+- **A PS3 core, for now.** Only the frontend-to-core interface stays ready for one.
+- **Shipping, mirroring or downloading Sony BIOS files, PS3 system software or games.** Users supply their own.
+- **Platforms other than Apple's.** This is an Apple-platform app by choice.
+- **The Mac App Store.** Its terms and the GPL are contested; the project can't grant an exception.
+- **The PS2 on iOS.** It needs a recompiler for usable speed, and iOS forbids generating code at run time.
+- **Bundling DuckStation.** Its licence forbids redistribution with modification.
 
 ## Principles
 
 - **Layered, and the law is mechanical.** Four layers, dependencies pointing down, enforced by a check — see [ADR 0001](../adrs/layer-enforcement.md).
+- **The reference decides.** A ported subsystem is right when its trace matches the reference's compiled build; the first divergence is the bug. *(2026-11-07.)*
+- **Provenance stays clean and visible.** Every ported file names the reference file it comes from and its authors; nothing is read from a source the licence rules exclude. *(2026-11-07.)*
+- **The licence boundary holds.** Shared infrastructure never contains emulator code, and never imports a core. *(2026-11-07.)*
 - **The disc decides.** What is on the disc beats the folder hint, which beats the extension or size.
-- **The emulators stay themselves.** iStation passes their own flags and reads their own exit; it never patches, links or reconfigures them beyond their documented config.
+- **Installed emulators stay themselves.** For a console without a native core, iStation passes the emulator's own flags and reads its own exit; it never patches, links or reconfigures it beyond its documented config.
 - **The user's history is sacred.** The library file is read compatibly, always ([ADR 0007](../adrs/backwards-compatibility.md)).
-- **Phase 1 matters most.** Until the app boots a real game from each console and comes back, nothing else is worth building (the user's Build Roadmap).
+- **The first milestone matters most.** Until the Swift R3000A boots OpenBIOS with a trace identical to SwanStation's, nothing else in a core is worth building. *(Revised 2026-11-07; it replaces "Phase 1 matters most".)*
 
 ## Success criteria
 
-- One PS1, one PS2 and one PS3 game boot from iStation and return to it on exit (the v0.0.1 gate).
-- The whole library shows real titles and covers (v0.1.0 gate).
-- A game can be picked and launched from the sofa without touching the keyboard (v0.4.0 gate).
-- The v1.0.0 `.dmg` installs and runs on a clean Mac with no warnings; the v2.0.0 bundle plays one game from each console with no separate installs.
+*(Revised 2026-11-07.)*
+
+- **v0.0.1:** OpenBIOS boots to its shell in the Swift core with an instruction trace identical to SwanStation's, and ps1-tests' `cop` and `code-in-io` pass.
+- PS1 games boot and play in iStation, with no installed emulator (v0.2.0).
+- The v1.0.0 `.dmg` installs and plays PS1 games on a clean Mac with no warnings.
+- PS2: the EE and IOP interpreters boot the user's BIOS to its first screen with traces matching PCSX2.
 
 ---
 

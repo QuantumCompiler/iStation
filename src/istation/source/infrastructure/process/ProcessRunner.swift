@@ -23,7 +23,7 @@ public struct ProcessExit: Equatable, Sendable {
     }
 }
 
-/// Starts child processes. This module is the one place iStation spawns one (ADR 0008).
+/// Starts child processes. This module is the one place iStation spawns one (ADR 0010).
 public protocol ProcessRunning: Sendable {
     /// Starts `command` and returns once it is running. `onExit` is called once, on an arbitrary
     /// thread, when the process exits.

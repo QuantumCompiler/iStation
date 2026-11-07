@@ -1,6 +1,6 @@
 # ADR 0008 — Emulators are separate programs, driven only by their command line, and iStation ships none of their code or Sony's files
 
-**Status:** Accepted · **Date:** 2026-10-31
+**Status:** Superseded by [ADR 0010](cores-are-ports-of-open-references.md) (2026-11-07) · **Date:** 2026-10-31
 
 ## Context
 

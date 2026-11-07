@@ -14,10 +14,10 @@ Release notes in the house format, delivered as a draft. Publishing (a GitHub re
    - **Title and theme** — `iStation v<x.y.z> — <the phase's theme>`.
    - **Intro** — two sentences, in plain words for someone who plays games, not someone who builds them.
    - **Highlights** — what a person can now do.
-   - **Install** — how to get it (today: build from source with `./scripts/build-app.sh`; from v1.0.0: the notarized `.dmg`), and the emulators it needs (the user's own DuckStation/PCSX-Redux, PCSX2, RPCS3).
+   - **Install** — how to get it (today: build from source with `./scripts/build-app.sh`; from v1.0.0: the notarized `.dmg`), which consoles play in iStation's own cores, and which still need the user's installed emulator (DuckStation, PCSX2, RPCS3).
    - **Platforms** — macOS 14+, Apple Silicon.
    - **Known limitations** — from the open Maintenance items and ROADMAP; honest.
-   - **Reference** — the licences (GPLv3; each bundled emulator's own from v2.0.0) and the source tag.
+   - **Reference** — the licences (the app GPLv3; its cores' references and their credits; shared infrastructure GPL-2.0-or-later) and the source tag.
    No Sony logos or artwork; describe compatibility only ("plays PS2 games").
 5. **Check every claim** against the evidence; drop what can't be backed.
 6. **Deliver the draft** as text.

@@ -1,6 +1,6 @@
 # The emulator launch contract
 
-How iStation finds and starts each emulator. iStation passes only flags the emulator's own argument parser reads, checked against each project's source on 2026-10-25 (the user's design), and learns that a session has ended only from the process exiting ([ADR 0008](../adrs/emulators-are-separate-programs.md)). Implemented in `src/istation/source/data/emulators/LaunchContract.swift` (the flags) and `src/istation/source/business/launching/GameLauncher.swift` (the command).
+How iStation finds and starts each installed emulator — for a console without a native core yet (since 2026-11-07, iStation ports its own cores: [ADR 0010](../adrs/cores-are-ports-of-open-references.md)). iStation passes only flags the emulator's own argument parser reads, checked against each project's source on 2026-10-25 (the user's design), and learns that a session has ended only from the process exiting ([ADR 0010](../adrs/cores-are-ports-of-open-references.md) §5). Implemented in `src/istation/source/data/emulators/LaunchContract.swift` (the flags) and `src/istation/source/business/launching/GameLauncher.swift` (the command).
 
 ## Which emulator runs which console
 

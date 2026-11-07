@@ -27,15 +27,16 @@ Project context for coding agents working on **iStation**. Read this before maki
 
 ## What this is
 
-iStation is a personal, native macOS app that gives DuckStation (PS1), PCSX2 (PS2) and RPCS3 (PS3) one shared game library and one Play button. It scans the user's folders, identifies each game's console by reading the disc itself (SYSTEM.CNF's boot key, PS3's PARAM.SFO), launches the right emulator as a separate process with that emulator's own flags, comes back to the front when the game closes, and records last played and play time. It is a launcher by design: it emulates nothing and links no emulator code. See [SPEC.md](SPEC.md) for scope and [MILESTONES.md](MILESTONES.md) for what has shipped.
+iStation is a personal, native Apple-platform app that plays PS1 and PS2 games in its own Swift emulators, behind one game library and one Play button. **Re-envisioned 2026-11-07 (the user's call):** each console's core is a Swift port of an open-source reference — PS1 from SwanStation, then PS2 from PCSX2, both GPLv3 — checked against the reference's compiled build by trace ([ADR 0010](../adrs/cores-are-ports-of-open-references.md)). The library app is their frontend: it scans the user's folders, identifies each game's console by reading the disc itself (SYSTEM.CNF's boot key, PS3's PARAM.SFO), records last played and play time, and — for a console without a native core yet — launches the user's installed emulator (DuckStation, PCSX2, RPCS3) with its own flags and comes back to the front when the game closes. No core exists yet: v0.0.1 builds the first, the R3000A. See [SPEC.md](SPEC.md) for scope and [MILESTONES.md](MILESTONES.md) for what has shipped.
 
 ## Stack & environment
 
 - **Language / framework:** Swift 6 in language mode 6 — strict concurrency (the default, taken 2026-10-31) — with SwiftUI and Observation; macOS 14 Sonoma or later.
 - **Build:** Swift Package Manager, `src/istation/Package.swift` (swift-tools-version 6.0): one library target per module, generated from the module map, plus the `iStation` executable. `swift build` from `src/istation/`. In Xcode, open `iStation.xcodeproj` at the repository root (the user's call, 2026-10-31): a thin project with no targets of its own that opens the package, and one shared scheme, `iStation`, that runs the app and tests every test target. It is not the v1.0.0 move: whether iStation gets an Xcode app target (app icon, signing, notarization) is still a `[user]` call — such a target can depend on this package unchanged.
 - **Tests:** Swift Testing (the default, taken 2026-10-31, over the scaffold's XCTest): `swift test` from `src/istation/`, which also runs the architecture checks.
-- **Platforms / devices:** macOS 14+ on Apple Silicon. Development host as of 2026-10-31: macOS 27, Xcode 27.1, Swift 6.4. Intel support: _TODO:_ undecided (no item owns it yet).
-- **Key dependencies:** none beyond Apple's SDK — [ADR 0008](../adrs/emulators-are-separate-programs.md)'s allow-list is empty. The emulators are the user's own installed apps, driven only by their command lines: never edited, linked or bundled before v2.0.0.
+- **Platforms / devices:** macOS 14+ on Apple Silicon; iOS later, for PS1 only (no code generation at run time on iOS). Development host as of 2026-10-31: macOS 27, Xcode 27.1, Swift 6.4. Intel support: _TODO:_ undecided (no item owns it yet).
+- **Key dependencies:** none beyond Apple's SDK — [ADR 0010](../adrs/cores-are-ports-of-open-references.md)'s allow-list is empty (libchdr and Sparkle are expected, each after a licence review). The references — [SwanStation](https://github.com/libretro/swanstation) for PS1, [PCSX2](https://github.com/PCSX2/pcsx2) for PS2 — are read and built locally, never vendored. Installed emulators are the user's own apps, driven only by their command lines, for consoles without a native core.
+- **Licences:** shared infrastructure GPL-2.0-or-later, ported cores GPL-3.0, the app as a whole GPLv3 ([ADR 0011](../adrs/each-module-carries-its-licence.md), the user's call, 2026-11-07).
 - **Lint / format:** _TODO:_ no formatter or linter chosen (ROADMAP → Ideas).
 
 ---
@@ -45,6 +46,10 @@ iStation is a personal, native macOS app that gives DuckStation (PS1), PCSX2 (PS
 Four layers, lowest to highest — **Infrastructure → Data → Business → Presentation** — and **a module depends only on its own layer or the layers below it** ([ADR 0001](../adrs/layer-enforcement.md)). The `modules` table at the top of `src/istation/Package.swift` is the one declaration of which module sits where and what it may import ([ADR 0002](../adrs/module-map.md)); one concern per module ([ADR 0003](../adrs/granular-modules.md)); tests mirror the source tree ([ADR 0004](../adrs/tests-mirror-architecture.md)). Each layer root carries a short `CLAUDE.md` card with its modules and rules.
 
 **Enforced by:** one SwiftPM target per module with exactly its row's dependencies, `swift build --explicit-target-dependency-import-check=error`, and `ArchitectureTests` (`src/istation/tests/architecture/`: the layering and layer-context checks), run by `swift test` and in CI — an upward or undeclared edge fails the run.
+
+### The cores: ported, traced, behind one interface
+
+A core lives in Business: one module per CPU family, generic over the bus it is given (the R3000A serves the PS1 and the PS2's I/O processor), and one module per console that owns its memory map and wires its devices — because the reference's devices form one dependency cycle, a device is carved into its own module only once the trace harness guards it. Hot paths use concrete types or `@inlinable` generics, never protocol-typed values; the frontend reaches a core only through one narrow, serializable interface ([ADR 0012](../adrs/cores-shape-and-hot-paths.md)). Every module carries a licence, and shared infrastructure never imports a core ([ADR 0011](../adrs/each-module-carries-its-licence.md)). A port is right when its trace matches the reference's: the reference is built from a pinned commit under `tools/`, outside the shipped app.
 
 ### The UI: MVVM, one styles module
 
@@ -66,22 +71,22 @@ Presentation is one module per user-facing place, each **`Views/` + `ViewModels/
 
 **Enforcement.** `ArchitectureTests/LayeringTests.swift` and `LayerContextTests.swift`; the per-module targets; CI's explicit-import build.
 
-### ⚠ Emulators are separate programs, driven only by their command line
+### ⚠ Ported code comes only from its reference, and stays on its side of the licence line
 
-**Rule.** iStation reaches an emulator only by starting its binary with its own flags and watching the process exit. Nothing links, embeds, loads or modifies emulator code.
+**Rule.** A core's code is ported from its one reference — PS1 from SwanStation, PS2 from PCSX2 — and from nothing else: the current DuckStation (stenzek/duckstation) is never read or copied. Every ported file names the reference file it comes from and that file's authors. Shared infrastructure never contains emulator code and never imports a core. Installed emulators — for consoles without a native core — are reached only by their command line.
 
-**Why.** DuckStation's CC BY-NC-ND licence forbids modification and embedding; PCSX2 (GPLv3) and RPCS3 (GPLv2 only) cannot be linked into one binary. Separate processes are also why an emulator update needs no iStation change ([ADR 0008](../adrs/emulators-are-separate-programs.md)).
+**Why.** Each port is a derivative work: it must be GPLv3 and keep its reference's credits. DuckStation is CC BY-NC-ND since 2024, which forbids derivatives; RPCS3 is GPLv2-only and can never be linked with GPLv3 code. A shared layer that stays free of emulator code is what lets a later GPLv2-only core use it ([ADR 0010](../adrs/cores-are-ports-of-open-references.md), [ADR 0011](../adrs/each-module-carries-its-licence.md)).
 
 **Sub-rules.**
-- Only `InfrastructureProcess` starts a process; Business reaches it only through `BusinessLaunching`.
-- A flag changes only against the emulator's own argument parser, with [reference/emulator-launch-contract.md](../reference/emulator-launch-contract.md) and `LaunchContractTests` updated in the same change.
-- An external package is added only after a licence review, on ADR 0008's allow-list.
+- A third-party library inside a reference is licence-checked before it is ported or linked; an external package joins the build only after a licence review, on ADR 0010's allow-list.
+- The reference is built and traced locally from a pinned commit (`tools/`), never vendored and never shipped.
+- Only `InfrastructureProcess` starts a process; Business reaches it only through `BusinessLaunching`. An installed emulator's flag changes only against its own argument parser, with [reference/emulator-launch-contract.md](../reference/emulator-launch-contract.md) and `LaunchContractTests` updated in the same change.
 
-**Enforcement.** `ArchitectureTests/ProjectRulesTests.swift` — process spawning outside `source/infrastructure/process/`, `dlopen`, and any package or binary target not on the allow-list fail the run.
+**Enforcement.** `ArchitectureTests/ProjectRulesTests.swift` — process spawning or `dlopen` outside `source/infrastructure/process/`, and any package or binary target not on the allow-list, fail the run. The licence boundary gains its check with Architecture item A1, which gates the first ported module. Provenance has no mechanical check: review holds it, by each ported file's credit header.
 
 ### ⚠ iStation never ships, downloads or commits Sony's files or games
 
-**Rule.** No BIOS file, PS3 system software, disc image or game is ever in the repository, in a build, or fetched by the app. Users supply their own.
+**Rule.** No BIOS file, PS3 system software, disc image or game is ever in the repository, in a build, or fetched by the app. Users supply their own. Open replacements and open test suites are not Sony's files: OpenBIOS (MIT), ps1-tests (MIT) and ps2autotests (ISC) may be committed as test fixtures, each beside its licence, through the check's allow-list ([ADR 0010](../adrs/cores-are-ports-of-open-references.md)).
 
 **Why.** Distributing them is not iStation's right, and a single committed file would taint the public GPL repository the v1.0.0 release publishes.
 
@@ -89,7 +94,7 @@ Presentation is one module per user-facing place, each **`Views/` + `ViewModels/
 - Tests build their discs in memory (`SupportDiscFixtures`) inside a `Sandbox`; never add a real image as a fixture.
 - No Sony logos or artwork; describe compatibility only ("plays PS2 games").
 
-**Enforcement.** `ArchitectureTests/ProjectRulesTests.swift` fails on any `.iso .bin .img .cue .m3u .chd .cso .zso .gz .pbp .ecm .pup .rom .mec .nvm` file in the repository outside build output.
+**Enforcement.** `ArchitectureTests/ProjectRulesTests.swift` fails on any `.iso .bin .img .cue .m3u .chd .cso .zso .gz .pbp .ecm .pup .rom .mec .nvm` file in the repository outside build output; the allow-list for open fixtures arrives with the first one (v0.0.1, item 2e).
 
 ### ⚠ View-models never import the UI toolkit
 
@@ -156,7 +161,7 @@ Presentation is one module per user-facing place, each **`Views/` + `ViewModels/
 | Presentation | `settings` | the Settings window |
 | Presentation | `app` | the composition root and the scenes |
 
-The entry point `src/istation/source/main/iStationApp.swift` (the `@main` app) starts the composition over the real user's folders; it is not a module. Detail per module lives in the layer cards and [DEVELOPER.md](DEVELOPER.md).
+The entry point `src/istation/source/main/iStationApp.swift` (the `@main` app) starts the composition over the real user's folders; it is not a module. Every module above is shared infrastructure (GPL-2.0-or-later). The first core modules — the R3000A and the PS1 console, in Business, GPL-3.0 — arrive with v0.0.1's items 2c and 2d. Detail per module lives in the layer cards and [DEVELOPER.md](DEVELOPER.md).
 
 ---
 
@@ -173,7 +178,7 @@ The entry point `src/istation/source/main/iStationApp.swift` (the `@main` app) s
 
 Take the **topmost 🟢 item** of the earliest version table, or the item the user names. Read its document — it is the working spec. Before writing code, resolve its **Open calls**: every `[user]` call answered by the user, every `[default: …]` taken and recorded as a dated decision. One item at a time; when it ships, stop and wait to be asked to continue. A bare "Continue" means: re-read this file, then take the topmost claimable item.
 
-Runs against the user's real emulators, games, BIOS files or signing identity are the user's to start: an item that needs one says so, and the agent prepares the run and records its result rather than starting it.
+Runs against the user's real emulators, games, BIOS files or signing identity are the user's to start: an item that needs one says so, and the agent prepares the run and records its result rather than starting it. Building and tracing a reference (SwanStation, PCSX2) on open test content — OpenBIOS, homebrew, the open suites — is not such a run: the agent does it, in a scratch folder or under `tools/`.
 
 ### Decisions and questions
 
@@ -181,7 +186,7 @@ Decisions are dated and attributed ("the user's call, YYYY-MM-DD"). Questions ar
 
 ### Versioning
 
-One version per roadmap phase (the user's call, 2026-10-31): **v0.0.1** first build · **v0.1.0** cover art and titles · **v0.2.0** CHD support · **v0.3.0** per-game settings · **v0.4.0** controllers and couch mode · **v1.0.0** the launcher release · **v2.0.0** bundled emulators. A fix between releases is a patch, `v0.x.y`. Each release is built on a branch named for it (`v0.0.1` today) and, when its backlog table is empty, merged into `stable` and tagged `v<x.y.z>` (the user's call, 2026-10-31). The live number is carried by the branch name, `CFBundleShortVersionString` in `src/istation/scripts/build-app.sh`, and ROADMAP's "In progress" heading — `/istation-maintenance-update-release` moves them together.
+One version per roadmap phase (the user's call, 2026-10-31; re-planned 2026-11-07 with the re-vision): **v0.0.1** the R3000A boots OpenBIOS · **v0.1.0** the first picture · **v0.2.0** PS1 games boot · **v0.3.0** Metal renderer, audio and input · **v0.4.0** iOS (PS1) · **v1.0.0** the PS1 release · **v2.x** PS2. A fix between releases is a patch, `v0.x.y`. Each release is built on a branch named for it (`v0.0.1` today) and, when its backlog table is empty, merged into `stable` and tagged `v<x.y.z>` (the user's call, 2026-10-31). The live number is carried by the branch name, `CFBundleShortVersionString` in `src/istation/scripts/build-app.sh`, and ROADMAP's "In progress" heading — `/istation-maintenance-update-release` moves them together.
 
 ---
 
@@ -194,8 +199,10 @@ Every change satisfies this before merge:
 - [ ] Format and lint: _TODO:_ no formatter configured yet — match the surrounding code.
 - [ ] New tests are **hermetic** — no network, files only inside a `Sandbox`, never the real home folder, Launch Services, a real emulator or a real game; real runs are the user's to start.
 - [ ] **The layer law holds**: a new module is a directory in its layer, a `Module` row in `Package.swift`, a line on its layer card, a row in ADR 0002's table, a test directory in `tests/<layer>/<module>/` and its test target in the `iStation` Xcode scheme — all in the same change (the layer-context check fails on any one alone).
-- [ ] **Emulators stay separate**: launching goes through `BusinessLaunching` → `InfrastructureProcess`; a changed flag updates the launch contract and its tests; no new package without a licence review on ADR 0008's allow-list.
-- [ ] **No game, BIOS or firmware file** is added anywhere, fixtures included.
+- [ ] **Ported code is clean**: it comes only from its reference (never the current DuckStation), each ported file names its reference file and authors, it sits in a GPL-3.0 module that shared infrastructure never imports, and its behavior is checked against the reference's trace ([ADR 0010](../adrs/cores-are-ports-of-open-references.md), [ADR 0011](../adrs/each-module-carries-its-licence.md)).
+- [ ] **Hot paths use concrete types**: no protocol-typed value, unspecialized generic or allocation in per-instruction, per-pixel or per-sample code ([ADR 0012](../adrs/cores-shape-and-hot-paths.md)).
+- [ ] **Installed emulators stay separate**: launching goes through `BusinessLaunching` → `InfrastructureProcess`; a changed flag updates the launch contract and its tests; no new package without a licence review on ADR 0010's allow-list.
+- [ ] **No game, BIOS or firmware file** is added anywhere, fixtures included — open fixtures (OpenBIOS, ps1-tests, ps2autotests) only beside their licence, through the allow-list.
 - [ ] **The library file stays compatible**: a new persisted field decodes with `decodeIfPresent` and a default; a shape change adds a recording to `RecordedLibraryFileTests`.
 - [ ] **A view has its view-model and its previews**: new UI logic lives in a view-model or in `Library` (tested over fakes, every named state), not the view; every new or changed view has a named `#Preview` per visible state, debug-only, over the module's own fakes and the sample games — never data from the user's own library ([ADR 0006](../adrs/presentation-previews.md), [ADR 0009](../adrs/previews-never-carry-the-users-library.md)).
 - [ ] **Visuals come from `styles`**: no literal color, font or size in a feature view — a new need is a token; a component a second module wants is promoted to `styles`, never copied ([ADR 0005](../adrs/presentation-mvvm.md)).
@@ -222,7 +229,7 @@ When a work item ships, in the same change:
 4. **Update the [Codebase Map](#codebase-map), [DEVELOPER.md](DEVELOPER.md)**, and for a module added, moved or retired: its layer card, the module map and ADR 0002's table.
 5. **Update [SPEC.md](SPEC.md)** only if scope, non-goals or principles changed — with a dated note.
 6. **A new standing rule** gets an ADR (a changed one, a superseding ADR) and, once enforced, a `⚠` section above.
-7. **A changed contract** (an emulator's flags, the library file) updates its [reference](../reference/README.md) document.
+7. **A changed contract** (an installed emulator's flags, the library file, a trace format) updates its [reference](../reference/README.md) document.
 
 ---
 
@@ -230,5 +237,5 @@ When a work item ships, in the same change:
 
 - **Today (v0.0.1):** `./scripts/build-app.sh` (from `src/istation/`) builds `build/iStation.app`, ad-hoc signed, for the user's own Mac; copy it to /Applications. `swift run iStation` runs it unbundled.
 - **A release** is its branch merged into `stable` and tagged `v<x.y.z>`; the tag, the merge and any publishing are the user's to do (`/istation-maintenance-update-release` prepares them).
-- **From v1.0.0:** the seven-step pipeline in [SPEC.md → Distribution](SPEC.md#distribution) — Developer ID signing with hardened runtime, notarization, a notarized `.dmg`, a GitHub release beside the source tag, and a Sparkle appcast. The signing identity, notarization and publishing are the user's.
+- **From v1.0.0:** the release pipeline in [SPEC.md → Distribution](SPEC.md#distribution) — Developer ID signing with hardened runtime, notarization, a notarized `.dmg` outside the App Store, a GitHub release beside the source tag (the source published under GPLv3), and a Sparkle appcast. The signing identity, notarization and publishing are the user's.
 - **CI:** `.github/workflows/ci.yml` runs the strict build, `swift test` (with the architecture checks) and the docs validator on a macOS runner, **only for an open pull request and for a merge into `stable`** — a push to a release branch runs nothing (the user's call, 2026-10-31). Between pull requests, the local `swift test` in the checklist above is the only guard.

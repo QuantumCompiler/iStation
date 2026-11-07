@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-/// iStation's own laws: emulators stay separate programs and the repository carries none of their
-/// code or Sony's files (ADR 0008); tests and previews never reach the real home folder (ADR 0004).
+/// iStation's own laws: installed emulators stay separate programs, external code joins only after a
+/// licence review, and the repository carries no Sony files (ADR 0010); tests and previews never reach the real home folder (ADR 0004).
 @Suite("Project rules") struct ProjectRulesTests {
     @Test("Only InfrastructureProcess starts a process, and nothing loads code at runtime")
     func onlyInfrastructureProcessSpawnsProcesses() {
@@ -16,10 +16,10 @@ import Testing
         #expect(violations.isEmpty, "\(violations.report)")
     }
 
-    /// Each addition is licence-reviewed first, in ADR 0008's table.
+    /// Each addition is licence-reviewed first, in ADR 0010's allow-list.
     static let allowedPackages: [String] = []
 
-    @Test("The package links no external code beyond ADR 0008's allow-list")
+    @Test("The package links no external code beyond ADR 0010's allow-list")
     func noExternalPackages() {
         var violations = Violations()
         let manifest = Repository.text(Repository.manifest) ?? ""

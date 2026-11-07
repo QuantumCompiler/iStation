@@ -72,7 +72,7 @@ Every test target is Swift Testing, named `<Layer><Module>Tests`, at `tests/<lay
 | `PresentationLibraryTests` | Presentation | tiles follow the query, playing marks a tile, detail text, the empty state |
 | `PresentationSettingsTests` | Presentation | emulator rows, choosing an app, toggles saved, folder hints and removal |
 | `PresentationAppTests` | Presentation | the composition over a sandbox home: file location, discovery, the grid follows the shell |
-| `ArchitectureTests` | — | `LayeringTests`, `LayerContextTests`, `ProjectRulesTests` (ADRs 0001–0008) |
+| `ArchitectureTests` | — | `LayeringTests`, `LayerContextTests`, `ProjectRulesTests` (ADRs 0001–0007, 0010) |
 
 ## Modules
 

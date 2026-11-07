@@ -26,7 +26,7 @@ To `/istation-backlog-create-item`'s bar (the format in the backlog README), plu
 - **Evidence baked in** with its numbers and `file:line` — "measured, not guessed: <date>, <method>".
 - **Walls mapped visibly**: each wall owned by exactly one document; siblings reference it by id.
 - **Answers as dated decisions** ("2026-11-02: … (the user's call)"); unanswered recommendations as `[default: …]`; user-owned unknowns as `[user]`.
-- **Core constraints** naming every `⚠` invariant the item touches (CLAUDE.md): the layer law, emulators as separate programs, no Sony files, UI-free view-models, the library file's compatibility, the real home untouched.
+- **Core constraints** naming every `⚠` invariant the item touches (CLAUDE.md): the layer law, ported code from its reference only and on its side of the licence line, no Sony files, UI-free view-models, the library file's compatibility, the real home untouched.
 - **Seam + files** naming the layer and module from the codebase map, or the new module with its `Module(…)` row.
 - **Gates** wiring the siblings' build order with real ids and no cycles; an item useful alone carries no gate.
 - One **Reference** pass: in-house precedents and the emulators' or libraries' own sources.

@@ -57,14 +57,15 @@ Every item follows this shape (sections in order; omit one only when it is genui
 
 Rows are in suggested build order. **Gates** name only pending items; an item builds on everything shipped plus its gate chain; no cycles. **Split first** items are groomed into their sub-documents before anyone builds. Moving an item between tables is a `git mv`, its row, its Version cell and its links. Same-table links are bare filenames; cross-table links `../<table-dir>/<file>`; links out of the backlog `../../assistant/…`.
 
-**Ids spent so far:** track 1 (`1a`); `M1`, `M2`. No `A` id yet.
+**Ids spent so far:** track 1 (`1a`), track 2 (`2a`–`2e`); `M1`, `M2`; `A1`.
 
 ### Architecture
 
-The structural reshaping queue, claimable by name at any time. Empty: the project was constructed in the layered shape (2026-10-31), so there was no carve to queue.
+The structural reshaping queue, claimable by name at any time. The project was constructed in the layered shape (2026-10-31), so there was no carve to queue. A1 came from the re-vision (2026-11-07): [ADR 0011](../adrs/each-module-carries-its-licence.md) puts a licence on every module and forbids an edge to a stricter one, and A1 gives that rule its check before the first GPL-3.0 module (2c) — which it gates.
 
 | # | Item | Version | File | Status |
 |---|---|---|---|---|
+| A1 | Each module carries its licence — licence tags on every row, the boundary check, SPDX headers, licence files | arch. | [`architecture/each-module-carries-its-licence.md`](architecture/each-module-carries-its-licence.md) | 🟢 |
 
 ### Maintenance
 
@@ -77,8 +78,14 @@ The release-agnostic upkeep queue — bugs, polish, performance, developer ergon
 
 ### v0.0.1
 
-Phase 1 of the user's Build Roadmap (2026-10-26): "until the scaffold compiles and boots a game from each console, nothing else is worth building." Its first two checklist lines (compile, tests green) shipped with the construction (Milestone A, 2026-10-31). What remains is the gate, which only the user can run: it needs their emulators and their games. When 1a ships, this table is empty and v0.0.1 is released.
+**The R3000A boots OpenBIOS** — re-scoped 2026-11-07, when the user re-envisioned iStation as native Swift emulators ported from SwanStation (PS1) and PCSX2 (PS2) ([SPEC.md](../assistant/SPEC.md), [ADR 0010](../adrs/cores-are-ports-of-open-references.md)). Construction's first two lines (compile, tests green) shipped with Milestone A. The old gate, 1a — one game per console booting through the installed emulators — was retired the same day (the user's call); its first run is recorded in [Milestone C](../assistant/MILESTONES.md#milestone-c--the-re-vision).
+
+Track 2 is the re-vision spike's split (2026-11-07, recorded in Milestone C). It measured, over a scratch clone and build of SwanStation commit `631f0fb3`: a clean provenance (DuckStation's history to 2022-01-11, then libretro's own) and GPLv3-compatible dependencies; a clean arm64 build; OpenBIOS embedded and booted when no BIOS is found; no trace logging in its interpreter; its 13 subsystems in one include cycle; ~6,600 lines of C++ in this milestone's slice; and the Swift hot-path costs behind [ADR 0012](../adrs/cores-shape-and-hot-paths.md). It split into a shared trace format (2a), the reference's trace (2b), the CPU (2c, gated by A1's licence check), the console around it (2d) and the gate (2e). The user's calls of 2026-11-07 — shared infrastructure GPL-2.0-or-later, the gate's bar, `access-time` and `io-access-bitwidth` moved to v0.1.0 — are recorded as decisions in each document; the rest are `[default: …]`. When 2e ships, this table is empty and v0.0.1 is released.
 
 | # | Item | Version | File | Status |
 |---|---|---|---|---|
-| 1a | First boot — point iStation at the emulators; one PS1, PS2 and PS3 game boot and return on exit | v0.0.1 | [`v0.0.1/first-boot-gate.md`](v0.0.1/first-boot-gate.md) | 🟢 |
+| 2a | The trace format — one record per guest instruction, and the first divergence between two traces | v0.0.1 | [`v0.0.1/trace-format.md`](v0.0.1/trace-format.md) | 🟢 |
+| 2b | The reference trace — SwanStation from a pinned commit, tracing every instruction of an OpenBIOS boot | v0.0.1 | [`v0.0.1/reference-trace.md`](v0.0.1/reference-trace.md) | 🔒 2a |
+| 2c | The R3000A interpreter — ported from SwanStation, generic over its bus | v0.0.1 | [`v0.0.1/r3000a-interpreter.md`](v0.0.1/r3000a-interpreter.md) | 🔒 A1, 2a |
+| 2d | The PS1 console — memory map, interrupts, timing, minimal DMA and timers, device stubs | v0.0.1 | [`v0.0.1/ps1-console.md`](v0.0.1/ps1-console.md) | 🔒 2c |
+| 2e | Gate: OpenBIOS boots — BIOS and PS-EXE loading, TTY, open fixtures; the trace identical to SwanStation's | v0.0.1 | [`v0.0.1/openbios-boots.md`](v0.0.1/openbios-boots.md) | 🔒 2b, 2d |

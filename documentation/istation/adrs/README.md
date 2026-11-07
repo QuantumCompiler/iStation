@@ -17,5 +17,8 @@ The standing rules of iStation's architecture, each written once, dated, and kep
 | [0005](presentation-mvvm.md) | Presentation modules are MVVM, and share one styles module |
 | [0006](presentation-previews.md) | Every Presentation module stands alone, and every view has its previews |
 | [0007](backwards-compatibility.md) | A library file written by an older iStation keeps loading |
-| [0008](emulators-are-separate-programs.md) | Emulators are separate programs, driven only by their command line; iStation ships none of their code or Sony's files |
+| [0008](emulators-are-separate-programs.md) | ~~Emulators are separate programs, driven only by their command line; iStation ships none of their code or Sony's files~~ — superseded by 0010 |
 | [0009](previews-never-carry-the-users-library.md) | Previews show the sample games, never the user's own library (supersedes ADR 0006's preview-data plan) |
+| [0010](cores-are-ports-of-open-references.md) | iStation's cores are Swift ports of open-source references (PS1 from SwanStation, PS2 from PCSX2); installed emulators cover the rest; no Sony files (supersedes 0008) |
+| [0011](each-module-carries-its-licence.md) | Each module carries its licence, and never depends on a stricter one |
+| [0012](cores-shape-and-hot-paths.md) | A core is a CPU module and a console module behind one narrow interface, and its hot paths use concrete types |
