@@ -18,3 +18,4 @@ The standing rules of iStation's architecture, each written once, dated, and kep
 | [0006](presentation-previews.md) | Every Presentation module stands alone, and every view has its previews |
 | [0007](backwards-compatibility.md) | A library file written by an older iStation keeps loading |
 | [0008](emulators-are-separate-programs.md) | Emulators are separate programs, driven only by their command line; iStation ships none of their code or Sony's files |
+| [0009](previews-never-carry-the-users-library.md) | Previews show the sample games, never the user's own library (supersedes ADR 0006's preview-data plan) |

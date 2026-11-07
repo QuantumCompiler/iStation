@@ -19,8 +19,8 @@ enum PreviewLibrary {
     }
 
     /// Games as LibraryScanner reports them for the disc fixtures in tests/support/discfixtures
-    /// (same titles, serials and boot targets), with play history added. Replace with a recorded
-    /// library.json once the phase-1 gate has run against real games.
+    /// (same titles, serials and boot targets), with play history added. Never data from the
+    /// user's own library (ADR 0009).
     static let recorded = LibraryState(
         folders: [LibraryFolder(url: URL(fileURLWithPath: "/Games/PS1"), platformHint: .ps1)],
         games: [

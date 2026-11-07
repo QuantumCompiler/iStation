@@ -89,7 +89,6 @@ The user's open questions from the Build Roadmap (2026-10-26), each `[user]`:
 
 - Pick a Swift formatter/linter (`swift format` ships with the toolchain) and add it to the checklist and CI.
 - Intel Macs: build and test universal, or state Apple Silicon only.
-- A recorded `library.json` from a real library as the previews' fixture, once the v0.0.1 gate has run (item 1a asks).
 
 ## Non-goals
 

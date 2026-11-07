@@ -1,6 +1,6 @@
 # ADR 0006 — Every Presentation module stands alone, and every view has its previews
 
-**Status:** Accepted · **Date:** 2026-10-31
+**Status:** Accepted, with the preview-data plan in §3 superseded by [ADR 0009](previews-never-carry-the-users-library.md) · **Date:** 2026-10-31
 
 ## Context
 
