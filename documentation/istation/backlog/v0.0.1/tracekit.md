@@ -17,10 +17,10 @@ Measured, not guessed (2026-11-07): tracing through Revula's tool calls (one rou
 
 **Decisions made** (dated):
 - 2026-11-07: TraceKit is the trace format, recorder and diff tool, personal builds only (the user's brief).
+- 2026-11-07: the records — per instruction: guest PC, instruction word, cycle count, and a 64-bit checksum over the general registers, HI, LO and the COP0 status, cause and EPC registers; per frame: frame number, and checksums of guest RAM, of the displayed image and of the frame's audio samples; a full-state record at a fixed interval and on demand (the default, confirmed by the user).
+- 2026-11-07: the diff compares every field; a flag ignores cycle counts while timing is being ported, and no gate uses it (the default, confirmed by the user).
 
-**Open calls:**
-- [default: per instruction — guest PC, instruction word, cycle count, and a 64-bit checksum over the general registers, HI, LO and the COP0 status, cause and EPC registers; per frame — frame number, and checksums of guest RAM, of the displayed image and of the frame's audio samples; a full-state record at a fixed interval and on demand] The records.
-- [default: the diff compares every field; a flag ignores cycle counts while timing is being ported, and no gate uses it] What counts as a divergence.
+**Open calls:** none — all answered 2026-11-07.
 
 **Guardrail(s).** Tests pin both encodings byte for byte against hand-written records, the reader's rejection of truncated and foreign files, and the diff's report of the first differing record and field.
 

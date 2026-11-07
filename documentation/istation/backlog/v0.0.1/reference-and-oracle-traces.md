@@ -17,11 +17,13 @@
 
 **Decisions made** (dated):
 - 2026-11-07: ProjectPSX may be traced from inside its source; SwanStation only from outside, unmodified, guest state only (the user's brief).
+- 2026-11-07: the agent installs the .NET 10 SDK with Homebrew (`brew install --cask dotnet-sdk`, 10.0.403 on 2026-11-07) (the user's call).
+- 2026-11-07: the pinned commits are those current when the item starts, recorded in each README and moved forward only by a dated decision (the default, confirmed by the user).
+- 2026-11-07: the oracle records per frame only — guest RAM, image and audio checksums; per-instruction state comes from ProjectPSX, and from SwanStation only by LLDB breakpoints when a divergence needs narrowing (the default, confirmed by the user).
+- 2026-11-07: in the execute-group run this item is built after 3e and 3f (the gates allow it: neither depends on 3d), and SwanStation is cloned and built by a separate helper session that relays no source text, so nothing of SwanStation's source can reach a session writing core code (the default, taken; [ADR 0013](../../adrs/shipped-code-derives-only-from-permissive-references.md) §3).
+- 2026-11-07: runs with the user's BIOS dump are prepared with exact steps and made later; the item stops at that point if it reaches it first (the user's call).
 
-**Open calls:**
-- [user] May the agent install the .NET 10 SDK on your Mac (for example `brew install --cask dotnet-sdk`), or will you install it? It blocks the ProjectPSX side.
-- [default: the commits current when the item starts, recorded in each README and moved forward only by a dated decision] The pinned commits.
-- [default: the oracle records per frame only — guest RAM, image and audio checksums; per-instruction state comes from ProjectPSX, and from SwanStation only by LLDB breakpoints when a divergence needs narrowing] SwanStation's granularity.
+**Open calls:** none — all answered 2026-11-07.
 
 **Guardrail(s).** Both tools run ps1-tests' `cpu/cop` and `cpu/code-in-io`, whose `psx.log` files were recorded on a real PS1: each tool's TTY output must reproduce them before its traces are trusted (a difference is recorded as that tool's known gap). Both tools' traces must read cleanly with `DataTracing`.
 

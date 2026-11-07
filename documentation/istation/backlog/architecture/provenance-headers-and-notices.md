@@ -17,12 +17,13 @@
 
 **Decisions made** (dated):
 - 2026-11-07: iStation's own code is MIT (the user's call); derived code keeps its reference's notice; nothing GPL ships (the user's brief).
+- 2026-11-07: the header is three comment lines — `// SPDX-License-Identifier: <id>`, `// SPDX-FileCopyrightText: <holders>`, and in a ported file `// Ported from <repository>/<path> — <its copyright line>` (the default, confirmed by the user).
+- 2026-11-07: "iStation contributors" is the copyright holder of iStation's own files, with the git history as the record of who (the default, confirmed by the user).
+- 2026-11-07: the acknowledgements list is one JSON file in the package, so source, tests and both apps read the same entries (the default, confirmed by the user).
+- 2026-11-07: a file mixing ProjectPSX-derived and iStation-written code is MIT with both copyright lines; a file with Play!-derived code is `BSD-2-Clause` (the default, confirmed by the user).
+- 2026-11-07: built in the `/istation-backlog-execute-group v0.0.1` run, before 3e, because it gates it (the user's call).
 
-**Open calls:**
-- [default: three comment lines — `// SPDX-License-Identifier: <id>`, `// SPDX-FileCopyrightText: <holders>`, and in a ported file `// Ported from <repository>/<path> — <its copyright line>`] The header's form.
-- [default: "iStation contributors" in the copyright line of iStation's own files, with the git history as the record of who] The copyright holder.
-- [default: the acknowledgements list is one JSON file in the package, so source, tests and both apps read the same entries] Where the list lives.
-- [default: a file that mixes ProjectPSX-derived and iStation-written code is MIT with both copyright lines; a file with Play!-derived code is `BSD-2-Clause`] Mixed files.
+**Open calls:** none — all answered 2026-11-07.
 
 **Guardrail(s).** Each rule fails on a planted violation and passes once it is removed: a Swift file without a header; a file in a `.projectPSX` module without a provenance line; a header naming a licence missing from the list.
 

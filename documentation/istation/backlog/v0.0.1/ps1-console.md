@@ -13,11 +13,11 @@
 
 **Decisions made** (dated):
 - 2026-11-07: one console module, devices carved out only behind the trace harness (ADR 0015).
+- 2026-11-07: the stubs answer as psx-spx documents each device's power-on state; which registers the BIOS touches is read from ProjectPSX's and SwanStation's traces (3d), not guessed (the default, confirmed by the user).
+- 2026-11-07: NTSC timing only (the default, confirmed by the user).
+- 2026-11-07: what ps1-tests' `access-time` and `io-access-bitwidth` need (memory wait states, device register widths) is ported here too, so 3g can pass all four CPU tests (the default, confirmed by the user).
 
-**Open calls:**
-- [default: the stubs answer as psx-spx documents each device's power-on state; which registers the BIOS touches is read from ProjectPSX's and SwanStation's traces (3d), not guessed] How much each stub does.
-- [default: NTSC timing only] Video standard.
-- [default: what ps1-tests' `access-time` and `io-access-bitwidth` need (memory wait states, device register widths) is ported here too, so 3g can pass all four CPU tests] Timing depth.
+**Open calls:** none — all answered 2026-11-07.
 
 **Guardrail(s).** The tests above; and in a personal run, the console's per-frame trace for the BIOS boot matches ProjectPSX's (3d) frame by frame, its first divergence naming the frame.
 

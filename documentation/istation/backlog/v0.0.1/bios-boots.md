@@ -17,10 +17,11 @@ Checked 2026-11-07: ps1-tests (MIT) has four CPU tests — `access-time`, `code-
 **Decisions made** (dated):
 - 2026-11-07: the milestone is the brief's — all of ps1-tests' CPU tests and a trace matching SwanStation's — replacing Milestone C's narrower bar (the user's brief).
 - 2026-11-07: OpenBIOS is not used, as a binary either, so the boot needs the user's BIOS (the default, taken; ADR 0013 §6).
+- 2026-11-07: "boots" means the BIOS reaches its shell, measured as the frame where SwanStation's recorded RAM stops changing in the boot sequence's pattern for 60 frames; the gate compares every frame up to it (the default, confirmed by the user).
+- 2026-11-07: for `access-time` and `io-access-bitwidth`, which ship no `psx.log`, SwanStation's TTY in 3d's run is the expected output (the default, confirmed by the user).
+- 2026-11-07: the gate's run with the user's BIOS is prepared with exact steps and made later (the user's call).
 
-**Open calls:**
-- [default: "boots" means the BIOS reaches its shell, measured as the frame where SwanStation's recorded RAM stops changing in the boot sequence's pattern for 60 frames; the gate compares every frame up to it] Where the boot ends.
-- [default: for `access-time` and `io-access-bitwidth`, which ship no `psx.log`, SwanStation's TTY in 3d's run is the expected output] Those two tests' expected output.
+**Open calls:** none — all answered 2026-11-07.
 
 **Guardrail(s).** The report is the guardrail: every frame up to the boot's end matches SwanStation's checksums, every test's TTY matches its expected output, and any per-instruction divergence from ProjectPSX is either fixed or listed as a known ProjectPSX error with psx-spx's evidence. Hermetic tests in 3e and 3f keep running in `swift test`.
 

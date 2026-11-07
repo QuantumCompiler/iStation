@@ -16,10 +16,10 @@ Its hot path is shaped by measurement (2026-11-07, iStation's own toy MIPS loop,
 **Decisions made** (dated):
 - 2026-11-07: PS1 from ProjectPSX; the IOP reuses this CPU (the user's brief).
 - 2026-11-07: one CPU module generic over its bus, concrete types in the hot path (ADR 0015).
+- 2026-11-07: where ProjectPSX and psx-spx disagree, psx-spx and SwanStation's recorded behaviour (3d) decide, and the difference is noted beside the code (the default, confirmed by the user).
+- 2026-11-07: no disassembler in this item; TraceKit's diff prints raw instruction words (the default, confirmed by the user).
 
-**Open calls:**
-- [default: where ProjectPSX and psx-spx disagree, psx-spx and SwanStation's recorded behaviour (3d) decide, and the difference is noted beside the code] Correcting the reference.
-- [default: no disassembler in this item; TraceKit's diff prints raw instruction words] Disassembly.
+**Open calls:** none — all answered 2026-11-07.
 
 **Guardrail(s).** The instruction tests pin semantics against psx-spx; a short MIPS program written in a test runs on the Swift CPU and, in a personal run, on ProjectPSX's traced build (3d), and the two traces must match; a benchmark test reports instructions per second.
 

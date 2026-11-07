@@ -13,10 +13,11 @@
 
 **Decisions made** (dated):
 - 2026-11-07: verify JIT under the App Store routine first; if it fails, rethink the PS2 on the Mac App Store before starting PS2 work (the user's brief).
+- 2026-11-07: verify in three runs — (1) ad-hoc signed with the hardened runtime, App Sandbox and `allow-jit`, run by the agent; (2) signed with the user's Apple Development identity and (3) a TestFlight build for macOS, both the user's runs, made only if (1) passes (the default, confirmed by the user).
+- 2026-11-07: a failure is recorded with the exact error and the macOS version and raises ROADMAP's PS2 decision; nothing else in v0.0.1 waits on it except 3b's choice of entitlements (the default, confirmed by the user).
+- 2026-11-07: in the `/istation-backlog-execute-group v0.0.1` run, the user's runs are prepared with exact steps and made later; 3a ships on run (1) (the user's call).
 
-**Open calls:**
-- [default: three runs — (1) ad-hoc signed with hardened runtime, sandbox and `allow-jit`, run by the agent; (2) signed with the user's Apple Development identity, the user's run; (3) a TestFlight build for macOS, the user's run, if (1) and (2) pass] How far to verify.
-- [default: a failure is recorded with the exact error and the macOS version, and raises ROADMAP's PS2 decision; nothing else in v0.0.1 waits on it except 3b's choice of entitlements] What a failure means.
+**Open calls:** none — all answered 2026-11-07.
 
 **Guardrail(s).** The probe checks its own result (the return value 42, and the second region's outcome) and prints both; its README records every run's signing, sandbox state, macOS version and result.
 
