@@ -41,4 +41,4 @@ The index row (in build order, the right status: 🟢, or 🔒 with its gate ids
 
 ## 5. Validate and report
 
-`python3 scripts/validate_docs.py documentation` (from the repository root) is clean. Report the path, id, position, gate, the docs updated, and every `[user]` call.
+`python3 scripts/validate_docs.py documentation` (from the repository root) is clean. **Commit and push** (CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`. Report the path, id, position, gate, the docs updated, and every `[user]` call.

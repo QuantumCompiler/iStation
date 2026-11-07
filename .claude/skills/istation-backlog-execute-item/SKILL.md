@@ -41,7 +41,7 @@ It is the working spec. A **split first** item is groomed into its sub-documents
   - `cd src/istation && swift build --explicit-target-dependency-import-check=error`
   - `cd src/istation && swift test` (includes `ArchitectureTests`)
   - `python3 scripts/validate_docs.py documentation` (from the repository root)
-- Changing repository settings, CI secrets, or anything outward-facing (pushing, publishing, signing) is asked first.
+- Changing repository settings, CI secrets, or anything else outward-facing (publishing, signing, force-pushing, touching `stable` or a tag) is asked first; pushing the release branch when the item ships is routine (§6).
 
 ## 6. Ship — the documentation and status flow, in the same change
 
@@ -53,7 +53,7 @@ It is the working spec. A **split first** item is groomed into its sub-documents
 6. A new standing rule → an ADR; promoted to a `⚠` section once enforced.
 7. The validator clean again.
 
-Commit only when the user's process says so, staging only this item's paths. End git commit messages with the attribution lines the session specifies.
+**Commit and push** (CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`.
 
 ## 7. Stop
 

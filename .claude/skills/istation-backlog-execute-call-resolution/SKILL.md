@@ -41,4 +41,5 @@ For every answer, in the same pass:
 
 - A search of the group's documents shows no `[user]` or `[default:` left except deliberate skips.
 - `python3 scripts/validate_docs.py documentation` (from the repository root) is clean.
+- **Commit and push** (CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`.
 - Report each call and its answer in one line, and what still blocks what.

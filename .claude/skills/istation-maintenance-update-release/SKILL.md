@@ -34,4 +34,4 @@ For a release: the version's table retired from the index; ROADMAP's section mov
 
 ## 5. Prepare, then hand over
 
-Give the user the exact commands, each in its own block, for what is theirs to run: commit the sweep; merge the release branch into `stable`; tag `v<x.y.z>`; push the branch and the tag; create the next `v<next>` branch. Report what was swept, the validation results, and those commands.
+**Commit and push the sweep yourself** (CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`. Then give the user the exact commands, each in its own block, for what is theirs to run: merge the release branch into `stable`; tag `v<x.y.z>`; push `stable` and the tag; create the next `v<next>` branch. Report what was swept, the validation results, and those commands.

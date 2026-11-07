@@ -183,6 +183,15 @@ Runs against the user's real games, BIOS files or signing identity are the user'
 
 Decisions are dated and attributed ("the user's call, YYYY-MM-DD"). Questions are tagged by owner — `[user]` blocks the build, `[default: …]` is taken and veto-able, `(consumed decision)` is owned elsewhere. Ask only what is genuinely the user's, in plain language.
 
+### Committing and pushing
+
+Every task ends with a commit and a push (the user's call, 2026-11-07): a shipped backlog item, a docs pass, a spike's documents, a groomed table, a release sweep, any change the user asked for. A task that changed no file — a spike's report, an answer — commits nothing.
+
+- **One commit per task**, staging only that task's paths, on the release branch (`v<x.y.z>`, today `v0.0.1`) — never on `stable`.
+- **The message is exactly one line, in this pattern and nothing else:** `v<x.y.z> : Title Case Summary` — the live version (the branch name), a space, a colon, a space, then a short summary with every word capitalized. Example: `v0.0.1 : Documentation And Planning`. No body, no blank line, no trailers — not even a session's default attribution lines: this rule takes precedence over them.
+- **Push right after committing**: `git push origin v<x.y.z>` (`git push -u origin v<x.y.z>` the first time). Never force-push, and never push `stable` or a tag: merging into `stable` and tagging stay the user's.
+- A push that fails (no network, rejected) is reported with its error and left for the user, never retried with force.
+
 ### Versioning
 
 One version per roadmap phase (the user's call, 2026-10-31; re-planned 2026-11-07 with the App Store brief): **v0.0.1** JIT verified, both build routines, the R3000A boots the BIOS · **v0.1.0** the first picture · **v0.2.0** PS1 games boot · **v0.3.0** Metal, audio and input · **v0.4.0** the iOS app · **v1.0.0** the PS1 release on the App Stores · **v2.x** PS2. A fix between releases is a patch, `v0.x.y`. Each release is built on a branch named for it (`v0.0.1` today) and, when its backlog table is empty, merged into `stable` and tagged `v<x.y.z>` (the user's call, 2026-10-31). The live number is carried by the branch name, `CFBundleShortVersionString` in `src/istation/scripts/build-app.sh` (from item 3b, the apps' xcconfig files), and ROADMAP's "In progress" heading — `/istation-maintenance-update-release` moves them together.
@@ -209,6 +218,7 @@ Every change satisfies this before merge:
 - [ ] **A new place is a module**: `Views/` + `ViewModels/`, its `Module` row, its test directory, its `SidebarItem` in `shell` if the sidebar reaches it, its view-model in `app`, its name on the Presentation card and in ADR 0002's table — in the same change.
 - [ ] The docs validator is clean: `python3 scripts/validate_docs.py documentation` (from the repository root).
 - [ ] The affected docs are updated in the same change (see **Documentation and Status**) — run `/istation-maintenance-update-documents` before opening a pull request.
+- [ ] **Committed and pushed**: one commit for the task, its message exactly `v<x.y.z> : Title Case Summary`, pushed to `origin/v<x.y.z>` (Working process → **Committing and pushing**).
 
 ## Code Style
 
@@ -230,12 +240,13 @@ When a work item ships, in the same change:
 5. **Update [SPEC.md](SPEC.md)** only if scope, non-goals or principles changed — with a dated note.
 6. **A new standing rule** gets an ADR (a changed one, a superseding ADR) and, once enforced, a `⚠` section above.
 7. **A changed contract** (an installed emulator's flags, the library file, a trace format) updates its [reference](../reference/README.md) document.
+8. **Commit and push** the whole change — one commit, `v<x.y.z> : Title Case Summary` (Working process → **Committing and pushing**).
 
 ---
 
 ## Release and Install
 
 - **Today (v0.0.1):** `./scripts/build-app.sh` (from `src/istation/`) builds the retiring library app as `build/iStation.app`, ad-hoc signed. From item 3b: one scheme or script per routine — the App Store archive (`xcodebuild archive` with export options) and the personal build — for each of the macOS and iOS apps.
-- **A release** is its branch merged into `stable` and tagged `v<x.y.z>`; the tag, the merge and any publishing are the user's to do (`/istation-maintenance-update-release` prepares them).
+- **A release** is its branch merged into `stable` and tagged `v<x.y.z>`; the tag, the merge and any publishing are the user's to do (`/istation-maintenance-update-release` prepares them). Pushing the release branch after each task is the agent's (Working process → **Committing and pushing**).
 - **From v1.0.0:** App Store submission of each app, after checking App Review Guidelines section 4.7 (retro game console emulators) — see [SPEC.md → Distribution](SPEC.md#distribution). The signing identity, App Store Connect and every submission are the user's.
 - **CI:** `.github/workflows/ci.yml` runs the strict build, `swift test` (with the architecture checks) and the docs validator on a macOS runner, **only for an open pull request and for a merge into `stable`** — a push to a release branch runs nothing (the user's call, 2026-10-31). Between pull requests, the local `swift test` in the checklist above is the only guard.

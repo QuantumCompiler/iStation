@@ -41,4 +41,5 @@ To `/istation-backlog-create-item`'s bar (the format in the backlog README), plu
 ## 5. Validate and report
 
 - `python3 scripts/validate_docs.py documentation` (from the repository root) is clean; every number quoted matches the report.
+- **Commit and push** (CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`.
 - Report: each document's path, id, position, gate and walls closed; decisions versus defaults; every `[user]` call; the docs updated; the validator's result.

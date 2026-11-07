@@ -13,4 +13,5 @@ The version scheme is one version per roadmap phase ([ROADMAP.md](../../../docum
 4. **One ordered, word-bounded, case-sensitive scripted replace** across `documentation/`, `CLAUDE.md`, `README.md` and `.claude/skills/`, applied in the same order as the moves, so `v0.1.0` never matches inside `v0.1.0x` and a bumped name is never bumped twice. Track numbers move with their version only if the house says so (it does not: ids are identities; a track keeps its number when its release moves).
 5. **The judgment edits** a script can't make: prose that names a version's theme ("the CHD release"), the Versioning section's list, the new version's ROADMAP section and theme paragraph, the index's table order (nearest release first). **Dated decisions and MILESTONES entries stay history**: they keep the version they were made under.
 6. **Validate**: `python3 scripts/validate_docs.py documentation` (from the repository root) is clean; a search finds no stale version string outside history.
-7. **Report** the mapping, the directories moved, and every file touched.
+7. **Commit and push** (CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`.
+8. **Report** the mapping, the directories moved, and every file touched.

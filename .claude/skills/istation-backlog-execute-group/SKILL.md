@@ -27,11 +27,11 @@ Record every answer in its document, propagated (as `/istation-backlog-execute-c
 
 Each item to `/istation-backlog-execute-item`'s full bar: 🚧 first; the layer law and every invariant; hermetic tests; green with the real commands (`cd src/istation && swift build --explicit-target-dependency-import-check=error`, `swift test`, and `python3 scripts/validate_docs.py documentation` from the root); shipped through the documentation flow (MILESTONES, document and row deleted, gates updated, ROADMAP ticked, map/cards/ADR 0002/DEVELOPER/reference as needed).
 
-**Commit once per shipped item**, staging only that item's paths, with the session's attribution lines.
+**Commit and push once per shipped item** (CLAUDE.md → Committing and pushing): staging only that item's paths, the message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`.
 
-- A step that would need a dangerous or outward-facing permission mid-run (pushing, publishing, signing, changing repository settings) means rethink the approach, not ask: the run is unsupervised.
+- A step that would need a dangerous or outward-facing permission mid-run (publishing, signing, force-pushing, touching `stable` or a tag, changing repository settings) means rethink the approach, not ask: the run is unsupervised.
 - **An item that fails its bar** is stopped: revert its partial change, record why in its document (a dated note under Decisions made, its row back to 🟢 or 🔒), and continue with the items that don't depend on it.
 
 ## 4. Report per item
 
-For each: shipped (its commit, its milestone) or stopped (why, what it needs); the docs updated; the commands run and their results; what is left for the user.
+For each: shipped (its commit, pushed; its milestone) or stopped (why, what it needs); the docs updated; the commands run and their results; what is left for the user.

@@ -32,6 +32,10 @@ The docs home is [`documentation/istation/`](../../../documentation/istation/REA
 - `cd src/istation && swift build --explicit-target-dependency-import-check=error`
 - `cd src/istation && swift test` — the layering and layer-context checks run inside it.
 
-## 4. Report
+## 4. Commit and push
+
+(CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`.
+
+## 5. Report
 
 What was fixed in each document, and what still needs the user (an unanswered `[user]` call, a SPEC question, a release step).

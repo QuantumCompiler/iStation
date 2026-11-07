@@ -35,7 +35,7 @@ Bigger than one focused session, or really a feature or product-shape question �
 
 ## 4. Place and validate
 
-The index row in the Maintenance table, a line in its preamble, the ROADMAP Maintenance line, the "Ids spent so far" line; never MILESTONES. `python3 scripts/validate_docs.py documentation` (from the repository root) is clean.
+The index row in the Maintenance table, a line in its preamble, the ROADMAP Maintenance line, the "Ids spent so far" line; never MILESTONES. `python3 scripts/validate_docs.py documentation` (from the repository root) is clean. **Commit and push** (CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`.
 
 ## 5. Report
 

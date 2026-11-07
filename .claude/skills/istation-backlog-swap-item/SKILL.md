@@ -14,4 +14,5 @@ The docs home is [`documentation/istation/`](../../../documentation/istation/REA
 5. **Fix every reference**, scripted and word-bounded so `M1` never matches `M10`: other items' gates and cross-links (`../maintenance/<file>` style), track preambles, the ROADMAP line (moved to the destination's section), CLAUDE.md, MILESTONES, the ADRs, `reference/`, and the skills under `.claude/skills/`. Its own document's Scope note and a dated Decisions entry ("YYYY-MM-DD: moved from M2 to 1b (the user's call)").
 6. **Retire** a version table the move left empty only at the pre-merge docs pass, never the standing tables; update the "Ids spent so far" line.
 7. **Validate**: `python3 scripts/validate_docs.py documentation` (from the repository root) is clean.
-8. **Report** the old → new id, its new position and status, and every file touched.
+8. **Commit and push** (CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`.
+9. **Report** the old → new id, its new position and status, and every file touched.
