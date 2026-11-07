@@ -6,3 +6,4 @@
 /src/istation/Packages/
 xcuserdata/
 DerivedData/
+*.profraw
