@@ -16,7 +16,7 @@ The brief's first three tasks: prove JIT works under the App Store routine, lay 
 
 - [x] **The scaffold compiles** and **the tests are green** ([Milestone A](MILESTONES.md#milestone-a--the-construction))
 - [ ] **Provenance headers and notices** — SPDX headers, provenance lines, the acknowledgements list and the root licence, with a check ([A2](../backlog/architecture/provenance-headers-and-notices.md))
-- [ ] **JIT under the App Store routine** — a sandboxed `allow-jit` macOS app that maps one `MAP_JIT` region and runs code it wrote ([3a](../backlog/v0.0.1/jit-under-the-app-store-routine.md))
+- [x] **JIT under the App Store routine** — a sandboxed `allow-jit` macOS app that maps one `MAP_JIT` region and runs code it wrote ([Milestone E](MILESTONES.md#milestone-e--jit-under-the-app-store-routine))
 - [ ] **The skeleton and both build routines** — the packages, the macOS and iOS apps, App Store and personal routines; the library app removed ([3b](../backlog/v0.0.1/skeleton-and-build-routines.md))
 - [ ] **TraceKit** — the trace format and the first divergence between two traces ([3c](../backlog/v0.0.1/tracekit.md))
 - [ ] **The reference and the oracle** — ProjectPSX with trace logging; SwanStation unmodified, recorded from outside ([3d](../backlog/v0.0.1/reference-and-oracle-traces.md))
@@ -81,7 +81,7 @@ Nothing queued: M1 and M2 were the library app's, and retired with it.
 
 Each `[user]`:
 
-- **If JIT fails under the App Sandbox (3a), how does the PS2 reach the Mac App Store** — interpreter only, or outside the store? Blocks v2.x. (2026-11-07)
+- **If JIT fails under the App Sandbox (3a), how does the PS2 reach the Mac App Store** — interpreter only, or outside the store? Blocks v2.x. (2026-11-07) *Not raised yet: 3a's run (1) passed on macOS 27.0.1, ad-hoc signed ([Milestone E](MILESTONES.md#milestone-e--jit-under-the-app-store-routine)); it stays open until your runs (2) and (3) in `tools/jit-probe/README.md`.*
 - **A PS1 high-level-emulated BIOS**, written from documentation (never from OpenBIOS), so App Store users need no BIOS dump? Unscheduled. (2026-11-07)
 
 ## Ideas

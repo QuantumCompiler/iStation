@@ -80,7 +80,7 @@ One Swift compilation condition (`PERSONAL_BUILD`), separate xcconfig and entitl
 ### Apple constraints
 
 - iOS App Store apps can't generate code at run time; the PS1 runs well interpreted, the PS2 doesn't — so PS2 is macOS-only.
-- JIT on macOS: the `allow-jit` entitlement, `MAP_JIT` memory and `pthread_jit_write_protect_np` toggling on Apple Silicon. Under the hardened runtime an app may create only one `MAP_JIT` region, so each code cache is one region. Developers report `allow-jit` accepted on the Mac App Store, and one report says JIT failed under the App Sandbox on macOS 26 — verified first (v0.0.1, item 3a); if it fails, PS2 on the Mac App Store is rethought before PS2 work starts.
+- JIT on macOS: the `allow-jit` entitlement, `MAP_JIT` memory and `pthread_jit_write_protect_np` toggling on Apple Silicon. Under the hardened runtime an app may create only one `MAP_JIT` region, so each code cache is one region. Developers report `allow-jit` accepted on the Mac App Store, and one report says JIT failed under the App Sandbox on macOS 26 — verified first (v0.0.1, item 3a); if it fails, PS2 on the Mac App Store is rethought before PS2 work starts. *Measured 2026-11-07 (3a, [Milestone E](MILESTONES.md#milestone-e--jit-under-the-app-store-routine)): on macOS 27.0.1 an ad-hoc-signed, sandboxed, hardened-runtime app with `allow-jit` maps a `MAP_JIT` region and runs its code; a second region was granted too, so the one-region rule is unconfirmed until signed runs.*
 - Audio through Core Audio / AVAudioEngine; input through the GameController framework; presentation through Metal.
 
 ## Distribution

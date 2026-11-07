@@ -166,3 +166,23 @@ The detailed record of finished work: what shipped, how it was built, the trade-
 - 2026-11-07: start the apps fresh; the library app and its launcher retire (the user's call).
 - 2026-11-07: the PS1 milestone is the brief's — ps1-tests' CPU tests passing with a trace matching SwanStation's — replacing Milestone C's narrower bar (the user's brief).
 - 2026-11-07: the brief's packages become products of the one layered package; the apps are targets in `iStation.xcodeproj`; OpenBIOS is not used, as a binary either (the defaults, taken).
+
+
+## Milestone E — JIT under the App Store routine
+
+**Goal.** Know, before any PS2 work, whether a macOS app built the App Store way can generate and run code: App Sandbox on, hardened runtime, `com.apple.security.cs.allow-jit`, never `allow-unsigned-executable-memory` or `get-task-allow` (v0.0.1 item 3a, the brief's first task).
+
+**Built** (3a, 2026-11-07): `tools/jit-probe/` — a one-file SwiftUI macOS app (`Sources/JITProbe.swift`, iStation's own code, MIT) with a `--probe` mode; `Sources/OSCacheControl.h`, a one-line bridging header, because `sys_icache_invalidate` is not exported to Swift by `Darwin`; `Info.plist` (placeholder identifier `local.istation.jit-probe`); `AppStore.entitlements` (sandbox + `allow-jit`) and `NoJIT.entitlements` (the control); `build.sh` (swiftc, bundle, `codesign --options runtime` ad-hoc or with a named identity, into git-ignored `.build/`); `README.md` with the results table and the user's two runs. The probe maps a `MAP_JIT` region, toggles `pthread_jit_write_protect_np`, writes `mov w0, #42; ret`, invalidates the instruction cache, calls it and expects 42, then tries a second region.
+
+**Trade-offs.** A swiftc-built bundle rather than an Xcode project keeps the probe one file and one script; TestFlight (run 3) needs an Xcode target, which its README describes. A control build without `allow-jit` was added to show the entitlement, not the build, is what grants the region.
+
+**Verified** (2026-11-07, macOS 27.0.1, build 26A434, M3 Max):
+
+- Run (0), the control — sandboxed, hardened runtime, no `allow-jit`: both `mmap(MAP_JIT)` calls refused with `EINVAL`.
+- **Run (1) — sandboxed (container `local.istation.jit-probe`), hardened runtime, `allow-jit`, ad-hoc signed: region 1 mapped, the code ran and returned 42: PASS**, from a shell and through Launch Services alike.
+- A second `MAP_JIT` region was **granted** in run (1) and ran too — Apple's porting guide describes one region per process; under ad-hoc signing it is not enforced. Whether real signing enforces it is open until runs (2) and (3).
+- Runs (2), signed with the user's Apple Development identity, and (3), TestFlight, are prepared in `tools/jit-probe/README.md` and are the user's. Run (3) needs an Apple Distribution certificate this Mac doesn't have yet.
+
+**Decisions consumed.**
+
+- 2026-11-07: verify JIT under the App Store routine first (the user's brief); three runs, (2) and (3) the user's; a failure raises the PS2 decision (the defaults, confirmed by the user).

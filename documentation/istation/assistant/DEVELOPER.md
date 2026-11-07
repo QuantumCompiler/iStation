@@ -11,6 +11,8 @@ iStation.xcodeproj/            opens the package in Xcode: no targets of its own
 .github/workflows/ci.yml       strict build, swift test, docs validator
 scripts/validate_docs.py       the docs validator (backlog index ↔ documents, links)
 documentation/                 the router and this docs home
+tools/
+  jit-probe/                   the JIT probe (3a): one sandboxed allow-jit app, build.sh, results in README.md
 src/istation/
   Package.swift                the module map (ADR 0002) and the targets generated from it
   scripts/build-app.sh         release build wrapped as build/iStation.app, ad-hoc signed
