@@ -27,6 +27,7 @@ let modules: [Module] = [
     Module(.data, "Playlists", testSupport: ["SupportSandbox"]),
     Module(.data, "Tracing", testSupport: ["SupportSandbox"]),
 
+    Module(.business, "R3000A", testSupport: ["SupportR3000ATrace", "SupportSandbox"], derivedFrom: .projectPSX),
     Module(.business, "PS1"),
 
     Module(.presentation, "Styles"),
@@ -39,12 +40,13 @@ let modules: [Module] = [
 let testSupport: [Support] = [
     Support(.infrastructure, "Sandbox"),
     Support(.data, "DiscFixtures"),
+    Support(.business, "R3000ATrace", uses: ["BusinessR3000A", "DataTracing"]),
 ]
 
 /// The library products the apps in iStation.xcodeproj link (ADR 0016). The apps are the entry
 /// points: nothing in the package is an executable, and nothing imports an app.
 let products: [Product] = [
-    .library(name: "PS1Core", targets: ["BusinessPS1"]),
+    .library(name: "PS1Core", targets: ["BusinessR3000A", "BusinessPS1"]),
     .library(name: "EmuKit", targets: ["PresentationStyles", "PresentationPlayer", "PresentationAcknowledgements"]),
     // Personal builds only: no app links it in its App Store routine (ADR 0016).
     .library(name: "TraceKit", targets: ["DataTracing"]),

@@ -257,3 +257,66 @@ The detailed record of finished work: what shipped, how it was built, the trade-
 
 - 2026-11-07: iStation's own code is MIT (the user's call); derived code keeps its reference's notice; nothing GPL ships (the user's brief).
 - 2026-11-07: the three-line header, "iStation contributors" as the holder, the list as one JSON file, mixed files MIT with both copyright lines and Play!-derived files BSD-2-Clause (the defaults, confirmed by the user).
+
+## Milestone I — The R3000A interpreter
+
+**Goal.** The first ported code: the PS1's CPU as an interpreter, ported from ProjectPSX's `ProjectPSX/Core/CPU.cs` (MIT, pinned at `f4dc13aea42d`) — the only CPU path that works on iOS and the accuracy baseline for everything after — and generic over its bus, so the PS2's I/O processor can reuse it (v0.0.1 item 3e; [ADR 0015](../adrs/a-core-is-a-cpu-module-and-a-console-module.md)).
+
+**Built** (3e, 2026-11-07, by a session that has never read a GPL emulator's source):
+
+- **`BusinessR3000A`** (Business layer, product `PS1Core`; `Module(.business, "R3000A", …, derivedFrom: .projectPSX)`), in `src/istation/source/business/r3000a/` — every file with ProjectPSX's notice and its provenance line:
+  - `R3000A.swift`: `R3000A<Bus: R3000ABus, Cop2: Coprocessor2, Tracer: R3000ATracer>`, a final class. Its state is ProjectPSX's (`pc` and `nextPC`, the branch and delay-slot flags, HI/LO, the write-back and the two-stage load delay, COP0 with PRID 2). `step()` runs fetch, execute, memory access and write-back and returns the fetch's cycles; `handleInterrupts()` is called by the console between instructions, as ProjectPSX's run loop does; `raise` pushes SR's mode stack and records CAUSE, EPC, BD, BT and the jump destination.
+  - `Instructions.swift`: ProjectPSX's main and SPECIAL opcode tables as two switches, with the COP0 moves and RFE, and the COP2 transfers.
+  - `Bus.swift`: `R3000ABus` (fetch with its cycles; 8-, 16- and 32-bit loads and stores that `throw(BusError)`; `interruptPending`).
+  - `Coprocessor2.swift`: `Coprocessor2`, and `NoCoprocessor2` for the IOP.
+  - `Tracer.swift`: `R3000ATracer`, `RetiredInstruction` (with a pointer to the registers, valid during the call), `NoTracer`.
+  - `Exceptions.swift`: `ExceptionCode`, `COP0Register`.
+- **`SupportR3000ATrace`** (`tests/support/r3000atrace/`): `TraceKitTracer` writes TraceKit's instruction records, plus a full-state record every `fullStateInterval`. It re-exports `DataTracing` through its declared edge, so a Business test reaches TraceKit without a direct import the layer check would refuse.
+- **Tests** in `tests/business/r3000a/`:
+  - `Harness.swift`: an in-memory `TestBus` (2 MB, bus errors beyond) and a small assembler.
+  - One suite per family: `ArithmeticTests` (with `MultiplyDivideTests`), `LoadStoreTests`, `BranchTests`, `ExceptionTests`, `Coprocessor2Tests`, `TracingTests` and `BenchmarkTests`.
+  - The `macOS Personal` scheme runs them.
+
+**Where it departs from ProjectPSX** (psx-spx decides; each is a comment beside the code):
+
+- Misaligned fetches, loads and stores always raise address errors, and ADD/ADDI/SUB always trap on overflow. ProjectPSX does both only when built with `CPU_EXCEPTIONS`.
+- A fetch from nothing raises IBE and a load or store DBE; ProjectPSX has no bus errors.
+- The exception vector follows SR's BEV. ProjectPSX's `SR & 0x400000 >> 22` parses as `SR & 1`, which is always 0 after the mode push, so it always vectors to RAM.
+- COP2, LWC2 and SWC2 need SR's CU2, and with `NoCoprocessor2` they raise Coprocessor Unusable.
+- A misaligned SWC2 raises the store's address error; ProjectPSX raises the load's.
+- SWL and SWR are held back while the cache is isolated, like the other stores.
+
+**ProjectPSX's quirks kept until SwanStation's trace (3d) decides:**
+
+- BLTZAL/BGEZAL write r31 directly rather than through write-back.
+- Enabling interrupts by MTC0 with a software interrupt pending sets EPC to the instruction after the next one, which never runs.
+- An interrupt waits while the next instruction is a COP2 one.
+- LWL and LWR ignore cache isolation.
+- COP1, COP3 and the LWC0/1/3 and SWC0/1/3 encodings are NOPs.
+
+**Trade-offs.**
+
+- **No runtime exclusivity checks.** Every stored `var` of the CPU is `@exclusivity(unchecked)`. Swift checks each access to a class's stored property at run time, even in optimized builds and wherever the inlined hot path lands, and on the spike's loop those checks held the interpreter to **18 M instructions/s**. Holding the state behind unsafe pointers instead also avoids the checks but measured 213 M; the attribute measured 238–267 M, with simpler code. ADR 0015 §4 now says so, and the card and the checklist carry the rule.
+- **Real access widths.** Byte and halfword loads use the bus's 8- and 16-bit reads, where ProjectPSX reads 32 bits and truncates: the same result from RAM, and the right width for 3f's devices.
+- **Peeking the next instruction.** The COP2 postponement looks at the next instruction through `bus.fetch`, as ProjectPSX reads RAM or BIOS directly, so a console's fetch must have no side effects.
+- **Cycles.** The count is the fetch's cycles only, as in ProjectPSX: the bus says what each region costs.
+
+**Verified** (2026-11-07, M3 Max, macOS 27.0.1, Xcode 27.1):
+
+- **The instruction tests**: every instruction family against psx-spx's semantics, 60 tests in 8 suites, green. They cover:
+  - both delay slots (a delay-slot load to the same register wins; an ALU write in a load's delay slot wins over the load);
+  - LWL/LWR/SWL/SWR at every byte offset, and the unaligned pairs;
+  - every exception the document names, with EPC, BD, BT, BadVaddr and the vector;
+  - interrupts (enabled, masked, after a branch, postponed before COP2, software);
+  - RFE, the COP0 moves, cache isolation, COP2 routing;
+  - the tracer through TraceKit's records.
+- **Planted bugs, 3 of 3 caught, then restored**: the load-delay overwrite rule disabled; BEV ignored; the overflow check removed.
+- **Instructions per second** (`ISTATION_BENCHMARK=1 swift test -c release --filter BenchmarkTests`): the spike's loop (`lw`, `addiu`, `sw`, `addiu`, `bne`, `nop`; 300 million instructions) runs through the full pipeline at **238–267 M instructions/s** across two runs. That is about a third of the spike's toy interpreter, which had no pipeline, flags or exceptions, and about seven times the PS1's 33.9 MHz. A tracer switched off by its type (its hook would sum every word) runs at the same rate as `NoTracer`: the hook folds away, so tracing off costs nothing measurable.
+- **Provenance**: the checks pass for the new `.projectPSX` module (`portedModulesNameTheirSources`, `everyLicenceIsAcknowledged`).
+- **The full suite**: `swift test` — 132 tests in 11 test runs, green (ArchitectureTests included); the strict build clean; the docs validator clean; `xcodebuild test -scheme "macOS Personal"` — TEST SUCCEEDED.
+- **Still to come with 3d**: the same program on ProjectPSX's traced build, trace against trace. 3d carries that guardrail.
+
+**Decisions consumed.**
+
+- 2026-11-07: PS1 from ProjectPSX; the IOP reuses this CPU (the user's brief). One CPU module generic over its bus, concrete types in the hot path (ADR 0015).
+- 2026-11-07: where ProjectPSX and psx-spx disagree, psx-spx and SwanStation's recorded behaviour (3d) decide, and the difference is noted beside the code; no disassembler — TraceKit's diff prints raw instruction words (the defaults, confirmed by the user).

@@ -27,11 +27,11 @@ src/istation/
   source/
     infrastructure/            CLAUDE.md · bytes/
     data/                      CLAUDE.md · iso9660/ systemcnf/ playlists/ tracing/
-    business/                  CLAUDE.md · ps1/
+    business/                  CLAUDE.md · r3000a/ ps1/
     presentation/              CLAUDE.md · styles/ player/ acknowledgements/
   tests/
     infrastructure/ data/ business/ presentation/   CLAUDE.md each · one directory per module
-    support/                   sandbox/ (infrastructure) · discfixtures/ (data)
+    support/                   sandbox/ (infrastructure) · discfixtures/ (data) · r3000atrace/ (business)
     architecture/              the layering, layer-context and project-rule checks
 ```
 
@@ -54,6 +54,7 @@ From `src/istation/` unless noted.
 | Xcode (repo root) | `open iStation.xcodeproj`; scheme `macOS Personal`: ⌘R runs, ⌘U runs every package test |
 | All tests through Xcode (repo root) | `xcodebuild test -project iStation.xcodeproj -scheme "macOS Personal" -destination 'platform=macOS'` |
 | TraceKit's throughput (2.5 GB in a temporary folder) | `ISTATION_BENCHMARK=1 swift test -c release --filter ThroughputTests` |
+| The R3000A's instructions per second (the spike's loop, 300 M instructions) | `ISTATION_BENCHMARK=1 swift test -c release --filter BenchmarkTests` |
 | Docs validator (repo root) | `python3 scripts/validate_docs.py documentation` |
 | Lint / format | _TODO:_ none chosen |
 
@@ -83,6 +84,7 @@ Every test target is Swift Testing, named `<Layer><Module>Tests`, at `tests/<lay
 | `DataSystemCNFTests` | Data | PS1/PS2 boot keys, serials, PSX.EXE, no boot key |
 | `DataPlaylistsTests` | Data | cue files quoted and unquoted; m3u comments; unreadable files |
 | `DataTracingTests` | Data | the trace formats byte for byte; round trips across the buffer; truncated, foreign, newer and unknown input; FNV-1a vectors and the register checksum; the first divergence by field; checkpoints; throughput (off by default) |
+| `BusinessR3000ATests` | Business | every instruction family against psx-spx over an in-memory bus and a small assembler (`Harness.swift`): ALU and the overflow trap, shifts, MULT/DIV and their edge cases, loads with the load-delay slot, LWL/LWR/SWL/SWR at every offset, branches and jumps with the delay slot, SYSCALL, BREAK, reserved instructions, address and bus errors, interrupts, RFE, the COP0 moves, cache isolation, COP2 routing and Coprocessor Unusable; the tracer through TraceKit's records; the benchmark (off by default) |
 | `BusinessPS1Tests` | Business | a new console is powered off |
 | `PresentationStylesTests` | Presentation | the screen's 4:3 shape; distinct symbols |
 | `PresentationPlayerTests` | Presentation | a new player has nothing loaded |
@@ -104,7 +106,8 @@ Every test target is Swift Testing, named `<Layer><Module>Tests`, at `tests/<lay
 
 ### Business
 
-- **`ps1`** (`BusinessPS1`, product `PS1Core`) — `PS1Console.swift`: `PS1Console` (`name`, `isPoweredOn`), a powered-off placeholder until the R3000A (3e) and the console's memory map and devices (3f).
+- **`r3000a`** (`BusinessR3000A`, product `PS1Core`; ported from ProjectPSX's `CPU.cs`, so every file carries its notice) — `R3000A.swift`: `R3000A<Bus, Cop2, Tracer>` (a final class; `step()` runs one instruction and returns its fetch cycles; `handleInterrupts()`, called by the console between instructions; `pc`, `nextPC`, `hi`, `lo`, `cycles`, `register(_:)`/`setRegister`, `cop0Register(_:)`/`setCOP0Register`, `jump(to:)`), its pipeline (write-back, the load-delay slot) and `raise`; `Instructions.swift`: decode and execute, ProjectPSX's two opcode tables as switches; `Bus.swift`: `R3000ABus` (fetch, 8/16/32-bit loads and stores with `throws(BusError)`, `interruptPending`), `Fetch`, `BusError`; `Coprocessor2.swift`: `Coprocessor2`, `NoCoprocessor2` (the IOP: COP2 is Coprocessor Unusable); `Tracer.swift`: `R3000ATracer`, `RetiredInstruction`, `NoTracer`; `Exceptions.swift`: `ExceptionCode`, `COP0Register`. Every departure from ProjectPSX is a comment beside the code naming psx-spx; the hot path is `@inlinable`, and every stored `var` `@exclusivity(unchecked)` (ADR 0015 §4).
+- **`ps1`** (`BusinessPS1`, product `PS1Core`) — `PS1Console.swift`: `PS1Console` (`name`, `isPoweredOn`), a powered-off placeholder until the console's memory map and devices (3f).
 
 ### Presentation
 

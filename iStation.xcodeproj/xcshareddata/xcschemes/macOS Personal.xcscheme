@@ -83,6 +83,16 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BusinessR3000ATests"
+               BuildableName = "BusinessR3000ATests"
+               BlueprintName = "BusinessR3000ATests"
+               ReferencedContainer = "container:src/istation">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "BusinessPS1Tests"
                BuildableName = "BusinessPS1Tests"
                BlueprintName = "BusinessPS1Tests"

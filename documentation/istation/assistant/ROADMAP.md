@@ -20,7 +20,7 @@ The brief's first three tasks: prove JIT works under the App Store routine, lay 
 - [x] **The skeleton and both build routines** — the packages, the macOS and iOS apps, App Store and personal routines; the library app removed ([Milestone F](MILESTONES.md#milestone-f--the-skeleton-and-both-build-routines))
 - [x] **TraceKit** — the trace format and the first divergence between two traces ([Milestone G](MILESTONES.md#milestone-g--tracekit))
 - [ ] **The reference and the oracle** — ProjectPSX with trace logging; SwanStation unmodified, recorded from outside ([3d](../backlog/v0.0.1/reference-and-oracle-traces.md))
-- [ ] **The R3000A interpreter** — ported from ProjectPSX, generic over its bus ([3e](../backlog/v0.0.1/r3000a-interpreter.md))
+- [x] **The R3000A interpreter** — ported from ProjectPSX, generic over its bus ([Milestone I](MILESTONES.md#milestone-i--the-r3000a-interpreter))
 - [ ] **The PS1 console** — memory map, interrupt controller, timers, DMA and the devices the BIOS needs ([3f](../backlog/v0.0.1/ps1-console.md))
 - [ ] **Gate: the BIOS boots** — ps1-tests' CPU tests pass and the guest-state trace matches SwanStation's (the user's run, with their BIOS) ([3g](../backlog/v0.0.1/bios-boots.md))
 

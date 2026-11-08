@@ -25,13 +25,14 @@
 
 **Open calls:** none — all answered 2026-11-07.
 
-**Guardrail(s).** Both tools run ps1-tests' `cpu/cop` and `cpu/code-in-io`, whose `psx.log` files were recorded on a real PS1: each tool's TTY output must reproduce them before its traces are trusted (a difference is recorded as that tool's known gap). Both tools' traces must read cleanly with `DataTracing`.
+**Guardrail(s).** Both tools run ps1-tests' `cpu/cop` and `cpu/code-in-io`, whose `psx.log` files were recorded on a real PS1: each tool's TTY output must reproduce them before its traces are trusted (a difference is recorded as that tool's known gap). Both tools' traces must read cleanly with `DataTracing`. Carried from 3e (2026-11-07, when it shipped): a short MIPS program built in a test runs on ProjectPSX's traced build and on the Swift R3000A, and the two instruction traces match (`TraceDiff`, cycles ignored where the buses' timings differ).
 
 **Acceptance criteria:**
 - [ ] `tools/projectpsx-trace/build.sh` and `tools/swanstation-oracle/build.sh` build from a clean checkout into git-ignored `.build/` folders.
 - [ ] With the user's BIOS (the user's run), each writes a BIOS-boot trace that `DataTracing` reads; ProjectPSX's per instruction and per frame, SwanStation's per frame.
 - [ ] Each tool's TTY for ps1-tests' `cop` and `code-in-io` is compared with `psx.log`, and the result recorded.
 - [ ] The boot's instruction count, trace sizes and run times are recorded in MILESTONES.
+- [ ] A test-built MIPS program's instruction trace from ProjectPSX matches the Swift R3000A's (3e's guardrail).
 - [ ] Nothing from `.build/` is tracked, and no SwanStation source file was opened.
 
 **Scope note.** v0.0.1, track 3; gated on 3c (the formats). 3g compares against both. Out of scope: PCSX2 and Play! (v2.x), VRAM-level traces (v0.1.0).

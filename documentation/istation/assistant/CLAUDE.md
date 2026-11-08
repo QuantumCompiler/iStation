@@ -29,7 +29,7 @@ Project context for coding agents working on **iStation**. Read this before maki
 
 iStation is two native Apple apps with PlayStation emulators written in Swift — macOS (PS1 and PS2) and iOS (PS1) — eligible for Apple's App Stores. **Re-envisioned 2026-11-07 (the user's call)** by the brief "PS1 and PS2 emulators in Swift (App Store-eligible)": shipped code is ported only from permissively licensed references — PS1 from ProjectPSX (MIT), PS2 from Play! (BSD) — while the more accurate GPL emulators, SwanStation and PCSX2, are black-box oracles whose guest-visible behaviour is recorded and compared ([ADR 0013](../adrs/shipped-code-derives-only-from-permissive-references.md)). Every app has an App Store release routine and a personal routine with debugging and tracing tools ([ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md)). iStation's own code is MIT.
 
-The repository holds the package's first shape (since v0.0.1's item 3b, 2026-11-07): the four disc-format readers kept for v0.2.0, a powered-off PS1 console, EmuKit's player and acknowledgements views, and the macOS and iOS apps with both build routines. No emulator code exists yet: the R3000A and the PS1 console arrive with items 3e and 3f. See [SPEC.md](SPEC.md) for scope and [MILESTONES.md](MILESTONES.md) for what has shipped.
+The repository holds the package's first shape (since v0.0.1's item 3b, 2026-11-07): the four disc-format readers kept for v0.2.0, a powered-off PS1 console, EmuKit's player and acknowledgements views, and the macOS and iOS apps with both build routines. The first emulator code is the R3000A interpreter (item 3e), ported from ProjectPSX; the PS1 console's memory map and devices arrive with item 3f. See [SPEC.md](SPEC.md) for scope and [MILESTONES.md](MILESTONES.md) for what has shipped.
 
 ## Stack & environment
 
@@ -148,12 +148,13 @@ Presentation is EmuKit: one module per user-facing place, each **`Views/` + `Vie
 | Data | `systemcnf` | SYSTEM.CNF: the boot key's console and serial |
 | Data | `playlists` | .cue track files and .m3u disc entries |
 | Data | `tracing` | TraceKit: trace records, files, the first divergence and checkpoints (personal builds only) |
-| Business | `ps1` | the PS1 console (a powered-off placeholder until items 3e and 3f) |
+| Business | `r3000a` | the R3000A interpreter, generic over its bus, coprocessor 2 and tracer (ported from ProjectPSX) |
+| Business | `ps1` | the PS1 console (a powered-off placeholder until item 3f) |
 | Presentation | `styles` | the visual tokens: palette, symbols, metrics, typography |
 | Presentation | `player` | the player's screen |
 | Presentation | `acknowledgements` | every notice the app carries |
 
-The products: `PS1Core` (`ps1`), `EmuKit` (`styles`, `player`, `acknowledgements`) and `TraceKit` (`tracing`, personal builds only); the format readers join a product with v0.2.0's discs. The apps' targets in `iStation.xcodeproj` (`src/istation/apps/macos/`, `src/istation/apps/ios/`) are the entry points and composition roots, not modules. Detail per module lives in the layer cards and [DEVELOPER.md](DEVELOPER.md).
+The products: `PS1Core` (`r3000a`, `ps1`), `EmuKit` (`styles`, `player`, `acknowledgements`) and `TraceKit` (`tracing`, personal builds only); the format readers join a product with v0.2.0's discs. The apps' targets in `iStation.xcodeproj` (`src/istation/apps/macos/`, `src/istation/apps/ios/`) are the entry points and composition roots, not modules. Detail per module lives in the layer cards and [DEVELOPER.md](DEVELOPER.md).
 
 ---
 
@@ -201,7 +202,7 @@ Every change satisfies this before merge:
 - [ ] New tests are **hermetic** — no network, files only inside a `Sandbox`, never the real home folder, Launch Services, a real emulator or a real game; real runs are the user's to start.
 - [ ] **The layer law holds**: a new module is a directory in its layer, a `Module` row in `Package.swift`, a line on its layer card, a row in ADR 0002's table, a test directory in `tests/<layer>/<module>/` and its test target in the `iStation` Xcode scheme — all in the same change (the layer-context check fails on any one alone).
 - [ ] **Shipped code is clean**: it comes only from a permissive source (ProjectPSX, Play!, iStation's own, public documentation) — never from a GPL emulator's source or disassembly — and each file opens with its SPDX header — a ported one also with `// Ported from <repository>/<path> — <copyright>`, in a module the map marks `derivedFrom:` — with the acknowledgements list (`src/istation/apps/Acknowledgements.json`) updated ([ADR 0013](../adrs/shipped-code-derives-only-from-permissive-references.md), [ADR 0014](../adrs/own-code-is-mit-and-derived-code-keeps-its-notice.md)).
-- [ ] **Hot paths use concrete types**: no protocol-typed value, unspecialized generic or allocation in per-instruction, per-pixel or per-sample code ([ADR 0015](../adrs/a-core-is-a-cpu-module-and-a-console-module.md)).
+- [ ] **Hot paths use concrete types**: no protocol-typed value, unspecialized generic or allocation in per-instruction, per-pixel or per-sample code, and no class stored `var` there without `@exclusivity(unchecked)` ([ADR 0015](../adrs/a-core-is-a-cpu-module-and-a-console-module.md)).
 - [ ] **Release builds carry no tools**: TraceKit and every debug view sit under `#if PERSONAL_BUILD`; the release entitlements carry neither `allow-unsigned-executable-memory` nor `get-task-allow` ([ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md)).
 - [ ] **No game, BIOS or firmware file** is added anywhere, fixtures included — open test suites only beside their licence, through the allow-list; never OpenBIOS.
 - [ ] **The user's data stays readable**: a new persisted field (settings, memory cards) decodes with a default; a save state carries its version ([ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md) §5).
