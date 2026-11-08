@@ -132,9 +132,14 @@ import Testing
     @Test func anNTSCFrameIs263LinesOf3413VideoCycles() {
         let machine = makeMachine()
         for _ in 0..<10 { machine.runFrame() }
-        let expected = 10 * 263 * 3413 * 7 / 11 // CPU cycles: the video clock is 11/7 of the CPU's
+        // CPU cycles: psx-spx's NTSC video clock, 53.693175 MHz, against the CPU's 33.8688 MHz.
+        let expected = 10 * 263 * 3413 * 33_868_800 / 53_693_175
         #expect(abs(Int(machine.cycles) - expected) < 200)
         #expect(machine.frame == 10)
+        // psx-spx's 59.826 Hz, within the 0.015% its 3413 cycles a line differ from the rate's 3412.5;
+        // nocash's 11/7 clock gave 59.29 Hz.
+        let rate = 33_868_800 * 10 / Double(machine.cycles)
+        #expect(abs(rate - 59.826) < 0.02)
     }
 
     @Test func everyFrameRequestsTheVerticalBlank() throws {

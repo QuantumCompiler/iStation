@@ -73,7 +73,12 @@ public enum MIPS {
 
     public static func mfc0(_ rt: UInt32, _ rd: UInt32) -> UInt32 { 0x10 << 26 | 0x00 << 21 | rt << 16 | rd << 11 }
     public static func mtc0(_ rt: UInt32, _ rd: UInt32) -> UInt32 { 0x10 << 26 | 0x04 << 21 | rt << 16 | rd << 11 }
-    public static let rfe: UInt32 = 0x10 << 26 | 0x10 << 21 | 0x10
+    public static func bc0f(_ offset: Int) -> UInt32 { i(0x10, 0x08, 0x00, offset) }
+    public static func bc0t(_ offset: Int) -> UInt32 { i(0x10, 0x08, 0x01, offset) }
+    /// A COP0 command: bit 25 set, the command in the low 25 bits. 10h is RFE; 01h, 02h, 06h and 08h
+    /// are TLBR, TLBWI, TLBWR and TLBP.
+    public static func cop0(_ command: UInt32) -> UInt32 { 0x10 << 26 | 1 << 25 | command & 0x1FF_FFFF }
+    public static let rfe: UInt32 = cop0(0x10)
     public static func mfc2(_ rt: UInt32, _ rd: UInt32) -> UInt32 { 0x12 << 26 | 0x00 << 21 | rt << 16 | rd << 11 }
     public static func cfc2(_ rt: UInt32, _ rd: UInt32) -> UInt32 { 0x12 << 26 | 0x02 << 21 | rt << 16 | rd << 11 }
     public static func mtc2(_ rt: UInt32, _ rd: UInt32) -> UInt32 { 0x12 << 26 | 0x04 << 21 | rt << 16 | rd << 11 }

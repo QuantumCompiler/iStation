@@ -151,6 +151,65 @@ import Testing
         #expect(cpu.pc == ramVector)
     }
 
+    @Test(arguments: [
+        (MIPS.lb(t0, 1, s0), ExceptionCode.addressErrorLoad),
+        (MIPS.lhu(t0, 2, s0), ExceptionCode.addressErrorLoad),
+        (MIPS.lw(t0, 4, s0), ExceptionCode.addressErrorLoad),
+        (MIPS.lwl(t0, 3, s0), ExceptionCode.addressErrorLoad),
+        (MIPS.lwr(t0, 1, s0), ExceptionCode.addressErrorLoad),
+        (MIPS.sb(t0, 1, s0), ExceptionCode.addressErrorStore),
+        (MIPS.sh(t0, 2, s0), ExceptionCode.addressErrorStore),
+        (MIPS.sw(t0, 4, s0), ExceptionCode.addressErrorStore),
+        (MIPS.swl(t0, 3, s0), ExceptionCode.addressErrorStore),
+        (MIPS.swr(t0, 1, s0), ExceptionCode.addressErrorStore),
+    ], [UInt32(0x2), 0x1_0002]) // KUc, then KUc with IsC
+    func inUserModeAnAccessOutsideKUSEGIsAnAddressError(access: (UInt32, ExceptionCode), sr: UInt32) {
+        // psx-spx, "COP0 - Exception Handling": AdEL and AdES "occur when attempting to read outside of
+        // KUseg in user mode"; BadVaddr names the address. It makes no exception for an isolated cache.
+        let (word, code) = access
+        let cpu = cpu([word, MIPS.nop])
+        cpu.setCOP0Register(COP0Register.sr, sr)
+        cpu.jump(to: userOrigin)
+        cpu[t0] = 0xAAAA_AAAA
+        cpu.run(2)
+        #expect(cpu.exceptionCode == code.rawValue)
+        #expect(cpu.epc == userOrigin)
+        #expect(cpu.cop0Register(COP0Register.badVaddr) == data + UInt32(word & 0xFFFF))
+        #expect(cpu[t0] == 0xAAAA_AAAA)
+        #expect(cpu.bus.word(at: data) == 0x3322_1100)
+        #expect(cpu.bus.word(at: data + 4) == 0x7766_5544)
+    }
+
+    @Test func inUserModeKUSEGIsReachable() {
+        let cpu = cpu([MIPS.lw(t0, 0, s1), MIPS.lbu(t1, 1, s1), MIPS.sw(t0, 4, s1), MIPS.sb(t1, 0, s1)])
+        cpu.setCOP0Register(COP0Register.sr, 0x2)
+        cpu.jump(to: userOrigin)
+        cpu[s1] = data & 0x1FFF_FFFF
+        cpu.run(4)
+        #expect(cpu.exceptionCode == 0)
+        #expect(cpu.pc == userOrigin + 16)
+        #expect(cpu.bus.word(at: data) == 0x3322_1111)
+        #expect(cpu.bus.word(at: data + 4) == 0x3322_1100)
+    }
+
+    @Test func inUserModeIsolatingTheCacheHoldsBackKUSEGAccesses() {
+        // psx-spx, SR bit 16: "When isolated, all load and store operations are targetted to the cache".
+        let cpu = cpu([MIPS.lw(t0, 0, s1), MIPS.lbu(t1, 1, s1), MIPS.sw(t2, 4, s1), MIPS.sb(t2, 0, s1), MIPS.swl(t2, 4, s1), MIPS.nop])
+        cpu.setCOP0Register(COP0Register.sr, 0x1_0002) // KUc, IsC
+        cpu.jump(to: userOrigin)
+        cpu[s1] = data & 0x1FFF_FFFF
+        cpu[t0] = 0xAAAA_AAAA
+        cpu[t1] = 0xBBBB_BBBB
+        cpu[t2] = 0x1234_5678
+        cpu.run(6)
+        #expect(cpu.exceptionCode == 0)
+        #expect(cpu.pc == userOrigin + 24)
+        #expect(cpu[t0] == 0xAAAA_AAAA)
+        #expect(cpu[t1] == 0xBBBB_BBBB)
+        #expect(cpu.bus.word(at: data) == 0x3322_1100)
+        #expect(cpu.bus.word(at: data + 4) == 0x7766_5544)
+    }
+
     @Test func isolatingTheCacheKeepsStoresAndLoadsFromMemory() {
         let cpu = cpu([
             MIPS.mtc0(t1, UInt32(COP0Register.sr)), MIPS.sw(t0, 0, s0), MIPS.sb(t0, 4, s0), MIPS.swl(t0, 4, s0), MIPS.lw(t2, 0, s0),

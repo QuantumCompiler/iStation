@@ -20,30 +20,48 @@ public struct VideoSync: Equatable, Sendable {
 /// 32-bit slot (psx-spx, "Timers"). ProjectPSX's counting, kept as it is; its author marks it for
 /// rework, and SwanStation's trace (3d) will say where.
 public final class Timers {
-    public private(set) var timers = [Timer(number: 0), Timer(number: 1), Timer(number: 2)]
+    // One unchecked stored property per counter, not an array: the console ticks all three every slice,
+    // and an array in a class pays an exclusivity check and a uniqueness check on each (ADR 0015 §4).
+    @exclusivity(unchecked) var timer0 = Timer(number: 0)
+    @exclusivity(unchecked) var timer1 = Timer(number: 1)
+    @exclusivity(unchecked) var timer2 = Timer(number: 2)
+
+    /// The three counters, in order: a copy, for tools and tests.
+    public var timers: [Timer] { [timer0, timer1, timer2] }
 
     public init() {}
 
     func read(_ offset: UInt32) -> UInt32 {
-        let number = Int(offset >> 4)
-        guard number < 3 else { return 0xFFFF_FFFF }
-        return timers[number].read(offset & 0xF)
+        switch offset >> 4 {
+        case 0: timer0.read(offset & 0xF)
+        case 1: timer1.read(offset & 0xF)
+        case 2: timer2.read(offset & 0xF)
+        default: 0xFFFF_FFFF
+        }
     }
 
     func write(_ offset: UInt32, _ value: UInt32) {
-        let number = Int(offset >> 4)
-        guard number < 3 else { return }
-        timers[number].write(offset & 0xF, value)
+        switch offset >> 4 {
+        case 0: timer0.write(offset & 0xF, value)
+        case 1: timer1.write(offset & 0xF, value)
+        case 2: timer2.write(offset & 0xF, value)
+        default: break
+        }
     }
 
     /// Advances timer `number` by `cycles` of the system clock; true when it requests its interrupt.
     func tick(_ number: Int, _ cycles: Int) -> Bool {
-        timers[number].tick(cycles)
+        switch number {
+        case 0: timer0.tick(cycles)
+        case 1: timer1.tick(cycles)
+        case 2: timer2.tick(cycles)
+        default: false
+        }
     }
 
     func sync(_ video: VideoSync) {
-        timers[0].sync(video)
-        timers[1].sync(video)
+        timer0.sync(video)
+        timer1.sync(video)
     }
 
     /// One root counter.
@@ -116,7 +134,8 @@ public final class Timers {
                 if clockSource == 0 || clockSource == 2 {
                     counter &+= UInt32(UInt16(truncatingIfNeeded: cycles))
                 } else {
-                    counter &+= UInt32(UInt16(truncatingIfNeeded: cycles * 11 / 7 / video.dotDivider)) // the dot clock
+                    // The dot clock, from the NTSC video clock (psx-spx); ProjectPSX's is 11/7 of the CPU's.
+                    counter &+= UInt32(UInt16(truncatingIfNeeded: GPU.videoCycles(cycles) / video.dotDivider))
                 }
                 cycles = 0
                 return handleIRQ()

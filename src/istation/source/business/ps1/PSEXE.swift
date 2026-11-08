@@ -11,8 +11,9 @@ public enum PSEXEError: Error, Equatable, Sendable {
     case notAnEXE
 }
 
-/// A PS-X EXE: a 2 KB header, then the code and data it loads into RAM (psx-spx, "CDROM File Formats":
-/// the header fields ProjectPSX's `loadEXE` reads, plus the memory fill it skips).
+/// A PS-X EXE: a 2 KB header, then the code and data it loads into RAM (psx-spx, "CDROM File Formats").
+/// ProjectPSX's `loadEXE` reads the start, gp, destination and stack fields; iStation also honours the
+/// size field and the memory fill, as psx-spx describes them.
 public struct PSEXE: Equatable, Sendable {
     public static let headerSize = 0x800
     static let magic = Array("PS-X EXE".utf8)
@@ -51,6 +52,7 @@ public struct PSEXE: Equatable, Sendable {
         func word(_ offset: Int) -> UInt32 {
             UInt32(bytes[offset]) | UInt32(bytes[offset + 1]) << 8 | UInt32(bytes[offset + 2]) << 16 | UInt32(bytes[offset + 3]) << 24
         }
+        // psx-spx: the header's size decides what loads; ProjectPSX copies the whole file after the header.
         let size = min(Int(word(0x1C)), bytes.count - Self.headerSize)
         self.init(
             pc: word(0x10), gp: word(0x14), destination: word(0x18),

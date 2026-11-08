@@ -267,8 +267,8 @@ The detailed record of finished work: what shipped, how it was built, the trade-
 - **`BusinessR3000A`** (Business layer, product `PS1Core`; `Module(.business, "R3000A", …, derivedFrom: .projectPSX)`), in `src/istation/source/business/r3000a/` — every file with ProjectPSX's notice and its provenance line:
   - `R3000A.swift`: `R3000A<Bus: R3000ABus, Cop2: Coprocessor2, Tracer: R3000ATracer>`, a final class. Its state is ProjectPSX's (`pc` and `nextPC`, the branch and delay-slot flags, HI/LO, the write-back and the two-stage load delay, COP0 with PRID 2). `step()` runs fetch, execute, memory access and write-back and returns the fetch's cycles; `handleInterrupts()` is called by the console between instructions, as ProjectPSX's run loop does; `raise` pushes SR's mode stack and records CAUSE, EPC, BD, BT and the jump destination.
   - `Instructions.swift`: ProjectPSX's main and SPECIAL opcode tables as two switches, with the COP0 moves and RFE, and the COP2 transfers.
-  - `Bus.swift`: `R3000ABus` (fetch with its cycles; 8-, 16- and 32-bit loads and stores that `throw(BusError)`; `interruptPending`).
-  - `Coprocessor2.swift`: `Coprocessor2`, and `NoCoprocessor2` for the IOP.
+  - `Bus.swift`: `R3000ABus` (fetch with its cycles; 8-, 16- and 32-bit loads and stores that `throw(BusError)`; `interruptPending`; and, since the review, `peek32`, memory's word with no load's cost and no device's side effects).
+  - `Coprocessor2.swift`: `Coprocessor2`, and `NoCoprocessor2` for the IOP — and for the PS1 until v0.2.0's GTE.
   - `Tracer.swift`: `R3000ATracer`, `RetiredInstruction` (with a pointer to the registers, valid during the call), `NoTracer`.
   - `Exceptions.swift`: `ExceptionCode`, `COP0Register`.
 - **`SupportR3000ATrace`** (`tests/support/r3000atrace/`): `TraceKitTracer` writes TraceKit's instruction records, plus a full-state record every `fullStateInterval`. It re-exports `DataTracing` through its declared edge, so a Business test reaches TraceKit without a direct import the layer check would refuse.
@@ -284,7 +284,15 @@ The detailed record of finished work: what shipped, how it was built, the trade-
 - The exception vector follows SR's BEV. ProjectPSX's `SR & 0x400000 >> 22` parses as `SR & 1`, which is always 0 after the mode push, so it always vectors to RAM.
 - COP2, LWC2 and SWC2 need SR's CU2, and with `NoCoprocessor2` they raise Coprocessor Unusable.
 - A misaligned SWC2 raises the store's address error; ProjectPSX raises the load's.
-- SWL and SWR are held back while the cache is isolated, like the other stores.
+- SWL and SWR are held back while the cache is isolated, like the other stores, and so are LWC2 and SWC2.
+
+Added by the review (2026-11-07):
+
+- **User mode.** With SR's KUc set, a fetch, load or store outside KUSEG is an address error, and without CU0 the COP0 moves and RFE raise Coprocessor Unusable. ProjectPSX has no user mode. Kernel mode's path is unchanged: a load or store tests one flag, as it tested isolation alone.
+- **COP0's commands.** Only RFE (function 10h) runs; TLBR, TLBWI, TLBWR and TLBP are Reserved Instructions, and BC0F and BC0T raise Coprocessor Unusable. ProjectPSX runs every command as RFE.
+- **COP0's registers.** MTC0 to the registers the PS1 lacks (0–2, 4, 10) or to garbage ones (16–31) changes nothing; TAR, BadVaddr, EPC and PRID are read-only; DCIC keeps only its bits 0xFF80F03F. MFC0 of 16–31 reads the last real register read. ProjectPSX writes every one — for 16–31 past the end of its 16-word array — and raises Reserved Instruction on reading 16–31.
+- **The exception entry.** An interrupt taken just after a branch records the branch's destination in TAR (ProjectPSX writes `pc`), and nothing at the vector is in a delay slot: the branch flags are cleared.
+- **SWL and SWR** merge their bytes into a peek of memory, not a load: no load's time, no device's read side effects, and a device gets one byte store per lane. ProjectPSX loads the whole word.
 
 **ProjectPSX's quirks kept until SwanStation's trace (3d) decides:**
 
@@ -298,7 +306,7 @@ The detailed record of finished work: what shipped, how it was built, the trade-
 
 - **No runtime exclusivity checks.** Every stored `var` of the CPU is `@exclusivity(unchecked)`. Swift checks each access to a class's stored property at run time, even in optimized builds and wherever the inlined hot path lands, and on the spike's loop those checks held the interpreter to **18 M instructions/s**. Holding the state behind unsafe pointers instead also avoids the checks but measured 213 M; the attribute measured 238–267 M, with simpler code. ADR 0015 §4 now says so, and the card and the checklist carry the rule.
 - **Real access widths.** Byte and halfword loads use the bus's 8- and 16-bit reads, where ProjectPSX reads 32 bits and truncates: the same result from RAM, and the right width for 3f's devices.
-- **Peeking the next instruction.** The COP2 postponement looks at the next instruction through `bus.fetch`, as ProjectPSX reads RAM or BIOS directly, so a console's fetch must have no side effects.
+- **Peeking the next instruction.** The COP2 postponement looks at the next instruction through `bus.peek32`, which answers RAM, the BIOS and the scratchpad and nil for a device, as ProjectPSX reads RAM or BIOS directly — no cycles, no side effects. (Until the review it went through `bus.fetch`, which a timer's mode register or the SPU's end could answer.)
 - **Cycles.** The count is the fetch's cycles only, as in ProjectPSX: the bus says what each region costs.
 
 **Verified** (2026-11-07, M3 Max, macOS 27.0.1, Xcode 27.1):
@@ -314,7 +322,7 @@ The detailed record of finished work: what shipped, how it was built, the trade-
 - **Instructions per second** (`ISTATION_BENCHMARK=1 swift test -c release --filter BenchmarkTests`): the spike's loop (`lw`, `addiu`, `sw`, `addiu`, `bne`, `nop`; 300 million instructions) runs through the full pipeline at **238–267 M instructions/s** across two runs. That is about a third of the spike's toy interpreter, which had no pipeline, flags or exceptions, and about seven times the PS1's 33.9 MHz. A tracer switched off by its type (its hook would sum every word) runs at the same rate as `NoTracer`: the hook folds away, so tracing off costs nothing measurable.
 - **Provenance**: the checks pass for the new `.projectPSX` module (`portedModulesNameTheirSources`, `everyLicenceIsAcknowledged`).
 - **The full suite**: `swift test` — 132 tests in 11 test runs, green (ArchitectureTests included); the strict build clean; the docs validator clean; `xcodebuild test -scheme "macOS Personal"` — TEST SUCCEEDED.
-- **Still to come with 3d**: the same program on ProjectPSX's traced build, trace against trace. 3d carries that guardrail.
+- **After the review** (2026-11-07): an independent review of 3e and 3f — each finding checked by a skeptic against psx-spx and ProjectPSX — confirmed the defects above and fixed them, each with a test that fails without it; the worst was MTC0 to registers 16–31 writing past COP0's array. Now **76 tests in 8 suites**, green, and the R3000A and PS1 tests clean under AddressSanitizer. The benchmark re-measured **257–261 M instructions/s** (`NoTracer`, two runs; a summing tracer 235–246 M).
 
 **Decisions consumed.**
 
@@ -327,31 +335,35 @@ The detailed record of finished work: what shipped, how it was built, the trade-
 
 **Built** (3f, 2026-11-07, by a session that has never read a GPL emulator's source). `BusinessPS1` (`Module(.business, "PS1", uses: ["BusinessR3000A"], …, derivedFrom: .projectPSX)`), in `src/istation/source/business/ps1/`, every file with ProjectPSX's notice and its provenance line:
 
-- **`PS1Machine<Tracer>`**: the R3000A specialized over `PS1Bus`, and ProjectPSX's run loop — about 100 cycles of CPU, then the devices for what they took, then the interrupt check. `runFrame()` runs to the next vertical blank. `load(_:)` starts a PS-EXE now; `boot(_:)` starts one when the BIOS reaches its shell at 0x80030000. `tty` is expansion 2's output, plus the BIOS's putchar (A(3Ch), B(3Dh)) when `capturesBIOSPutchar` is on, as ProjectPSX's `TTY()` hears it.
+- **`PS1Machine<Tracer>`**: the R3000A specialized over `PS1Bus`, and ProjectPSX's run loop — about 100 cycles of CPU (each instruction's fetch and load wait states counted toward the slice), then the devices for what they took, then the interrupt check. `runFrame()` runs to the next vertical blank. `load(_:)` lands any pending load, then starts a PS-EXE now; `boot(_:)` starts one when the BIOS reaches its shell at 0x80030000. `tty` is expansion 2's output, plus the BIOS's putchar (A(3Ch), B(3Dh)) when `capturesBIOSPutchar` is on, as ProjectPSX's `TTY()` hears it. Its CPU has `NoCoprocessor2` until v0.2.0's GTE, so COP2 raises Coprocessor Unusable.
 - **`PS1Console`**: what the apps hold. It is powered off until `powerOn(bios:)` gets a 512 KB image.
-- **`PS1Bus`**: the memory map. The 2 MB of RAM is mirrored through the BIOS's 8 MB window; then the scratchpad (KUSEG and KSEG0), the I/O ports, expansions 1–3, the read-only BIOS and the cache control register. RAM and BIOS fetches and RAM loads and stores take an `@inlinable` fast path.
-- **`MemoryControl`**: the delay/size registers, COM_DELAY, RAM_SIZE and cache control, and each region's load time.
-- **`InterruptController`**, **`Timers`** and **`DMA`**: the seven channels with DPCR and DICR. OTC writes real tables; the device channels feed the stubs.
-- **`GPU`**: NTSC timing (263 lines of 3413 video cycles), GPUSTAT and the GP1 display commands; no drawing.
+- **`PS1Bus`**: the memory map. The 2 MB of RAM is mirrored through the window RAM_SIZE sets (the BIOS's 8 MB); then the scratchpad (KUSEG and KSEG0), the I/O ports, expansions 1–3 as far as their size registers reach, the read-only BIOS and the cache control register. RAM and BIOS fetches and RAM loads and stores take an `@inlinable` fast path. `peek32` reads memory for the CPU's look-ahead, and `withRAM(_:)` hands tools the guest RAM, both without a load's cost.
+- **`MemoryControl`**: the delay/size registers, COM_DELAY, RAM_SIZE and cache control, with psx-spx's fixed bits; each region's load time, and the expansions' and RAM banks' sizes.
+- **`InterruptController`**, **`Timers`** and **`DMA`**: the seven channels with DPCR and DICR. OTC writes real tables; the device channels feed the stubs, a word at a time, at most 0x10000 words a store or a tick.
+- **`GPU`**: NTSC timing (263 lines of 3413 video cycles; an interlaced field 262.5), GPUSTAT and the GP1 display commands; no drawing.
 - **The stubs**: `CDROMStub`, `SPUStub` (SPUSTAT follows SPUCNT, which the BIOS waits on), `MDECStub` and `PortsStub`. Each answers with psx-spx's power-on state.
-- **`Expansion2`**: the TTY and the POST display. **`PSEXE`**: reads, writes and loads the format.
+- **`Expansion2`**: the TTY, its most recent 1 MB kept, and the POST display. **`PSEXE`**: reads, writes and loads the format.
 - **Two shared changes**: `R3000ABus`'s narrow stores now pass the whole source register (3e's interface, changed with its tests), and the tests' assembler moved to `SupportMIPS` (`tests/support/mips/`), shared by both cores' tests.
 - **Tests** in `tests/business/ps1/`, the `macOS Personal` scheme already running them.
 
 **Where it departs from ProjectPSX** (psx-spx and the hardware decide; each is a comment beside the code):
 
 - **Wait states.** A load costs its region's access time, charged to the devices' clock, so the devices run at the real rate. ProjectPSX charges loads nothing and ticks its devices three times faster to compensate (`MIPS_UNDERCLOCK`). The times come from psx-spx's formula over the delay registers for expansions 1–3, the BIOS, the SPU and the CD-ROM, and from ps1-tests' `access-time` log, recorded on hardware, for RAM (5), the scratchpad (1), the I/O ports (3) and cache control. Fetches keep ProjectPSX's 1 and 20 cycles, so cycle counts stay comparable with its traces. Stores cost nothing (the write buffer).
-- **Bus errors** where psx-spx maps nothing: past the RAM window, between the regions, beyond the BIOS, KSEG2 outside the control registers, and the scratchpad through KSEG1 or as code. ProjectPSX logs these and reads all ones.
-- **Widths, from the `io-access-bitwidth` log on hardware.**
-  - A narrow store reaches a 32-bit port as the whole source register.
+- **Bus errors** where psx-spx maps nothing or locks the address: past RAM_SIZE's banks (its 0x0888 leaves 2 MB), past each expansion's size from DEV0, DEV8 and DEV1 (judged on an access's first byte; ProjectPSX's second TTY port at 0x1F802080 stays open), psx-spx's locked gaps in the I/O region and in KSEG2, between the regions, beyond the BIOS, and the scratchpad through KSEG1 or as code. ProjectPSX has no bus errors: it mirrors RAM through everything below 0x1F000000 and its expansion ROM through expansion 1, reads memory-control bytes or a nearby device in the I/O gaps, mirrors the BIOS through 0x1F804000–0x1FC7FFFF, and reads all ones from 0x1FC80000 up.
+- **Widths, from psx-spx and the `io-access-bitwidth` log on hardware.**
+  - A narrow store reaches a 32-bit port as the whole source register, and a narrow load reads its byte lane of the port.
   - The 8-bit CD-ROM port is read again for each byte of a wider load.
-  - The 16-bit SPU and controller registers take a narrow store's low halfword.
-  - The empty expansions read all ones at every width.
+  - The SPU's 16-bit registers take a byte or halfword store's low halfword, ignore a byte store to an odd address, and read or write two registers for a word.
+  - The controller and serial ports' 16-bit registers take a byte store at an odd address shifted left 8, and only a word store's low halfword.
+  - A DMA channel's BCR takes a narrow store in its own byte lanes, and a halfword store to DICR's upper half clears its force-IRQ bit.
+  - Expansion 2 reads all ones at every width, as the log shows. Expansions 1 and 3 read all ones too, by choice — nothing is attached — though the log's expansion 3 row reads open-bus values that aren't modelled.
   - DICR keeps its bits 0–5, and timer targets are 16 bits.
-- **Smaller fixes.** The memory control registers are initialized, with the values the BIOS writes; ProjectPSX leaves them as uninitialized memory. The video clock's 11/7 is kept exactly; ProjectPSX drops the remainder on every tick. OTC entries are 24 bits.
-- **Loading.** A PS-EXE's fill region is zeroed, and the EXE starts when the PC reaches the shell, which holds for any BIOS. ProjectPSX skips the fill and patches SCPH-1001's image at 0xBFC06FF0.
+- **DMA.** Words move one at a time, and nothing guest-sized is allocated (ProjectPSX hands the device a span of RAM). No store or tick moves more than 0x10000 words on a channel; ProjectPSX moves GPU-from-RAM's and MDEC in's every block at once, up to 2³² words. A transfer follows CHCR's step, −4 included, in 24 bits, writing nothing past RAM's window; MADR and BCR end as psx-spx says; a block size or count of 0 means 0x10000 in every sync mode. DICR's bit 31 is psx-spx's formula and requests the interrupt as it rises, and a completion sets its flag only with the master enable on. 0x1F8010xC mirrors CHCR, and OTC's CHCR keeps only bits 24, 28 and 30, with bit 1 fixed from power-on.
+- **The GPU.** The video clock is the NTSC console's 53.693175 MHz, kept exactly against the CPU's 33.8688 MHz; ProjectPSX uses 11/7 (psx-spx's PSone/PAL ratio) and drops the remainder on every tick. An interlaced field is 262.5 lines, 263 and 262 in turn. GPUSTAT's bit 13 reads 1 without interlace and alternates by field with it, at 240 lines too; bit 31 reads 0 in the vertical blank. GP1(40h–FFh) mirror GP1(00h–3Fh), and GP1(08h)'s 368-pixel bit means divider 7 whatever HDS1 holds (ProjectPSX indexed past its table).
+- **Smaller fixes.** The memory control registers are initialized, with the values the BIOS writes as they read back; ProjectPSX leaves them as uninitialized memory. OTC entries are 24 bits. JOY_CTRL's and SIO_CTRL's bit 6 resets the port's mode, control and baud registers (ProjectPSX's SIO1 is plain memory). The TTY keeps its last 1 MB.
+- **Loading.** psx-spx's size field decides how much of a PS-EXE loads (ProjectPSX copies the whole file), its fill region is zeroed, a load still in the CPU's delay slot lands before the EXE's registers are set, and the EXE starts when the PC reaches the shell, which holds for any BIOS. ProjectPSX skips the fill and patches SCPH-1001's image at 0xBFC06FF0.
 
-**Trade-offs.** psx-spx calls its access-time formula approximate, and against the hardware log it misses for expansion 2 (15/29/57 cycles against 11/26/56), the CD-ROM (7/13/25 against 8/14/26) and the SPU (21/41 against 18/39). It is kept, since it responds to the registers the BIOS writes, and 3g settles the differences against SwanStation's output; the BIOS and expansions 1 and 3 match. The log's open-bus upper halves (I_MASK reading 0x1234_0678, for one) aren't modelled. GP0 is consumed unread until v0.1.0 draws, so GPUSTAT's drawing bits stay 0. The CD-ROM never answers, so a real BIOS's boot may wait on it; which registers it needs is read from 3d's traces before any stub does more.
+**Trade-offs.** psx-spx calls its access-time formula approximate, and against the hardware log it misses for expansion 2 (15/29/57 cycles against 11/26/56), the CD-ROM (7/13/25 against 8/14/26) and the SPU (21/41 against 18/39). It is kept, since it responds to the registers the BIOS writes, and 3g settles the differences against SwanStation's output; the BIOS and expansions 1 and 3 match. The log's open-bus values (I_MASK's upper half reading 0x1234_0678, for one, and expansion 3) aren't modelled. GP0 is consumed unread until v0.1.0 draws, so GPUSTAT's drawing bits stay 0. The CD-ROM never answers, so a real BIOS's boot may wait on it; which registers it needs is read from 3d's traces before any stub does more. Two of ProjectPSX's behaviours stay until 3g's comparison with SwanStation: the vertical blank's interrupt comes at the field's end whatever GP1(07h)'s Y2 holds (the console counts frames off the same signal, so moving it means separating the two), and a linked-list DMA stops only after 0xFFFF nodes, which with 255-word nodes costs about 0.1 ms of host time per store today and will cost more once GP0 draws.
 
 **Verified** (2026-11-07, M3 Max, macOS 27.0.1, Xcode 27.1):
 
@@ -363,11 +375,12 @@ The detailed record of finished work: what shipped, how it was built, the trade-
   - the NTSC frame, within 200 cycles over 10 frames, and GPUSTAT;
   - PS-EXE round trips and loading;
   - the TTY through expansion 2, the BIOS's putchar and the boot hook;
-  - each region's load cost, measured as cycles per loop; the console powering on.
+  - the load costs of RAM, the BIOS, the scratchpad and an I/O port, measured as cycles per loop, and psx-spx's formula for the regions the delay registers govern; the console powering on.
 - **Planted bugs, 4 of 4 caught, then restored**: a narrow store truncated; the video clock at 10/7; RAM loads free; the CD-ROM port not repeated.
 - **Speed** (`ISTATION_BENCHMARK=1 swift test -c release --filter BusinessPS1Tests.BenchmarkTests`): the spike's loop on the whole console — CPU, bus, wait states and devices, 600 frames — runs at **209–210 M instructions/s, 10.3× the PS1's 33.8688 MHz**, two runs.
 - **The full suite**: `swift test` — 173 tests in 11 test runs, green (the architecture checks included); the strict build and the release build clean; the docs validator clean; `xcodebuild test -scheme "macOS Personal"` — TEST SUCCEEDED; both apps' personal routines build (`./scripts/build-personal.sh macOS`, `iOS`).
 - **For 3g**: the per-frame comparison with ProjectPSX, carried into 3g's document.
+- **After the review** (2026-11-07, the review in Milestone I): the bus and device findings fixed — among them a GP1(08h) mode that indexed past the dot-divider table, a DMA store that could ask the host for 17 GB, and the CPU's look-ahead reading past the SPU's registers — each with a regression test (`BusRegressionTests`, `DeviceRegressionTests`). Now **76 tests in 15 suites**, green, and clean under AddressSanitizer; `swift test` runs 223 tests in 11 test runs, green, with the strict and release builds clean. The console's benchmark re-measured **218–222 M instructions/s, 10.7–10.9× the PS1**.
 
 **Decisions consumed.**
 

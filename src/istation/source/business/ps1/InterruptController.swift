@@ -21,10 +21,12 @@ public enum Interrupt: UInt32, Sendable {
 /// I_STAT (0x1F801070) and I_MASK (0x1F801074). The line to the CPU's IP2 is up while a requested
 /// interrupt is unmasked.
 public final class InterruptController {
+    // Unchecked: the CPU reads both every slice, and a checked access costs each read (ADR 0015 §4).
+
     /// Requests waiting for acknowledgement, eleven bits.
-    public private(set) var status: UInt32 = 0
+    @exclusivity(unchecked) public private(set) var status: UInt32 = 0
     /// Which requests reach the CPU, eleven bits.
-    public private(set) var mask: UInt32 = 0
+    @exclusivity(unchecked) public private(set) var mask: UInt32 = 0
 
     public init() {}
 

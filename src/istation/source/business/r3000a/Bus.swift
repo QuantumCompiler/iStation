@@ -37,4 +37,8 @@ public protocol R3000ABus: AnyObject {
     func store32(_ address: UInt32, _ value: UInt32) throws(BusError)
     /// The interrupt controller's line to COP0 CAUSE bit 10 (IP2).
     var interruptPending: Bool { get }
+    /// The word at `address`, rounded down to a word, as memory holds it — with no load's cost and no
+    /// device's side effects: for the CPU's look-ahead and SWL/SWR's merge. A device register, or an
+    /// address nothing answers, is nil.
+    func peek32(_ address: UInt32) -> UInt32?
 }

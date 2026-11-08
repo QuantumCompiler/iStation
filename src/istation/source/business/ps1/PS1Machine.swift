@@ -18,6 +18,7 @@ public enum PS1Error: Error, Equatable, Sendable {
 /// Its devices run at the CPU's real rate, loads' wait states included; ProjectPSX instead runs them
 /// three times faster than its loads-cost-nothing CPU.
 public final class PS1Machine<Tracer: R3000ATracer> {
+    /// No GTE until v0.2.0: COP2, LWC2 and SWC2 raise Coprocessor Unusable even with SR's CU2 set.
     public typealias CPU = R3000A<PS1Bus, NoCoprocessor2, Tracer>
 
     public let bus: PS1Bus
@@ -71,11 +72,15 @@ public final class PS1Machine<Tracer: R3000ATracer> {
     @discardableResult
     public func runSlice() -> Bool {
         var elapsed = 0
+        // A slice counts every cycle — fetches and loads' wait states — so device ticks, DMA blocks and
+        // interrupt checks keep their cadence through load-heavy code.
         while elapsed < Self.sliceCycles {
-            if watchesPC { watch() }
-            elapsed &+= cpu.step()
+            if watchesPC {
+                let pc = cpu.pc
+                if pc == 0xA0 || pc == 0xB0 || pc == 0x8003_0000 { watch() }
+            }
+            elapsed &+= cpu.step() &+ bus.takeStallCycles()
         }
-        elapsed &+= bus.takeStallCycles()
         elapsedCycles &+= UInt64(elapsed)
         let frameEnded = bus.tick(elapsed)
         if frameEnded { frames += 1 }
@@ -101,9 +106,13 @@ public final class PS1Machine<Tracer: R3000ATracer> {
     /// Loads `exe` into RAM and starts it now, as the BIOS's exec would: its fill zeroed, r28 its gp,
     /// r29 and r30 its stack — or, when its header names none, the stack the CPU has, else 0x801FFFF0.
     public func load(_ exe: PSEXE) {
+        cpu.settlePendingLoad() // a BIOS load still in flight lands before the loader's registers
         bus.copyToRAM(exe.text, at: exe.destination)
         if exe.fillSize > 0 { bus.zeroRAM(at: exe.fillStart, count: exe.fillSize) } // ProjectPSX skips the fill
         cpu.setRegister(28, exe.gp)
+        // psx-spx: r29 and r30 both start at base + offset; ProjectPSX gives r29 the base alone. With no
+        // stack in the header, the CPU's stays — and when there is none, as when an EXE runs without a
+        // BIOS, 0x801FFFF0 (iStation's stand-in for a caller's stack, not either reference's).
         if exe.stackBase != 0 {
             cpu.setRegister(29, exe.stackBase &+ exe.stackOffset)
             cpu.setRegister(30, exe.stackBase &+ exe.stackOffset)

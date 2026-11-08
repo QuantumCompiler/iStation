@@ -29,6 +29,10 @@ final class TestBus: R3000ABus {
         return physical
     }
 
+    func peek32(_ address: UInt32) -> UInt32? {
+        try? load32(address & ~3)
+    }
+
     func fetch(_ address: UInt32) throws(BusError) -> Fetch {
         Fetch(word: try load32(address), cycles: Self.fetchCycles)
     }
@@ -73,6 +77,9 @@ typealias TestCPU = R3000A<TestBus, NoCoprocessor2, NoTracer>
 
 /// Where test programs start: RAM, through KSEG0.
 let origin: UInt32 = 0x8000_1000
+/// `origin` through KUSEG, where a program in user mode runs: outside KUSEG, user mode's fetches,
+/// loads and stores are address errors (psx-spx, "COP0 - Exception Handling").
+let userOrigin: UInt32 = 0x0000_1000
 /// Where tests keep data.
 let data: UInt32 = 0x8000_2000
 /// The exception vector with SR's BEV clear.

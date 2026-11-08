@@ -36,8 +36,19 @@ public final class R3000A<Bus: R3000ABus, Cop2: Coprocessor2, Tracer: R3000ATrac
     @exclusivity(unchecked) @usableFromInline var isDelaySlot = false
     @exclusivity(unchecked) @usableFromInline var tookBranch = false
     @exclusivity(unchecked) @usableFromInline var delaySlotTookBranch = false
-    /// SR bit 16 (IsC): stores go to the cache, not to memory.
+    /// SR bit 16 (IsC): loads and stores go to the cache, not to memory. It starts clear, as SR reads 0
+    /// at power-on (psx-spx); ProjectPSX's `dontIsolateCache` starts false, so its byte, halfword and
+    /// word loads and stores (LB, LBU, LH, LHU, LW, SB, SH, SW) are ignored until SR is first written.
+    /// Its LWL, LWR, SWL, SWR, LWC2 and SWC2 never test it.
     @exclusivity(unchecked) @usableFromInline var cacheIsolated = false
+    /// The address bits a fetch must have clear: the alignment bits, and in user mode bit 31 too, as
+    /// psx-spx makes an address outside KUSEG an address error there. ProjectPSX has no user mode.
+    @exclusivity(unchecked) @usableFromInline var fetchMask: UInt32 = 0x3
+    /// The cache is isolated or the CPU is in user mode: a load or store tests this one Bool, as it
+    /// tested isolation alone, and only then which (`heldBack`), so kernel mode pays nothing more.
+    @exclusivity(unchecked) @usableFromInline var accessGuarded = false
+    /// The last value MFC0 read from a real COP0 register: what a garbage register, 16–31, reads.
+    @exclusivity(unchecked) @usableFromInline var lastCOP0Read: UInt32 = 0
     @exclusivity(unchecked) @usableFromInline var writeBack = Pending()
     @exclusivity(unchecked) @usableFromInline var memoryLoad = Pending()
     @exclusivity(unchecked) @usableFromInline var delayedLoad = Pending()
@@ -79,10 +90,20 @@ public final class R3000A<Bus: R3000ABus, Cop2: Coprocessor2, Tracer: R3000ATrac
     /// COP0 register `index` (0–15).
     public func cop0Register(_ index: Int) -> UInt32 { cop0[index] }
 
-    /// Sets a COP0 register directly — for loaders and tests. SR's cache-isolation bit takes effect.
+    /// Sets a COP0 register directly — for loaders and tests. SR's cache-isolation and user-mode bits
+    /// take effect.
     public func setCOP0Register(_ index: Int, _ value: UInt32) {
         cop0[index] = value
-        if index == COP0Register.sr { cacheIsolated = value & 0x1_0000 != 0 }
+        if index == COP0Register.sr { statusChanged() }
+    }
+
+    /// Lands the load still in its delay slot now, as if the next instruction had run: for a loader
+    /// that sets registers between instructions, so a pending load can't overwrite them afterwards.
+    public func settlePendingLoad() {
+        gpr[Int(memoryLoad.register)] = memoryLoad.value
+        gpr[0] = 0
+        memoryLoad = Pending()
+        delayedLoad = Pending()
     }
 
     /// Starts executing at `address`, as after a jump with no delay slot.
@@ -108,8 +129,9 @@ public final class R3000A<Bus: R3000ABus, Cop2: Coprocessor2, Tracer: R3000ATrac
         tookBranch = false
 
         var fetchCycles = 1
-        if currentPC & 0x3 != 0 {
-            // ProjectPSX checks this only with CPU_EXCEPTIONS defined; psx-spx: always an address error.
+        if currentPC & fetchMask != 0 {
+            // ProjectPSX checks alignment only with CPU_EXCEPTIONS defined; psx-spx: a misaligned fetch
+            // is always an address error, and so is one outside KUSEG in user mode.
             word = 0
             cop0[COP0Register.badVaddr] = currentPC
             raise(.addressErrorLoad)
@@ -144,7 +166,9 @@ public final class R3000A<Bus: R3000ABus, Cop2: Coprocessor2, Tracer: R3000ATrac
     public func handleInterrupts() {
         // ProjectPSX's quirk, kept: an interrupt waits while the next instruction is a COP2 one, so
         // the GTE command isn't lost (its comment names Crash Bandicoot's intro).
-        if let next = try? bus.fetch(pc), next.word >> 26 == 0x12 { return }
+        // A peek, not a fetch: ProjectPSX reads RAM or the BIOS directly, and a look-ahead must neither
+        // cost cycles nor touch a device.
+        if let next = bus.peek32(pc), next >> 26 == 0x12 { return }
 
         if bus.interruptPending {
             cop0[COP0Register.cause] |= 0x400
@@ -193,6 +217,14 @@ public final class R3000A<Bus: R3000ABus, Cop2: Coprocessor2, Tracer: R3000ATrac
     @inlinable
     func reg(_ index: UInt32) -> UInt32 { gpr[Int(index)] }
 
+    /// Caches what SR decides for every fetch, load and store: cache isolation and user mode.
+    @inlinable
+    func statusChanged() {
+        cacheIsolated = cop0[COP0Register.sr] & 0x1_0000 != 0
+        fetchMask = userMode ? 0x8000_0003 : 0x3
+        accessGuarded = cacheIsolated || userMode
+    }
+
     // MARK: - Exceptions
 
     /// Enters an exception: pushes SR's mode bits, records CAUSE and EPC (and, in a delay slot,
@@ -201,6 +233,9 @@ public final class R3000A<Bus: R3000ABus, Cop2: Coprocessor2, Tracer: R3000ATrac
     func raise(_ code: ExceptionCode, coprocessor: UInt32 = 0) {
         let mode = cop0[COP0Register.sr] & 0x3F
         cop0[COP0Register.sr] = (cop0[COP0Register.sr] & ~UInt32(0x3F)) | ((mode << 2) & 0x3F)
+        // The push clears KUc: the handler runs in kernel mode.
+        fetchMask = 0x3
+        accessGuarded = cacheIsolated
 
         let oldCause = cop0[COP0Register.cause] & 0xFF00
         cop0[COP0Register.cause] = code.rawValue << 2 | oldCause | coprocessor << 28
@@ -218,9 +253,15 @@ public final class R3000A<Bus: R3000ABus, Cop2: Coprocessor2, Tracer: R3000ATrac
         if isDelaySlot {
             cop0[COP0Register.epc] &-= 4
             cop0[COP0Register.cause] |= 1 << 31
-            cop0[COP0Register.jumpDestination] = pc
+            // TAR: where the branch goes on (psx-spx: its destination). In the delay slot that is pc;
+            // between instructions, just after the branch, it is nextPC, where ProjectPSX writes pc.
+            cop0[COP0Register.jumpDestination] = code == .interrupt ? nextPC : pc
             if delaySlotTookBranch { cop0[COP0Register.cause] |= 1 << 30 }
         }
+        // Nothing at the vector is in a delay slot. ProjectPSX leaves the flags of a branch an
+        // interrupt followed, so the handler's first instruction faulting would report BD.
+        isBranch = false
+        tookBranch = false
 
         // psx-spx: SR's BEV (bit 22) selects the vector. ProjectPSX writes `SR & 0x400000 >> 22`,
         // which C# parses as `SR & 1` and so always vectors to RAM.
@@ -231,4 +272,13 @@ public final class R3000A<Bus: R3000ABus, Cop2: Coprocessor2, Tracer: R3000ATrac
     /// True when SR's CU2 bit (30) lets COP2 instructions run.
     @inlinable
     var cop2Usable: Bool { Cop2.isInstalled && cop0[COP0Register.sr] & 0x4000_0000 != 0 }
+
+    /// True in user mode: SR's KUc (bit 1). ProjectPSX has no user mode.
+    @inlinable
+    var userMode: Bool { cop0[COP0Register.sr] & 0x2 != 0 }
+
+    /// False in user mode without SR's CU0 (bit 28), where psx-spx makes COP0's registers and RFE raise
+    /// Coprocessor Unusable.
+    @inlinable
+    var cop0Usable: Bool { cop0[COP0Register.sr] & 0x1000_0002 != 0x2 }
 }

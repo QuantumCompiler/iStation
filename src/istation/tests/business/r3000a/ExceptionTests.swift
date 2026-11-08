@@ -11,11 +11,16 @@ import Testing
     @Test func syscallPushesTheModeStackAndVectorsToRAM() {
         let cpu = makeCPU([MIPS.syscall])
         cpu.setCOP0Register(COP0Register.sr, 0x0000_0403) // IM2, KUc, IEc
+        cpu.jump(to: userOrigin)
         cpu.step()
         #expect(cpu.exceptionCode == ExceptionCode.syscall.rawValue)
-        #expect(cpu.epc == origin)
+        #expect(cpu.epc == userOrigin)
         #expect(cpu.pc == ramVector)
         #expect(cpu.sr == 0x0000_040C)
+        // The push cleared KUc, so the handler runs from KSEG0 in kernel mode.
+        cpu.step()
+        #expect(cpu.exceptionCode == ExceptionCode.syscall.rawValue)
+        #expect(cpu.pc == ramVector + 4)
     }
 
     @Test func breakIsItsOwnException() {
@@ -39,6 +44,7 @@ import Testing
         (MIPS.r(0x3F), UInt32(0)), // SPECIAL function 0x3F
         (UInt32(0x4020_0000), UInt32(0)), // COP0 with rs = 1
         (MIPS.mfc0(t0, 0), UInt32(0)), // MFC0 of an unreadable register
+        (MIPS.mfc0(t0, 10), UInt32(0)),
     ])
     func undefinedEncodingsAreReservedInstructions(word: UInt32, coprocessor: UInt32) {
         let cpu = makeCPU([word])
@@ -55,6 +61,28 @@ import Testing
         cpu.step()
         #expect(cpu.pc == origin + 4)
         #expect(cpu.exceptionCode == 0)
+    }
+
+    @Test(arguments: [MIPS.cop0(0x01), MIPS.cop0(0x02), MIPS.cop0(0x06), MIPS.cop0(0x08)])
+    func theTLBCommandsAreReservedInstructionsNotRFE(word: UInt32) {
+        // psx-spx, "COP0 - Misc": RFE is the only COP0 command; TLBR, TLBWI, TLBWR and TLBP raise RI.
+        let cpu = makeCPU([word])
+        cpu.setCOP0Register(COP0Register.sr, 0x3C)
+        cpu.step()
+        #expect(cpu.exceptionCode == ExceptionCode.reservedInstruction.rawValue)
+        #expect(cpu.epc == origin)
+        #expect(cpu.sr == 0x30) // the exception's push of 0x3C, not RFE's pop (0x3F)
+    }
+
+    @Test(arguments: [MIPS.bc0f(4), MIPS.bc0t(4)])
+    func bc0fAndBC0TAreCoprocessorUnusable(word: UInt32) {
+        // psx-spx, "COP0 - Misc": the COP0 jumps aren't supported, excode 0Bh, unlike the TLB commands.
+        let cpu = makeCPU([word, MIPS.nop])
+        cpu.step()
+        #expect(cpu.exceptionCode == ExceptionCode.coprocessorUnusable.rawValue)
+        #expect(cpu.exceptionCoprocessor == 0)
+        #expect(cpu.epc == origin)
+        #expect(cpu.pc == ramVector)
     }
 
     @Test func rfePopsTheModeStackAndKeepsTheOldestPair() {
@@ -118,12 +146,124 @@ import Testing
         #expect(cpu.cop0Register(COP0Register.cause) == 0x300)
     }
 
-    @Test func otherCOP0RegistersReadBackWhatWasWritten() {
-        let cpu = makeCPU([MIPS.mtc0(t0, 3), MIPS.mtc0(t0, 7), MIPS.mfc0(t1, 3), MIPS.mfc0(t2, 7), MIPS.nop])
+    @Test(arguments: [UInt32(3), 5, 9, 11])
+    func theReadWriteCOP0RegistersReadBackWhatWasWritten(register: UInt32) {
+        // psx-spx, "COP0 - Register Summary": BPC, BDA, BDAM and BPCM are R/W.
+        let cpu = makeCPU([MIPS.mtc0(t0, register), MIPS.mfc0(t1, register), MIPS.nop])
         cpu[t0] = 0x1234_5678
-        cpu.run(5)
+        cpu.run(3)
         #expect(cpu[t1] == 0x1234_5678)
-        #expect(cpu[t2] == 0x1234_5678)
+    }
+
+    @Test func dcicKeepsOnlyItsWritableBits() {
+        // psx-spx, "cop0r7 - DCIC": bits 6–11 and 16–22 are "Not used / Always zero / R"; the rest are
+        // R/W, so 0x12345678 reads back as 0x12345678 & 0xFF80F03F.
+        let cpu = makeCPU([MIPS.mtc0(t0, 7), MIPS.mfc0(t1, 7), MIPS.nop])
+        cpu[t0] = 0x1234_5678
+        cpu.run(3)
+        #expect(cpu[t1] == 0x1200_5038)
+    }
+
+    @Test func theReadOnlyCOP0RegistersIgnoreWrites() {
+        // psx-spx, "COP0 - Register Summary": TAR, BadA, EPC and PRID are R.
+        let cpu = makeCPU([MIPS.mtc0(t0, 6), MIPS.mtc0(t0, 8), MIPS.mtc0(t0, 14), MIPS.mtc0(t0, 15)])
+        cpu[t0] = 0xDEAD_BEEF
+        cpu.run(4)
+        #expect(cpu.exceptionCode == 0)
+        #expect(cpu.pc == origin + 16)
+        #expect(cpu.cop0Register(COP0Register.jumpDestination) == 0)
+        #expect(cpu.cop0Register(COP0Register.badVaddr) == 0)
+        #expect(cpu.epc == 0)
+        #expect(cpu.cop0Register(COP0Register.prid) == 2)
+    }
+
+    @Test func theGarbageRegistersTakeNoWriteAndReadTheLastRealRead() {
+        // psx-spx, "cop0r16-r31 - Garbage": no exception, and a read soon after a real register's
+        // usually returns that register's value. A write past r15 must not reach past COP0's storage.
+        let cpu = makeCPU([
+            MIPS.mtc0(t0, 16), MIPS.mtc0(t0, 31), MIPS.mfc0(t1, UInt32(COP0Register.prid)),
+            MIPS.mfc0(t2, 16), MIPS.mfc0(t3, 31), MIPS.nop,
+        ])
+        cpu[t0] = 0xDEAD_BEEF
+        cpu.run(6)
+        #expect(cpu.exceptionCode == 0)
+        #expect(cpu.pc == origin + 24)
+        #expect(cpu[t1] == 2)
+        #expect(cpu[t2] == 2)
+        #expect(cpu[t3] == 2)
+    }
+
+    // MARK: - User mode
+
+    @Test(arguments: [MIPS.mtc0(t0, 3), MIPS.mfc0(t1, UInt32(COP0Register.sr)), MIPS.mtc0(t0, UInt32(COP0Register.sr)), MIPS.rfe])
+    func inUserModeWithoutCU0COP0IsUnusable(word: UInt32) {
+        // psx-spx, "cop0r16-r31 - Garbage": with SR's KUc set and CU0 clear, the other COP0 registers
+        // and RFE raise Coprocessor Unusable (excode 0Bh).
+        let cpu = makeCPU([word, MIPS.nop])
+        cpu.setCOP0Register(COP0Register.sr, 0x2) // KUc
+        cpu.jump(to: userOrigin)
+        cpu[t0] = 0x1234
+        cpu[t1] = 0xAAAA_AAAA
+        cpu.run(2)
+        #expect(cpu.exceptionCode == ExceptionCode.coprocessorUnusable.rawValue)
+        #expect(cpu.exceptionCoprocessor == 0)
+        #expect(cpu.epc == userOrigin)
+        #expect(cpu.sr == 0x8) // the push, not the write or RFE's pop
+        #expect(cpu.cop0Register(3) == 0)
+        #expect(cpu[t1] == 0xAAAA_AAAA)
+    }
+
+    @Test func inUserModeCU0OrTheGarbageRegistersAllowCOP0() {
+        let withCU0 = makeCPU([MIPS.mtc0(t0, 3), MIPS.mfc0(t1, 3), MIPS.nop])
+        withCU0.setCOP0Register(COP0Register.sr, 0x1000_0002) // CU0, KUc
+        withCU0.jump(to: userOrigin)
+        withCU0[t0] = 0x1234
+        withCU0.run(3)
+        #expect(withCU0.exceptionCode == 0)
+        #expect(withCU0[t1] == 0x1234)
+
+        // psx-spx: the garbage registers can be accessed even in user mode with COP0 disabled.
+        let garbage = makeCPU([MIPS.mtc0(t0, 20), MIPS.mfc0(t1, 20), MIPS.nop])
+        garbage.setCOP0Register(COP0Register.sr, 0x2)
+        garbage.jump(to: userOrigin)
+        garbage.run(3)
+        #expect(garbage.exceptionCode == 0)
+        #expect(garbage.pc == userOrigin + 12)
+    }
+
+    @Test func inUserModeAFetchOutsideKUSEGIsAnAddressError() {
+        // psx-spx: address errors "occur when attempting to read outside of KUseg in user mode", and
+        // BadVaddr is set "on references outside of kuseg (in User mode)".
+        let cpu = makeCPU([MIPS.nop])
+        cpu.setCOP0Register(COP0Register.sr, 0x2)
+        cpu.step()
+        #expect(cpu.exceptionCode == ExceptionCode.addressErrorLoad.rawValue)
+        #expect(cpu.epc == origin)
+        #expect(cpu.cop0Register(COP0Register.badVaddr) == origin)
+        #expect(cpu.pc == ramVector)
+    }
+
+    @Test func mtc0IntoUserModeTakesEffectAtTheNextFetch() {
+        let cpu = makeCPU([MIPS.mtc0(t0, UInt32(COP0Register.sr)), MIPS.nop])
+        cpu[t0] = 0x2 // KUc
+        cpu.run(2)
+        #expect(cpu.exceptionCode == ExceptionCode.addressErrorLoad.rawValue)
+        #expect(cpu.epc == origin + 4)
+        #expect(cpu.cop0Register(COP0Register.badVaddr) == origin + 4)
+    }
+
+    @Test func rfeIntoUserModeTakesEffectAtTheNextFetch() {
+        // psx-spx's return from an exception: jump to the user's address with RFE in the delay slot.
+        let cpu = makeCPU([MIPS.jr(k0), MIPS.rfe])
+        cpu.bus.write([MIPS.lw(t0, 0, s0)], at: userOrigin + 0x100)
+        cpu.setCOP0Register(COP0Register.sr, 0x8) // KUp, popped into KUc
+        cpu[k0] = userOrigin + 0x100
+        cpu[s0] = data
+        cpu.run(3)
+        // The fetch from KUSEG runs; the load from KSEG0 is the address error.
+        #expect(cpu.exceptionCode == ExceptionCode.addressErrorLoad.rawValue)
+        #expect(cpu.epc == userOrigin + 0x100)
+        #expect(cpu.cop0Register(COP0Register.badVaddr) == data)
     }
 
     // MARK: - Interrupts
@@ -162,6 +302,25 @@ import Testing
         cpu.handleInterrupts()
         #expect(cpu.epc == origin)
         #expect(cpu.inBranchDelay)
+        #expect(cpu.branchTaken)
+        // psx-spx, "cop0r6 - TAR": the branch's destination, not its delay slot.
+        #expect(cpu.cop0Register(COP0Register.jumpDestination) == origin + 4 + 16)
+    }
+
+    @Test func theHandlersFirstInstructionAfterAnInterruptIsNotInADelaySlot() {
+        // psx-spx, "cop0r14 - EPC": the faulting instruction's address unless BD is set, and nothing at
+        // the vector sits in a delay slot.
+        let cpu = makeCPU([MIPS.beq(zero, zero, 4), MIPS.nop])
+        cpu.bus.write([MIPS.syscall], at: ramVector)
+        cpu.setCOP0Register(COP0Register.sr, 0x401)
+        cpu.step()
+        cpu.bus.interruptPending = true
+        cpu.handleInterrupts()
+        cpu.step()
+        #expect(cpu.exceptionCode == ExceptionCode.syscall.rawValue)
+        #expect(cpu.epc == ramVector)
+        #expect(!cpu.inBranchDelay)
+        #expect(!cpu.branchTaken)
     }
 
     @Test func anInterruptWaitsWhileTheNextInstructionIsCOP2() {

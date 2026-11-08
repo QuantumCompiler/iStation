@@ -70,6 +70,30 @@ struct RecordingCoprocessor2: Coprocessor2 {
         #expect(store.exceptionCode == ExceptionCode.addressErrorStore.rawValue)
     }
 
+    @Test func isolatingTheCacheHoldsBackLWC2AndSWC2() {
+        // psx-spx, SR bit 16: "When isolated, all load and store operations are targetted to the cache".
+        let cpu = cpu([MIPS.lwc2(9, 0, s0), MIPS.swc2(10, 4, s0)], sr: 0x4001_0000) // CU2, IsC
+        cpu.cop2.data[10] = 0x1234_5678
+        cpu.run(2)
+        #expect(cpu.exceptionCode == 0)
+        #expect(cpu.cop2.data[9] == 0)
+        #expect(cpu.bus.word(at: data + 4) == 0)
+    }
+
+    @Test(arguments: [UInt32(0x4000_0002), 0x4001_0002]) // CU2 and KUc, then with IsC too
+    func inUserModeLWC2AndSWC2OutsideKUSEGAreAddressErrors(sr: UInt32) {
+        // psx-spx: outside KUSEG in user mode, an access is an address error, isolated cache or not.
+        for (word, code) in [(MIPS.lwc2(9, 0, s0), ExceptionCode.addressErrorLoad), (MIPS.swc2(9, 4, s0), .addressErrorStore)] {
+            let cpu = cpu([word], sr: sr)
+            cpu.jump(to: userOrigin)
+            cpu.step()
+            #expect(cpu.exceptionCode == code.rawValue)
+            #expect(cpu.cop0Register(COP0Register.badVaddr) == data + UInt32(word & 0xFFFF))
+            #expect(cpu.cop2.data[9] == 0)
+            #expect(cpu.bus.word(at: data + 4) == 0)
+        }
+    }
+
     @Test func withoutCU2EvenAnInstalledCoprocessorIsUnusable() {
         let cpu = cpu([MIPS.mtc2(t0, 5)], sr: 0)
         cpu[t0] = 1

@@ -7,17 +7,25 @@
 // power-on state: what the BIOS asks of them is read from ProjectPSX's and SwanStation's traces (3d)
 // before any of them does more. CD-ROM commands, SPU sound, MDEC decoding and the pads are v0.2.0's.
 
+// Their stored `var`s are unchecked: a load from the device reads them (ADR 0015 §4).
+
 /// The CD-ROM controller's four byte-wide ports, 0x1F801800–0x1F801803: the status register and its
 /// index; no disc, no commands, no interrupts.
 public final class CDROMStub {
     /// The register bank the index selects (bits 0–1 of a write to 0x1F801800).
-    public private(set) var index: UInt8 = 0
+    @exclusivity(unchecked) public private(set) var index: UInt8 = 0
 
     public init() {}
 
-    /// The status register: parameter FIFO empty (bit 3) and not full (bit 4), nothing busy, and the index.
+    /// The status register: parameter FIFO empty (bit 3) and not full (bit 4), nothing busy, and the
+    /// index. Port 3 is HINTMSK in banks 0 and 2 and HINTSTS in banks 1 and 3: no interrupt enabled or
+    /// flagged, and bits 5–7, which psx-spx says always read 1.
     func read(_ port: UInt32) -> UInt8 {
-        port == 0 ? 0x18 | index : 0
+        switch port {
+        case 0: 0x18 | index
+        case 3: 0xE0
+        default: 0
+        }
     }
 
     func write(_ port: UInt32, _ value: UInt8) {
@@ -28,20 +36,23 @@ public final class CDROMStub {
 /// The SPU's 16-bit registers, 0x1F801C00–0x1F801FFF, kept as written. SPUSTAT's mode bits follow
 /// SPUCNT's (psx-spx), which the BIOS waits for.
 public final class SPUStub {
-    var registers = [UInt16](repeating: 0, count: 0x200)
+    @exclusivity(unchecked) var registers = [UInt16](repeating: 0, count: 0x200)
 
     public init() {}
 
     static let control: UInt32 = 0x1AA
     static let status: UInt32 = 0x1AE
 
+    /// The register at `offset`, wrapped into the 512 so no offset reaches past them.
+    static func index(_ offset: UInt32) -> Int { Int(offset >> 1) & 0x1FF }
+
     func read(_ offset: UInt32) -> UInt16 {
-        if offset == Self.status { return registers[Int(Self.control >> 1)] & 0x3F }
-        return registers[Int(offset >> 1)]
+        let index = Self.index(offset)
+        return index == Self.index(Self.status) ? registers[Self.index(Self.control)] & 0x3F : registers[index]
     }
 
     func write(_ offset: UInt32, _ value: UInt16) {
-        registers[Int(offset >> 1)] = value
+        registers[Self.index(offset)] = value
     }
 
     /// A DMA transfer to the SPU's RAM: accepted and dropped until v0.2.0.
@@ -62,9 +73,12 @@ public final class MDECStub {
 /// registers report idle and the data register reads 0xFF; the rest keep what is written, through
 /// psx-spx's read masks.
 public final class PortsStub {
-    var registers = [UInt16](repeating: 0, count: 0x10)
+    @exclusivity(unchecked) var registers = [UInt16](repeating: 0, count: 0x10)
 
     public init() {}
+
+    /// The halfword register at `offset`, wrapped into the 16 so no offset reaches past them.
+    static func index(_ offset: UInt32) -> Int { Int(offset >> 1) & 0xF }
 
     /// The 32-bit slot at `offset`: two halfword registers, or a stat or data register.
     func read(_ offset: UInt32) -> UInt32 {
@@ -72,7 +86,7 @@ public final class PortsStub {
         case 0x00: 0xFF // JOY_RX_DATA: nothing answers
         case 0x04: 0x0000_0005 // JOY_STAT: both TX-ready flags set
         case 0x14: 0x0000_0805 // SIO_STAT, as ProjectPSX hard-codes it
-        default: UInt32(registers[Int(offset >> 1)]) | UInt32(registers[Int(offset >> 1) + 1]) << 16
+        default: UInt32(registers[Self.index(offset)]) | UInt32(registers[Self.index(offset + 2)]) << 16
         }
     }
 
@@ -80,11 +94,22 @@ public final class PortsStub {
     func write(_ offset: UInt32, _ value: UInt16) {
         switch offset {
         case 0x08: registers[4] = value & 0x013F // JOY_MODE's defined bits
-        case 0x18: registers[0xC] = value & 0x00FF // SIO_MODE's
+        case 0x18: registers[0xC] = value & 0x00FF // SIO_MODE's (ProjectPSX's SIO1 keeps every bit)
         case 0x0A, 0x1A:
-            // JOY_CTRL and SIO_CTRL: bit 6 resets the register; it and the acknowledge bit 4 read 0.
-            registers[Int(offset >> 1)] = value & 0x40 != 0 ? 0 : value & ~UInt16(0x50)
-        default: registers[Int(offset >> 1)] = value
+            // JOY_CTRL and SIO_CTRL (psx-spx). Bit 6 resets the port's mode, control and baud registers:
+            // psx-spx's "most registers", which ProjectPSX's JOYPAD names. It and the acknowledge bit 4
+            // are write-only, and bits 14–15 read 0, as does bit 7 but on SIO1 while its baud factor
+            // (mode bits 0–1) is non-zero. ProjectPSX's SIO1 is plain memory: no reset, no read masks.
+            let port = Int(offset & 0x10) >> 1
+            if value & 0x40 != 0 {
+                registers[port + 4] = 0
+                registers[port + 5] = 0
+                registers[port + 7] = 0
+            } else {
+                let keepsBit7 = offset == 0x1A && registers[0xC] & 0x3 != 0
+                registers[port + 5] = value & (keepsBit7 ? 0x3FAF : 0x3F2F)
+            }
+        default: registers[Self.index(offset)] = value
         }
     }
 }

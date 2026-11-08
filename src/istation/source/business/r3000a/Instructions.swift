@@ -182,17 +182,43 @@ extension R3000A {
 
     // MARK: - Loads
     //
-    // ProjectPSX checks alignment only with CPU_EXCEPTIONS defined and has no bus errors; psx-spx: a
-    // misaligned access is always an address error, and an access to nothing a bus error (DBE).
+    // ProjectPSX checks alignment only with CPU_EXCEPTIONS defined and has no bus errors or user mode;
+    // psx-spx: a misaligned access is always an address error, so is one outside KUSEG in user mode
+    // (`heldBack`), and an access to nothing is a bus error (DBE).
+    //
+    // ProjectPSX reads 32 bits for a byte or halfword load and truncates; here the bus gets the load's
+    // own width, as a device sees it: psx-spx's DEV8 region answers only 8-bit reads, and on hardware
+    // an Expansion 3 halfword read isn't the low half of its word read (ps1-tests' io-access-bitwidth).
 
     @inlinable
     func address(_ w: UInt32) -> UInt32 { reg(Self.rs(w)) &+ Self.immS(w) }
 
+    /// An address error: BadVaddr names the address (psx-spx).
+    @inlinable
+    func addressError(_ code: ExceptionCode, at address: UInt32, _ w: UInt32) {
+        cop0[COP0Register.badVaddr] = address
+        raise(code, coprocessor: Self.id(w))
+    }
+
+    /// While `accessGuarded`: true when a load or store must not reach the bus. In user mode, outside
+    /// KUSEG, it is an address error, raised here, isolated cache or not, as psx-spx makes no exception
+    /// for isolation and LWL and LWR raise it too; otherwise, with the cache isolated, it is ignored,
+    /// as in ProjectPSX.
+    @inlinable
+    func heldBack(_ address: UInt32, _ error: ExceptionCode, _ w: UInt32) -> Bool {
+        if userMode && address & 0x8000_0000 != 0 {
+            addressError(error, at: address, w)
+            return true
+        }
+        return cacheIsolated
+    }
+
     @inlinable
     func loadByte(_ w: UInt32, signed: Bool) {
-        guard !cacheIsolated else { return } // ProjectPSX: loads are ignored while the cache is isolated.
+        let address = address(w)
+        if accessGuarded, heldBack(address, .addressErrorLoad, w) { return }
         do {
-            let value = try bus.load8(address(w))
+            let value = try bus.load8(address)
             loadDelayed(Self.rt(w), signed ? UInt32(bitPattern: Int32(Int8(bitPattern: value))) : UInt32(value))
         } catch {
             raise(.busErrorData)
@@ -201,11 +227,10 @@ extension R3000A {
 
     @inlinable
     func loadHalf(_ w: UInt32, signed: Bool) {
-        guard !cacheIsolated else { return }
         let address = address(w)
+        if accessGuarded, heldBack(address, .addressErrorLoad, w) { return }
         guard address & 0x1 == 0 else {
-            cop0[COP0Register.badVaddr] = address
-            raise(.addressErrorLoad, coprocessor: Self.id(w))
+            addressError(.addressErrorLoad, at: address, w)
             return
         }
         do {
@@ -218,11 +243,10 @@ extension R3000A {
 
     @inlinable
     func loadWord(_ w: UInt32) {
-        guard !cacheIsolated else { return }
         let address = address(w)
+        if accessGuarded, heldBack(address, .addressErrorLoad, w) { return }
         guard address & 0x3 == 0 else {
-            cop0[COP0Register.badVaddr] = address
-            raise(.addressErrorLoad, coprocessor: Self.id(w))
+            addressError(.addressErrorLoad, at: address, w)
             return
         }
         do {
@@ -238,9 +262,15 @@ extension R3000A {
         register == memoryLoad.register ? memoryLoad.value : reg(register)
     }
 
+    // ProjectPSX's, kept until SwanStation's trace (3d) decides: LWL and LWR ignore cache isolation,
+    // though psx-spx sends every isolated load to the cache.
     @inlinable
     func loadWordLeft(_ w: UInt32) {
         let address = address(w)
+        if accessGuarded, userMode, address & 0x8000_0000 != 0 {
+            addressError(.addressErrorLoad, at: address, w)
+            return
+        }
         do {
             let aligned = try bus.load32(address & 0xFFFF_FFFC)
             let shift = (address & 0x3) << 3
@@ -254,6 +284,10 @@ extension R3000A {
     @inlinable
     func loadWordRight(_ w: UInt32) {
         let address = address(w)
+        if accessGuarded, userMode, address & 0x8000_0000 != 0 {
+            addressError(.addressErrorLoad, at: address, w)
+            return
+        }
         do {
             let aligned = try bus.load32(address & 0xFFFF_FFFC)
             let shift = (address & 0x3) << 3
@@ -268,9 +302,10 @@ extension R3000A {
 
     @inlinable
     func storeByte(_ w: UInt32) {
-        guard !cacheIsolated else { return } // Isolated: the write goes to the cache, not to memory.
+        let address = address(w)
+        if accessGuarded, heldBack(address, .addressErrorStore, w) { return }
         do {
-            try bus.store8(address(w), reg(Self.rt(w)))
+            try bus.store8(address, reg(Self.rt(w)))
         } catch {
             raise(.busErrorData)
         }
@@ -278,11 +313,10 @@ extension R3000A {
 
     @inlinable
     func storeHalf(_ w: UInt32) {
-        guard !cacheIsolated else { return }
         let address = address(w)
+        if accessGuarded, heldBack(address, .addressErrorStore, w) { return }
         guard address & 0x1 == 0 else {
-            cop0[COP0Register.badVaddr] = address
-            raise(.addressErrorStore, coprocessor: Self.id(w))
+            addressError(.addressErrorStore, at: address, w)
             return
         }
         do {
@@ -294,11 +328,10 @@ extension R3000A {
 
     @inlinable
     func storeWord(_ w: UInt32) {
-        guard !cacheIsolated else { return }
         let address = address(w)
+        if accessGuarded, heldBack(address, .addressErrorStore, w) { return }
         guard address & 0x3 == 0 else {
-            cop0[COP0Register.badVaddr] = address
-            raise(.addressErrorStore, coprocessor: Self.id(w))
+            addressError(.addressErrorStore, at: address, w)
             return
         }
         do {
@@ -312,13 +345,11 @@ extension R3000A {
     func storeWordLeft(_ w: UInt32) {
         // ProjectPSX lets SWL and SWR through while the cache is isolated; psx-spx: an isolated store
         // reaches only the cache, so they are held back like the other stores.
-        guard !cacheIsolated else { return }
         let address = address(w)
+        if accessGuarded, heldBack(address, .addressErrorStore, w) { return }
+        let shift = (address & 0x3) << 3
         do {
-            let aligned = try bus.load32(address & 0xFFFF_FFFC)
-            let shift = (address & 0x3) << 3
-            let mask = UInt32(0xFFFF_FF00) << shift
-            try bus.store32(address & 0xFFFF_FFFC, (aligned & mask) | (reg(Self.rt(w)) >> (24 - shift)))
+            try storeLanes(address & 0xFFFF_FFFC, reg(Self.rt(w)) >> (24 - shift), keeping: UInt32(0xFFFF_FF00) << shift)
         } catch {
             raise(.busErrorData)
         }
@@ -326,15 +357,27 @@ extension R3000A {
 
     @inlinable
     func storeWordRight(_ w: UInt32) {
-        guard !cacheIsolated else { return }
         let address = address(w)
+        if accessGuarded, heldBack(address, .addressErrorStore, w) { return }
+        let shift = (address & 0x3) << 3
         do {
-            let aligned = try bus.load32(address & 0xFFFF_FFFC)
-            let shift = (address & 0x3) << 3
-            let mask = UInt32(0x00FF_FFFF) >> (24 - shift)
-            try bus.store32(address & 0xFFFF_FFFC, (aligned & mask) | (reg(Self.rt(w)) << shift))
+            try storeLanes(address & 0xFFFF_FFFC, reg(Self.rt(w)) << shift, keeping: UInt32(0x00FF_FFFF) >> (24 - shift))
         } catch {
             raise(.busErrorData)
+        }
+    }
+
+    /// SWL's and SWR's write: only the store's byte lanes change. Memory's other bytes are merged from a
+    /// peek; a device gets each of the store's bytes. ProjectPSX loads the whole word first, which
+    /// charges a load's time and can trigger a device's read side effects.
+    @inlinable
+    func storeLanes(_ aligned: UInt32, _ value: UInt32, keeping kept: UInt32) throws(BusError) {
+        if let word = bus.peek32(aligned) {
+            try bus.store32(aligned, (word & kept) | value)
+            return
+        }
+        for lane: UInt32 in 0..<4 where (kept >> (lane * 8)) & 0xFF == 0 {
+            try bus.store8(aligned + lane, value >> (lane * 8))
         }
     }
 
@@ -345,16 +388,36 @@ extension R3000A {
         switch Self.rs(w) {
         case 0b0_0000: moveFromCOP0(w)
         case 0b0_0100: moveToCOP0(w)
-        case 0b1_0000: returnFromException()
+        // psx-spx: BC0F and BC0T aren't supported and raise Coprocessor Unusable; ProjectPSX raises
+        // Reserved Instruction.
+        case 0b0_1000 where Self.rt(w) <= 1: raise(.coprocessorUnusable, coprocessor: 0)
+        // psx-spx: RFE (10h) is the only COP0 command, and TLBR, TLBWI, TLBWR and TLBP are Reserved
+        // Instructions; ProjectPSX runs every command as RFE.
+        case 0b1_0000 where w & 0x3F == 0x10: returnFromException()
         default: raise(.reservedInstruction, coprocessor: Self.id(w))
         }
+    }
+
+    /// The COP0 registers the PS1 has (psx-spx): 3, 5–9 and 11–15. 0–2, 4 and 10 are N/A; 16–31 garbage.
+    @inlinable
+    static func isCOP0Register(_ register: UInt32) -> Bool {
+        register == 3 || (5...9).contains(register) || (11...15).contains(register)
     }
 
     @inlinable
     func moveFromCOP0(_ w: UInt32) {
         let register = Self.rd(w)
-        if register == 3 || (5...9).contains(register) || (11...15).contains(register) {
-            loadDelayed(Self.rt(w), cop0[Int(register)])
+        if Self.isCOP0Register(register) {
+            guard cop0Usable else {
+                raise(.coprocessorUnusable, coprocessor: 0)
+                return
+            }
+            lastCOP0Read = cop0[Int(register)]
+            loadDelayed(Self.rt(w), lastCOP0Read)
+        } else if register >= 16 {
+            // psx-spx: 16–31 read garbage, without an exception even in user mode, usually the value of
+            // the real register read just before; ProjectPSX raises Reserved Instruction.
+            loadDelayed(Self.rt(w), lastCOP0Read)
         } else {
             raise(.reservedInstruction, coprocessor: Self.id(w))
         }
@@ -362,15 +425,23 @@ extension R3000A {
 
     @inlinable
     func moveToCOP0(_ w: UInt32) {
+        // psx-spx: 0–2, 4 and 10 don't exist and 16–31 are garbage, so a write changes nothing.
+        // ProjectPSX stores it, and for 16–31 indexes past its 16-word array.
+        let register = Self.rd(w)
+        guard Self.isCOP0Register(register) else { return }
+        guard cop0Usable else {
+            raise(.coprocessorUnusable, coprocessor: 0)
+            return
+        }
         let value = reg(Self.rt(w))
-        let register = Int(Self.rd(w))
-        if register == COP0Register.cause {
+        switch Int(register) {
+        case COP0Register.cause:
             // Only the software-interrupt bits, 8 and 9, are writable.
-            cop0[register] = (cop0[register] & ~UInt32(0x300)) | (value & 0x300)
-        } else if register == COP0Register.sr {
-            cacheIsolated = value & 0x1_0000 != 0
-            let wasEnabled = cop0[register] & 0x1 == 1
-            cop0[register] = value
+            cop0[COP0Register.cause] = (cop0[COP0Register.cause] & ~UInt32(0x300)) | (value & 0x300)
+        case COP0Register.sr:
+            let wasEnabled = cop0[COP0Register.sr] & 0x1 == 1
+            cop0[COP0Register.sr] = value
+            statusChanged()
             // Enabling interrupts with a software interrupt pending takes it at once.
             let mask = (value >> 8) & 0x3
             let pending = (cop0[COP0Register.cause] >> 8) & 0x3
@@ -380,16 +451,27 @@ extension R3000A {
                 pc = nextPC
                 raise(.interrupt, coprocessor: Self.id(w))
             }
-        } else {
-            cop0[register] = value
+        case 7:
+            // DCIC: psx-spx's bits 6–11 and 16–22 are unused and always read zero; ProjectPSX stores
+            // every bit.
+            cop0[7] = value & 0xFF80_F03F
+        case 3, 5, 9, 11:
+            cop0[Int(register)] = value // BPC, BDA, BDAM, BPCM
+        default:
+            break // psx-spx: TAR, BadVaddr, EPC and PRID are read-only; ProjectPSX writes them.
         }
     }
 
     /// RFE pops SR's mode stack: bits 2–5 move down to 0–3; bits 4–5 stay.
     @inlinable
     func returnFromException() {
+        guard cop0Usable else {
+            raise(.coprocessorUnusable, coprocessor: 0)
+            return
+        }
         let mode = cop0[COP0Register.sr] & 0x3F
         cop0[COP0Register.sr] = (cop0[COP0Register.sr] & ~UInt32(0xF)) | (mode >> 2)
+        statusChanged()
     }
 
     // MARK: - COP2
@@ -422,10 +504,12 @@ extension R3000A {
             raise(.coprocessorUnusable, coprocessor: 2)
             return
         }
+        // ProjectPSX lets LWC2 and SWC2 through while the cache is isolated; psx-spx: an isolated load
+        // or store reaches only the cache, so they are held back like the others.
         let address = address(w)
+        if accessGuarded, heldBack(address, .addressErrorLoad, w) { return }
         guard address & 0x3 == 0 else {
-            cop0[COP0Register.badVaddr] = address
-            raise(.addressErrorLoad, coprocessor: Self.id(w))
+            addressError(.addressErrorLoad, at: address, w)
             return
         }
         do {
@@ -442,10 +526,10 @@ extension R3000A {
             return
         }
         let address = address(w)
+        if accessGuarded, heldBack(address, .addressErrorStore, w) { return }
         guard address & 0x3 == 0 else {
             // ProjectPSX raises the load's address error here; psx-spx: a store's.
-            cop0[COP0Register.badVaddr] = address
-            raise(.addressErrorStore, coprocessor: Self.id(w))
+            addressError(.addressErrorStore, at: address, w)
             return
         }
         do {
