@@ -29,7 +29,7 @@ Project context for coding agents working on **iStation**. Read this before maki
 
 iStation is two native Apple apps with PlayStation emulators written in Swift — macOS (PS1 and PS2) and iOS (PS1) — eligible for Apple's App Stores. **Re-envisioned 2026-11-07 (the user's call)** by the brief "PS1 and PS2 emulators in Swift (App Store-eligible)": shipped code is ported only from permissively licensed references — PS1 from ProjectPSX (MIT), PS2 from Play! (BSD) — while the more accurate GPL emulators, SwanStation and PCSX2, are black-box oracles whose guest-visible behaviour is recorded and compared ([ADR 0013](../adrs/shipped-code-derives-only-from-permissive-references.md)). Every app has an App Store release routine and a personal routine with debugging and tracing tools ([ADR 0016](../adrs/two-build-routines-and-a-fresh-start.md)). iStation's own code is MIT.
 
-The repository holds the package's first shape (since v0.0.1's item 3b, 2026-11-07): the four disc-format readers kept for v0.2.0, a powered-off PS1 console, EmuKit's player and acknowledgements views, and the macOS and iOS apps with both build routines. The first emulator code is the R3000A interpreter (item 3e), ported from ProjectPSX; the PS1 console's memory map and devices arrive with item 3f. See [SPEC.md](SPEC.md) for scope and [MILESTONES.md](MILESTONES.md) for what has shipped.
+The repository holds the package's first shape (since v0.0.1's item 3b, 2026-11-07): the four disc-format readers kept for v0.2.0, EmuKit's player and acknowledgements views, and the macOS and iOS apps with both build routines. The emulator code so far is ProjectPSX's, ported: the R3000A interpreter (item 3e) and the PS1 console around it (3f) — its memory map, interrupts, timers, DMA and the GPU's timing, the other devices stubbed — which runs programs built in code; booting a real BIOS is 3g's, the user's run. See [SPEC.md](SPEC.md) for scope and [MILESTONES.md](MILESTONES.md) for what has shipped.
 
 ## Stack & environment
 
@@ -149,7 +149,7 @@ Presentation is EmuKit: one module per user-facing place, each **`Views/` + `Vie
 | Data | `playlists` | .cue track files and .m3u disc entries |
 | Data | `tracing` | TraceKit: trace records, files, the first divergence and checkpoints (personal builds only) |
 | Business | `r3000a` | the R3000A interpreter, generic over its bus, coprocessor 2 and tracer (ported from ProjectPSX) |
-| Business | `ps1` | the PS1 console (a powered-off placeholder until item 3f) |
+| Business | `ps1` | the PS1 console: its memory map and wait states, interrupt controller, timers, DMA, the GPU's timing, stubs for the other devices, PS-EXE loading and the TTY (ported from ProjectPSX) |
 | Presentation | `styles` | the visual tokens: palette, symbols, metrics, typography |
 | Presentation | `player` | the player's screen |
 | Presentation | `acknowledgements` | every notice the app carries |

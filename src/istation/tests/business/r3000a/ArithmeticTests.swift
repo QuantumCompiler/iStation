@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 iStation contributors
 
 import BusinessR3000A
+import SupportMIPS
 import Testing
 
 /// ALU, shifts, comparisons, and the overflow trap (psx-spx, "CPU Arithmetic Opcodes").

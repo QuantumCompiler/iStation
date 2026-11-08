@@ -320,3 +320,56 @@ The detailed record of finished work: what shipped, how it was built, the trade-
 
 - 2026-11-07: PS1 from ProjectPSX; the IOP reuses this CPU (the user's brief). One CPU module generic over its bus, concrete types in the hot path (ADR 0015).
 - 2026-11-07: where ProjectPSX and psx-spx disagree, psx-spx and SwanStation's recorded behaviour (3d) decide, and the difference is noted beside the code; no disassembler — TraceKit's diff prints raw instruction words (the defaults, confirmed by the user).
+
+## Milestone J — The PS1 console
+
+**Goal.** A PS1 around the R3000A, so a BIOS can boot (3g): the memory map, the interrupt controller, the timers, DMA, the GPU's timing, the TTY, and enough of the other devices to answer the BIOS, ported from ProjectPSX (`Core/BUS.cs`, `Core/ProjectPSX.cs`, `Devices/InterruptController.cs`, `Devices/TIMERS.cs`, `Devices/DMA/`, `Devices/Expansion/Exp2.cs` and the timing of `Devices/GPU/GPU.cs`, at `f4dc13aea42d`), with PS-EXE loading for test programs (v0.0.1 item 3f; [ADR 0015](../adrs/a-core-is-a-cpu-module-and-a-console-module.md) §3).
+
+**Built** (3f, 2026-11-07, by a session that has never read a GPL emulator's source). `BusinessPS1` (`Module(.business, "PS1", uses: ["BusinessR3000A"], …, derivedFrom: .projectPSX)`), in `src/istation/source/business/ps1/`, every file with ProjectPSX's notice and its provenance line:
+
+- **`PS1Machine<Tracer>`**: the R3000A specialized over `PS1Bus`, and ProjectPSX's run loop — about 100 cycles of CPU, then the devices for what they took, then the interrupt check. `runFrame()` runs to the next vertical blank. `load(_:)` starts a PS-EXE now; `boot(_:)` starts one when the BIOS reaches its shell at 0x80030000. `tty` is expansion 2's output, plus the BIOS's putchar (A(3Ch), B(3Dh)) when `capturesBIOSPutchar` is on, as ProjectPSX's `TTY()` hears it.
+- **`PS1Console`**: what the apps hold. It is powered off until `powerOn(bios:)` gets a 512 KB image.
+- **`PS1Bus`**: the memory map. The 2 MB of RAM is mirrored through the BIOS's 8 MB window; then the scratchpad (KUSEG and KSEG0), the I/O ports, expansions 1–3, the read-only BIOS and the cache control register. RAM and BIOS fetches and RAM loads and stores take an `@inlinable` fast path.
+- **`MemoryControl`**: the delay/size registers, COM_DELAY, RAM_SIZE and cache control, and each region's load time.
+- **`InterruptController`**, **`Timers`** and **`DMA`**: the seven channels with DPCR and DICR. OTC writes real tables; the device channels feed the stubs.
+- **`GPU`**: NTSC timing (263 lines of 3413 video cycles), GPUSTAT and the GP1 display commands; no drawing.
+- **The stubs**: `CDROMStub`, `SPUStub` (SPUSTAT follows SPUCNT, which the BIOS waits on), `MDECStub` and `PortsStub`. Each answers with psx-spx's power-on state.
+- **`Expansion2`**: the TTY and the POST display. **`PSEXE`**: reads, writes and loads the format.
+- **Two shared changes**: `R3000ABus`'s narrow stores now pass the whole source register (3e's interface, changed with its tests), and the tests' assembler moved to `SupportMIPS` (`tests/support/mips/`), shared by both cores' tests.
+- **Tests** in `tests/business/ps1/`, the `macOS Personal` scheme already running them.
+
+**Where it departs from ProjectPSX** (psx-spx and the hardware decide; each is a comment beside the code):
+
+- **Wait states.** A load costs its region's access time, charged to the devices' clock, so the devices run at the real rate. ProjectPSX charges loads nothing and ticks its devices three times faster to compensate (`MIPS_UNDERCLOCK`). The times come from psx-spx's formula over the delay registers for expansions 1–3, the BIOS, the SPU and the CD-ROM, and from ps1-tests' `access-time` log, recorded on hardware, for RAM (5), the scratchpad (1), the I/O ports (3) and cache control. Fetches keep ProjectPSX's 1 and 20 cycles, so cycle counts stay comparable with its traces. Stores cost nothing (the write buffer).
+- **Bus errors** where psx-spx maps nothing: past the RAM window, between the regions, beyond the BIOS, KSEG2 outside the control registers, and the scratchpad through KSEG1 or as code. ProjectPSX logs these and reads all ones.
+- **Widths, from the `io-access-bitwidth` log on hardware.**
+  - A narrow store reaches a 32-bit port as the whole source register.
+  - The 8-bit CD-ROM port is read again for each byte of a wider load.
+  - The 16-bit SPU and controller registers take a narrow store's low halfword.
+  - The empty expansions read all ones at every width.
+  - DICR keeps its bits 0–5, and timer targets are 16 bits.
+- **Smaller fixes.** The memory control registers are initialized, with the values the BIOS writes; ProjectPSX leaves them as uninitialized memory. The video clock's 11/7 is kept exactly; ProjectPSX drops the remainder on every tick. OTC entries are 24 bits.
+- **Loading.** A PS-EXE's fill region is zeroed, and the EXE starts when the PC reaches the shell, which holds for any BIOS. ProjectPSX skips the fill and patches SCPH-1001's image at 0xBFC06FF0.
+
+**Trade-offs.** psx-spx calls its access-time formula approximate, and against the hardware log it misses for expansion 2 (15/29/57 cycles against 11/26/56), the CD-ROM (7/13/25 against 8/14/26) and the SPU (21/41 against 18/39). It is kept, since it responds to the registers the BIOS writes, and 3g settles the differences against SwanStation's output; the BIOS and expansions 1 and 3 match. The log's open-bus upper halves (I_MASK reading 0x1234_0678, for one) aren't modelled. GP0 is consumed unread until v0.1.0 draws, so GPUSTAT's drawing bits stay 0. The CD-ROM never answers, so a real BIOS's boot may wait on it; which registers it needs is read from 3d's traces before any stub does more.
+
+**Verified** (2026-11-07, M3 Max, macOS 27.0.1, Xcode 27.1):
+
+- **The console's tests**: 41 hermetic tests in 10 suites, over BIOS images and programs built in code, plus the benchmark, off by default. They cover:
+  - the memory map's mirrors, segments, read-only BIOS, empty expansions and bus errors;
+  - the I/O widths, each against a row of the hardware log;
+  - the CPU taking the vertical blank every frame through a handler and RFE;
+  - the timers' clocks, targets, IRQ and flags; OTC's table, DPCR and DICR;
+  - the NTSC frame, within 200 cycles over 10 frames, and GPUSTAT;
+  - PS-EXE round trips and loading;
+  - the TTY through expansion 2, the BIOS's putchar and the boot hook;
+  - each region's load cost, measured as cycles per loop; the console powering on.
+- **Planted bugs, 4 of 4 caught, then restored**: a narrow store truncated; the video clock at 10/7; RAM loads free; the CD-ROM port not repeated.
+- **Speed** (`ISTATION_BENCHMARK=1 swift test -c release --filter BusinessPS1Tests.BenchmarkTests`): the spike's loop on the whole console — CPU, bus, wait states and devices, 600 frames — runs at **209–210 M instructions/s, 10.3× the PS1's 33.8688 MHz**, two runs.
+- **The full suite**: `swift test` — 173 tests in 11 test runs, green (the architecture checks included); the strict build and the release build clean; the docs validator clean; `xcodebuild test -scheme "macOS Personal"` — TEST SUCCEEDED; both apps' personal routines build (`./scripts/build-personal.sh macOS`, `iOS`).
+- **For 3g**: the per-frame comparison with ProjectPSX, carried into 3g's document.
+
+**Decisions consumed.**
+
+- 2026-11-07: one console module, devices carved out only behind the trace harness (ADR 0015).
+- 2026-11-07: the stubs answer as psx-spx documents each device's power-on state; NTSC only; what `access-time` and `io-access-bitwidth` need — wait states, register widths — ported here (the defaults, confirmed by the user).

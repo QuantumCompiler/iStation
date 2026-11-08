@@ -3,6 +3,7 @@
 
 import BusinessR3000A
 import Foundation
+import SupportMIPS
 import Testing
 
 /// A tracer that would do work on every instruction, but is switched off by its type.

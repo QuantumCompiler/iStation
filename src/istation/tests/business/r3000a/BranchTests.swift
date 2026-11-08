@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 iStation contributors
 
 import BusinessR3000A
+import SupportMIPS
 import Testing
 
 /// Branches, jumps and the branch-delay slot (psx-spx, "CPU Jump Opcodes").

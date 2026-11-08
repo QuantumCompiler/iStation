@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 iStation contributors
 
 import BusinessR3000A
+import SupportMIPS
 import Testing
 
 /// Loads, stores and the load-delay slot (psx-spx, "CPU Load/Store Opcodes", "CPU Pipeline").

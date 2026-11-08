@@ -29,8 +29,11 @@ public protocol R3000ABus: AnyObject {
     func load8(_ address: UInt32) throws(BusError) -> UInt8
     func load16(_ address: UInt32) throws(BusError) -> UInt16
     func load32(_ address: UInt32) throws(BusError) -> UInt32
-    func store8(_ address: UInt32, _ value: UInt8) throws(BusError)
-    func store16(_ address: UInt32, _ value: UInt16) throws(BusError)
+    /// A byte or halfword store passes the whole source register: memory keeps the low byte or
+    /// halfword, but the PS1's 32-bit I/O ports see all of it (ps1-tests' io-access-bitwidth, on
+    /// hardware).
+    func store8(_ address: UInt32, _ value: UInt32) throws(BusError)
+    func store16(_ address: UInt32, _ value: UInt32) throws(BusError)
     func store32(_ address: UInt32, _ value: UInt32) throws(BusError)
     /// The interrupt controller's line to COP0 CAUSE bit 10 (IP2).
     var interruptPending: Bool { get }

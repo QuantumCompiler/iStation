@@ -20,10 +20,11 @@ Checked 2026-11-07: ps1-tests (MIT) has four CPU tests — `access-time`, `code-
 - 2026-11-07: "boots" means the BIOS reaches its shell, measured as the frame where SwanStation's recorded RAM stops changing in the boot sequence's pattern for 60 frames; the gate compares every frame up to it (the default, confirmed by the user).
 - 2026-11-07: for `access-time` and `io-access-bitwidth`, which ship no `psx.log`, SwanStation's TTY in 3d's run is the expected output (the default, confirmed by the user).
 - 2026-11-07: the gate's run with the user's BIOS is prepared with exact steps and made later (the user's call).
+- 2026-11-07 (a correction of fact, found building 3f): `access-time` and `io-access-bitwidth` do ship a `psx.log` recorded on hardware. The decision above stands — SwanStation's TTY is their expected output — and the report shows the hardware log beside it.
 
 **Open calls:** none — all answered 2026-11-07.
 
-**Guardrail(s).** The report is the guardrail: every frame up to the boot's end matches SwanStation's checksums, every test's TTY matches its expected output, and any per-instruction divergence from ProjectPSX is either fixed or listed as a known ProjectPSX error with psx-spx's evidence. Hermetic tests in 3e and 3f keep running in `swift test`.
+**Guardrail(s).** The report is the guardrail: every frame up to the boot's end matches SwanStation's checksums, every test's TTY matches its expected output, and any per-instruction divergence from ProjectPSX is either fixed or listed as a known ProjectPSX error with psx-spx's evidence. Hermetic tests in 3e and 3f keep running in `swift test`. Carried from 3f (2026-11-07, when it shipped): the console's per-frame trace for the boot also matches ProjectPSX's frame by frame, its first divergence naming the frame — expected to differ in timing, since 3f's devices run at the real rate where ProjectPSX's run three times faster ([Milestone J](../../assistant/MILESTONES.md#milestone-j--the-ps1-console)).
 
 **Acceptance criteria:**
 - [ ] In a personal build with the user's BIOS (the user's run), the BIOS boots to its shell with per-frame guest state matching SwanStation's.
@@ -32,4 +33,4 @@ Checked 2026-11-07: ps1-tests (MIT) has four CPU tests — `access-time`, `code-
 - [ ] Instructions per second for the boot are recorded in MILESTONES (ADR 0015's enforcement from here on).
 - [ ] Shipping this item empties v0.0.1's table.
 
-**Scope note.** v0.0.1, track 3, last: gated on 3d (the reference's and the oracle's traces) and 3f (the console). Out of scope: anything drawn on screen (v0.1.0) and games (v0.2.0).
+**Scope note.** v0.0.1, track 3, last: gated on 3d (the reference's and the oracle's traces); 3f (the console) shipped 2026-11-07. The runner has what it needs in `PS1Machine`: `boot(_:)` for a PS-EXE after the BIOS, `capturesBIOSPutchar` for the TTY ps1-tests print through the BIOS, and a generic tracer. Known gaps it should expect: psx-spx's access-time formula misses the hardware log for expansion 2, the CD-ROM and the SPU; the CD-ROM, SPU, MDEC and pads are stubs. Out of scope: anything drawn on screen (v0.1.0) and games (v0.2.0).

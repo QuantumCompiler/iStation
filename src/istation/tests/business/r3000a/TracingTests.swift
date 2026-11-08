@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 iStation contributors
 
 import BusinessR3000A
+import SupportMIPS
 import SupportR3000ATrace
 import SupportSandbox
 import Testing

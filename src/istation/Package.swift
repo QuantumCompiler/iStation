@@ -27,8 +27,8 @@ let modules: [Module] = [
     Module(.data, "Playlists", testSupport: ["SupportSandbox"]),
     Module(.data, "Tracing", testSupport: ["SupportSandbox"]),
 
-    Module(.business, "R3000A", testSupport: ["SupportR3000ATrace", "SupportSandbox"], derivedFrom: .projectPSX),
-    Module(.business, "PS1"),
+    Module(.business, "R3000A", testSupport: ["SupportMIPS", "SupportR3000ATrace", "SupportSandbox"], derivedFrom: .projectPSX),
+    Module(.business, "PS1", uses: ["BusinessR3000A"], testSupport: ["SupportMIPS"], derivedFrom: .projectPSX),
 
     Module(.presentation, "Styles"),
     Module(.presentation, "Player", uses: ["BusinessPS1", "PresentationStyles"]),
@@ -40,6 +40,7 @@ let modules: [Module] = [
 let testSupport: [Support] = [
     Support(.infrastructure, "Sandbox"),
     Support(.data, "DiscFixtures"),
+    Support(.business, "MIPS"),
     Support(.business, "R3000ATrace", uses: ["BusinessR3000A", "DataTracing"]),
 ]
 

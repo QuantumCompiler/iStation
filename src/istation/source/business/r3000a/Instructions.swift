@@ -270,7 +270,7 @@ extension R3000A {
     func storeByte(_ w: UInt32) {
         guard !cacheIsolated else { return } // Isolated: the write goes to the cache, not to memory.
         do {
-            try bus.store8(address(w), UInt8(truncatingIfNeeded: reg(Self.rt(w))))
+            try bus.store8(address(w), reg(Self.rt(w)))
         } catch {
             raise(.busErrorData)
         }
@@ -286,7 +286,7 @@ extension R3000A {
             return
         }
         do {
-            try bus.store16(address, UInt16(truncatingIfNeeded: reg(Self.rt(w))))
+            try bus.store16(address, reg(Self.rt(w)))
         } catch {
             raise(.busErrorData)
         }

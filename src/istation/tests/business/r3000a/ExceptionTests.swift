@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 iStation contributors
 
 import BusinessR3000A
+import SupportMIPS
 import Testing
 
 /// Exceptions, RFE, interrupts and the COP0 moves (psx-spx, "COP0 - Exception Handling",
