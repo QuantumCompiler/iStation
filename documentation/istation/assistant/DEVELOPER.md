@@ -18,6 +18,7 @@ tools/
   swanstation-oracle/          SwanStation built unmodified, and frontend.c, its headless libretro frontend (3d)
   istation-run/                the Swift console from the command line, the CPU-check program, trace diff (3d, 3g)
   ps1-tests/                   fetch.sh: the open CPU tests' programs and their psx.log files, into .build/ (3d, 3g)
+  gate/                        run.sh: v0.0.1's gate with the user's BIOS — the boot and the CPU tests on all three, report.md and frames.tsv (3d, 3g)
 src/istation/
   Package.swift                the module map (ADR 0002), the products PS1Core, EmuKit and TraceKit, PERSONAL_BUILD in debug
   apps/
@@ -61,6 +62,7 @@ From `src/istation/` unless noted.
 | The R3000A's instructions per second (the spike's loop, 300 M instructions) | `ISTATION_BENCHMARK=1 swift test -c release --filter BusinessR3000ATests.BenchmarkTests` |
 | The whole console's speed (the same loop, 600 frames) | `ISTATION_BENCHMARK=1 swift test -c release --filter BusinessPS1Tests.BenchmarkTests` |
 | The CPU check: one program on ProjectPSX and the Swift console, traces diffed (repo root) | `tools/projectpsx-trace/build.sh && tools/istation-run/cpu-check.sh` |
+| The gate, with your own BIOS (repo root; after both tools' `build.sh` and `tools/ps1-tests/fetch.sh`) | `tools/gate/run.sh <bios> [--scph1001] [--out <folder>]` |
 | Docs validator (repo root) | `python3 scripts/validate_docs.py documentation` |
 | Lint / format | _TODO:_ none chosen |
 

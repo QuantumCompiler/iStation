@@ -83,6 +83,7 @@ Each `[user]`:
 
 - **If JIT fails under the App Sandbox (3a), how does the PS2 reach the Mac App Store** — interpreter only, or outside the store? Blocks v2.x. (2026-11-07) *Not raised yet: 3a's run (1) passed on macOS 27.0.1, ad-hoc signed ([Milestone E](MILESTONES.md#milestone-e--jit-under-the-app-store-routine)); it stays open until your runs (2) and (3) in `tools/jit-probe/README.md`.*
 - **A PS1 high-level-emulated BIOS**, written from documentation (never from OpenBIOS), so App Store users need no BIOS dump? Unscheduled. (2026-11-07)
+- **What `access-time`'s and `io-access-bitwidth`'s expected output is (3g)**, if your run confirms that SwanStation's TTY can't be heard, as it couldn't with images built in code: their hardware `psx.log` (recommended), or SwanStation's heard another way? Blocks 3g, v0.0.1's last item. (2026-11-07) *See [3g's open call](../backlog/v0.0.1/bios-boots.md).*
 
 ## Ideas
 
