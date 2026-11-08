@@ -62,7 +62,7 @@ Until v0.1.0 defines the image's pixel format and v0.2.0 the audio's, those two 
 
 ## Divergence
 
-Two traces of the same granularity are compared record by record; the **first divergence** is the first index at which the records differ in kind or in any field, or at which one trace has ended. `TraceDiff` names the differing fields (`pc`, `word`, `cycles`, `registerChecksum`; `gpr[n]`, `hi`, `lo`, `sr`, `cause`, `epc`; `frame`, `ramChecksum`, `imageChecksum`, `audioChecksum`; `kind`; `end of trace`). A flag ignores cycle counts while timing is being ported; no gate uses it.
+Two traces of the same granularity are compared record by record; the **first divergence** is the first index at which the records differ in kind or in any field, or at which one trace has ended. `TraceDiff` names the differing fields (`pc`, `word`, `cycles`, `registerChecksum`; `gpr[n]`, `hi`, `lo`, `sr`, `cause`, `epc`; `frame`, `ramChecksum`, `imageChecksum`, `audioChecksum`; `kind`; `end of trace`). A flag ignores cycle counts where two consoles' timings are known to differ: only v0.0.1's gate uses it, for the Swift console's instructions against ProjectPSX's, whose devices run three times faster; every other comparison, the CPU check included, compares cycles.
 
 ## A checkpoint file
 

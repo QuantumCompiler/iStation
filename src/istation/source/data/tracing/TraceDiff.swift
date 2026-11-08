@@ -18,8 +18,8 @@ public struct TraceDivergence: Equatable, Sendable {
 
 /// The first divergence between two traces: the bug, when one is a port and the other its reference.
 public enum TraceDiff {
-    /// Compares every field of every record in order. `ignoringCycles` skips cycle counts while
-    /// timing is being ported; no gate uses it.
+    /// Compares every field of every record in order. `ignoringCycles` skips cycle counts where two
+    /// consoles' timings are known to differ: only v0.0.1's gate does, against ProjectPSX's instructions.
     public static func firstDivergence(_ left: URL, _ right: URL, ignoringCycles: Bool = false) throws -> TraceDivergence? {
         let leftReader = try TraceReader(url: left)
         let rightReader = try TraceReader(url: right)

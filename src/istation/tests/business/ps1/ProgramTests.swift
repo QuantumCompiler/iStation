@@ -76,6 +76,25 @@ import Testing
         machine.runFrame()
         #expect(machine.tty == "OK")
     }
+
+    @Test func theTTYSinceAnEXEStartedLeavesOutTheBIOSs() {
+        let machine = makeMachine(bios: makeBIOS(printing("BIOS ") + [MIPS.lui(t0, 0x8003), MIPS.jr(t0), MIPS.nop]))
+        #expect(machine.ttySinceEXE == "")
+        machine.boot(makeEXE(printing("OK") + halt))
+        #expect(machine.bootIsPending)
+        machine.runFrame()
+        #expect(!machine.bootIsPending)
+        #expect(machine.tty == "BIOS OK")
+        #expect(machine.ttySinceEXE == "OK")
+    }
+
+    @Test func anEXEWaitsWhileTheBIOSNeverReachesItsShell() {
+        let machine = makeMachine(bios: makeBIOS(printing("BIOS") + [MIPS.beq(zero, zero, -1), MIPS.nop]))
+        machine.boot(makeEXE(printing("OK") + halt))
+        machine.runFrame()
+        #expect(machine.bootIsPending)
+        #expect(machine.tty == "BIOS")
+    }
 }
 
 /// What loads cost (psx-spx, "Memory Control"; ps1-tests' access-time log, on hardware).

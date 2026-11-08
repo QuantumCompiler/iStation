@@ -92,6 +92,21 @@ import Testing
         #expect(try bus.load16(0x1F80_1058) == 0x78)
     }
 
+    @Test func aByteSentThroughAnEmptyControllerPortComesBackAs0xFF() throws {
+        // ProjectPSX's JOYPAD with no device answering, and psx-spx's unconnected port: the byte comes
+        // back 0xFF, with no acknowledge (bit 7) and no interrupt (bit 9).
+        try bus.store16(0x1F80_104A, 0x1003) // JOY_CTRL: TX enable, /JOY1 output, ACK interrupt enable
+        try bus.store8(0x1F80_1040, 0x01) // a controller's address byte
+        #expect(try bus.load16(0x1F80_1044) == 0x7) // TX ready 1 and 2, RX not empty
+        #expect(try bus.load8(0x1F80_1040) == 0xFF)
+        #expect(try bus.load16(0x1F80_1044) == 0x5) // the byte taken
+        try bus.store16(0x1F80_104A, 0x0000) // /JOY1 off: a byte sent waits
+        try bus.store8(0x1F80_1040, 0x01)
+        #expect(try bus.load16(0x1F80_1044) == 0x3)
+        try bus.store16(0x1F80_104A, 0x0040) // reset
+        #expect(try bus.load16(0x1F80_1044) == 0x5)
+    }
+
     @Test func aWordStoreToTheSerialPortsWritesOnlyItsLowHalfword() throws {
         // The log's 32-bit column (psx-spx: CROP).
         for (address, expected) in [(UInt32(0x1F80_1048), UInt32(0x38)), (0x1F80_1058, 0x78)] {

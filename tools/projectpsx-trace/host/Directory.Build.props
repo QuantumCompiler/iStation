@@ -1,0 +1,8 @@
+<Project>
+  <!-- SPDX-License-Identifier: MIT · SPDX-FileCopyrightText: 2026 iStation contributors -->
+  <!-- Every build output, intermediates included, lives in the git-ignored .build/. -->
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)../.build/obj/host/</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)../.build/bin/host/</BaseOutputPath>
+  </PropertyGroup>
+</Project>

@@ -52,6 +52,20 @@ public final class PS1Machine<Tracer: R3000ATracer> {
     /// Everything the console printed: expansion 2's TTY, and the BIOS's putchar when captured.
     public var tty: String { String(decoding: bus.expansion2.output, as: UTF8.self) }
 
+    /// What the console printed since the last PS-EXE started — without the BIOS's own messages, which a
+    /// test's expected output leaves out — or everything, when no EXE has started.
+    public var ttySinceEXE: String {
+        let output = bus.expansion2.output
+        return String(decoding: output.suffix(min(bus.expansion2.ttyCount - ttyBeforeEXE, output.count)), as: UTF8.self)
+    }
+
+    /// `expansion2.ttyCount` when the last PS-EXE started.
+    private var ttyBeforeEXE = 0
+
+    /// True while an EXE given to `boot(_:)` waits for the BIOS to reach its shell: until then
+    /// `ttySinceEXE` is the BIOS's own output, not the EXE's.
+    public var bootIsPending: Bool { exeToBoot != nil }
+
     // MARK: - Running
 
     /// Runs until the next vertical blank.
@@ -107,6 +121,7 @@ public final class PS1Machine<Tracer: R3000ATracer> {
     /// r29 and r30 its stack — or, when its header names none, the stack the CPU has, else 0x801FFFF0.
     public func load(_ exe: PSEXE) {
         cpu.settlePendingLoad() // a BIOS load still in flight lands before the loader's registers
+        ttyBeforeEXE = bus.expansion2.ttyCount
         bus.copyToRAM(exe.text, at: exe.destination)
         if exe.fillSize > 0 { bus.zeroRAM(at: exe.fillStart, count: exe.fillSize) } // ProjectPSX skips the fill
         cpu.setRegister(28, exe.gp)

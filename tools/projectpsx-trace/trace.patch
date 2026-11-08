@@ -1,0 +1,204 @@
+diff --git a/ProjectPSX/Core/BUS.cs b/ProjectPSX/Core/BUS.cs
+index d21abe6..5510600 100644
+--- a/ProjectPSX/Core/BUS.cs
++++ b/ProjectPSX/Core/BUS.cs
+@@ -32,7 +32,7 @@ namespace ProjectPSX {
+         private Exp2 exp2;
+ 
+         //temporary hardcoded bios/ex1
+-        private static string bios = "./SCPH1001.BIN"; //SCPH1001 //openbios
++        public static string bios = "./SCPH1001.BIN"; //SCPH1001 //openbios // iStation: the BIOS's path is the host's to set
+         private static string ex1 = "./caetlaEXP.BIN";
+ 
+         public BUS(GPU gpu, CDROM cdrom, SPU spu, JOYPAD joypad, TIMERS timers, MDEC mdec, InterruptController interruptController, Exp2 exp2) {
+@@ -47,6 +47,9 @@ namespace ProjectPSX {
+             this.exp2 = exp2;
+         }
+ 
++        // iStation trace logging: guest RAM, for the per-frame checksum.
++        public unsafe ReadOnlySpan<byte> Ram => new ReadOnlySpan<byte>(ramPtr, 2048 * 1024);
++
+         public unsafe uint load32(uint address) {
+             uint i = address >> 29;
+             uint addr = address & RegionMask[i];
+diff --git a/ProjectPSX/Core/CPU.cs b/ProjectPSX/Core/CPU.cs
+index ff143fd..9608bbf 100644
+--- a/ProjectPSX/Core/CPU.cs
++++ b/ProjectPSX/Core/CPU.cs
+@@ -113,6 +113,13 @@ namespace ProjectPSX {
+             MemAccess();
+             WriteBack();
+ 
++            // iStation trace logging (tools/projectpsx-trace): the instruction just retired, and its registers.
++            IStationTrace.cycles += (ulong)ticks;
++            if (IStationTrace.instructions != null) {
++                IStationTrace.Retired(PC_Now, instr.value, GPR, HI, LO, COP0_GPR[SR], COP0_GPR[CAUSE], COP0_GPR[EPC]);
++            }
++            if (IStationTrace.tty != null) IStationTrace.Putchar(PC, GPR[9], GPR[4]);
++
+             //if (debug) {
+             //  mips.PrintRegs();
+             //  mips.disassemble(instr, PC_Now, PC_Predictor);
+diff --git a/ProjectPSX/Core/IStationTrace.cs b/ProjectPSX/Core/IStationTrace.cs
+new file mode 100644
+index 0000000..70e909c
+--- /dev/null
++++ b/ProjectPSX/Core/IStationTrace.cs
+@@ -0,0 +1,107 @@
++// SPDX-License-Identifier: MIT
++// SPDX-FileCopyrightText: 2026 iStation contributors
++//
++// iStation's trace logging for ProjectPSX (tools/projectpsx-trace in the iStation repository): writes
++// the instruction and frame records of iStation's trace format, version 1
++// (documentation/istation/reference/trace-formats.md). Every integer little-endian; every checksum
++// FNV-1a 64.
++
++using System;
++using System.IO;
++
++namespace ProjectPSX {
++    public static class IStationTrace {
++        internal static BinaryWriter instructions;
++        static BinaryWriter frames;
++        static uint fullStateInterval;
++        static uint sinceFullState;
++        static ulong frameNumber;
++        /// <summary>The CPU's cycles so far: every fetch's, as ProjectPSX counts them.</summary>
++        public static ulong cycles;
++        /// <summary>Where the TTY goes, apart from ProjectPSX's own log lines: the BIOS's putchar, heard
++        /// as ProjectPSX's own TTY() hears it, and expansion 2's DUART. Null: not recorded.</summary>
++        public static Stream tty;
++        /// <summary>Where the TTY starts: an EXE's entry point, so the BIOS's own messages are left out of a
++        /// program's output. Null: from power-on, or once the PC has reached it.</summary>
++        public static uint? ttyFrom;
++        /// <summary>Both controller slots empty, as on the Swift console and SwanStation's oracle: ProjectPSX
++        /// always builds a digital pad and a memory card, which would answer the BIOS's polls.</summary>
++        public static bool portsEmpty = true;
++
++        /// <summary>ProjectPSX's TTY() test, on the PC about to run: A(3Ch) and B(3Dh), putchar.</summary>
++        internal static void Putchar(uint pc, uint r9, uint r4) {
++            if (ttyFrom == pc) ttyFrom = null;
++            if (pc == 0x000000B0 && r9 == 0x3D || pc == 0x000000A0 && r9 == 0x3C) TtyByte((byte)r4);
++        }
++
++        internal static void TtyByte(byte value) {
++            if (ttyFrom == null) tty?.WriteByte(value);
++        }
++
++        const ulong offsetBasis = 0xCBF29CE484222325;
++        const ulong prime = 0x00000100000001B3;
++
++        static BinaryWriter Open(string path, byte granularity, uint interval) {
++            var writer = new BinaryWriter(new BufferedStream(File.Create(path), 1 << 20));
++            writer.Write((byte)'I'); writer.Write((byte)'S'); writer.Write((byte)'T'); writer.Write((byte)'R');
++            writer.Write((ushort)1);
++            writer.Write(granularity);
++            writer.Write((byte)0);
++            writer.Write(interval);
++            writer.Write(0u);
++            return writer;
++        }
++
++        /// <summary>Starts writing per-instruction records to `path`, a full-state record every `interval` (0: none).</summary>
++        public static void StartInstructions(string path, uint interval) {
++            instructions = Open(path, 1, interval);
++            fullStateInterval = interval;
++        }
++
++        public static void StartFrames(string path) {
++            frames = Open(path, 2, 0);
++        }
++
++        public static void Finish() {
++            tty?.Flush();
++            instructions?.Flush(); instructions?.Dispose(); instructions = null;
++            frames?.Flush(); frames?.Dispose(); frames = null;
++        }
++
++        static ulong Add(ulong hash, uint word) {
++            for (int i = 0; i < 4; i++) { hash = (hash ^ (byte)(word >> (8 * i))) * prime; }
++            return hash;
++        }
++
++        internal static void Retired(uint pc, uint word, uint[] gpr, uint hi, uint lo, uint sr, uint cause, uint epc) {
++            ulong hash = offsetBasis;
++            for (int i = 0; i < 32; i++) hash = Add(hash, gpr[i]);
++            hash = Add(hash, hi); hash = Add(hash, lo); hash = Add(hash, sr); hash = Add(hash, cause); hash = Add(hash, epc);
++            instructions.Write((byte)0x01);
++            instructions.Write(pc);
++            instructions.Write(word);
++            instructions.Write(cycles);
++            instructions.Write(hash);
++            if (fullStateInterval != 0 && ++sinceFullState == fullStateInterval) {
++                sinceFullState = 0;
++                instructions.Write((byte)0x02);
++                instructions.Write(cycles);
++                instructions.Write(pc);
++                for (int i = 0; i < 32; i++) instructions.Write(gpr[i]);
++                instructions.Write(hi); instructions.Write(lo); instructions.Write(sr); instructions.Write(cause); instructions.Write(epc);
++            }
++        }
++
++        /// <summary>A frame record: called by the host at each vertical blank, with guest RAM. No picture or sound.</summary>
++        public static void Frame(ReadOnlySpan<byte> ram) {
++            if (frames == null) return;
++            ulong hash = offsetBasis;
++            foreach (byte b in ram) hash = (hash ^ b) * prime;
++            frames.Write((byte)0x03);
++            frames.Write(frameNumber++);
++            frames.Write(hash);
++            frames.Write(0UL);
++            frames.Write(0UL);
++        }
++    }
++}
+diff --git a/ProjectPSX/Core/ProjectPSX.cs b/ProjectPSX/Core/ProjectPSX.cs
+index 22e9d1d..38a3e37 100644
+--- a/ProjectPSX/Core/ProjectPSX.cs
++++ b/ProjectPSX/Core/ProjectPSX.cs
+@@ -13,6 +13,7 @@ namespace ProjectPSX {
+ 
+         private CPU cpu;
+         private BUS bus;
++        public BUS Bus => bus; // iStation trace logging: the host reads guest RAM at each vertical blank
+         private CDROM cdrom;
+         private GPU gpu;
+         private SPU spu;
+diff --git a/ProjectPSX/Devices/CDROM/CD.cs b/ProjectPSX/Devices/CDROM/CD.cs
+index 26a3361..988f19c 100644
+--- a/ProjectPSX/Devices/CDROM/CD.cs
++++ b/ProjectPSX/Devices/CDROM/CD.cs
+@@ -19,6 +19,8 @@ namespace ProjectPSX.Devices.CdRom {
+         public CD(string diskFilename) {
+             string ext = Path.GetExtension(diskFilename);
+ 
++            if (diskFilename.Length == 0) return; // iStation: no disc, like an EXE's (the BIOS alone)
++
+             if (ext == ".bin") {
+                 tracks = TrackBuilder.fromBin(diskFilename);
+             } else if (ext == ".cue") {
+diff --git a/ProjectPSX/Devices/Expansion/Exp2.cs b/ProjectPSX/Devices/Expansion/Exp2.cs
+index 7e274a0..a0e2119 100644
+--- a/ProjectPSX/Devices/Expansion/Exp2.cs
++++ b/ProjectPSX/Devices/Expansion/Exp2.cs
+@@ -19,6 +19,7 @@ public class Exp2 {
+             case 0x1F802080:
+                 Console.ForegroundColor = ConsoleColor.Cyan;
+                 Console.Write((char)value);
++                IStationTrace.TtyByte((byte)value); // iStation: the TTY, apart from ProjectPSX's own log lines
+                 Console.ResetColor();
+                 break;
+             default:
+diff --git a/ProjectPSX/Devices/Input/JOYPAD.cs b/ProjectPSX/Devices/Input/JOYPAD.cs
+index 54007ee..8db2177 100644
+--- a/ProjectPSX/Devices/Input/JOYPAD.cs
++++ b/ProjectPSX/Devices/Input/JOYPAD.cs
+@@ -90,7 +90,7 @@ namespace ProjectPSX {
+                         TXreadyFlag2 = true;
+ 
+                         //Console.WriteLine("[JOYPAD] DesiredSlot == " + desiredSlotNumber);
+-                        if (desiredSlotNumber == 1) {
++                        if (desiredSlotNumber == 1 || IStationTrace.portsEmpty) { // iStation: nothing plugged in
+                             JOY_RX_DATA = 0xFF;
+                             ackInputLevel = false;
+                             return;

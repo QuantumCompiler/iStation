@@ -81,5 +81,5 @@ Track 3 follows the brief's first tasks, in order: the JIT spike (3a, shipped 20
 
 | # | Item | Version | File | Status |
 |---|---|---|---|---|
-| 3d | The reference and the oracle — ProjectPSX with trace logging; SwanStation unmodified, recorded from outside | v0.0.1 | [`v0.0.1/reference-and-oracle-traces.md`](v0.0.1/reference-and-oracle-traces.md) | 🟢 |
+| 3d | The reference and the oracle — ProjectPSX with trace logging; SwanStation unmodified, recorded from outside | v0.0.1 | [`v0.0.1/reference-and-oracle-traces.md`](v0.0.1/reference-and-oracle-traces.md) | 🚧 |
 | 3g | Gate: the BIOS boots — ps1-tests' CPU tests pass and the guest-state trace matches SwanStation's (the user's run) | v0.0.1 | [`v0.0.1/bios-boots.md`](v0.0.1/bios-boots.md) | 🔒 3d |

@@ -23,6 +23,9 @@ public final class Expansion2 {
         ttyStart == 0 ? ttyBytes : Array(ttyBytes[ttyStart...] + ttyBytes[..<ttyStart])
     }
 
+    /// Every byte the TTY has been given, the ones the ring has dropped included.
+    @exclusivity(unchecked) public private(set) var ttyCount = 0
+
     /// The last value written to the POST display.
     @exclusivity(unchecked) public private(set) var post: UInt8 = 0
 
@@ -39,6 +42,7 @@ public final class Expansion2 {
     /// A byte for the TTY. The console's own TTY capture (the BIOS's putchar) appends here too, so the
     /// two stay in order.
     func append(_ byte: UInt8) {
+        ttyCount += 1
         guard ttyBytes.count == Self.ttyCapacity else {
             ttyBytes.append(byte)
             return
