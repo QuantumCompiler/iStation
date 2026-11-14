@@ -12,7 +12,7 @@ import PackageDescription
 //
 // ArchitectureTests (tests/architecture/) parses these rows: keep each row on one line, in this form.
 // A new module is a new row here, its two directories, its name on its layer's CLAUDE.md card and a
-// row in documentation/istation/adrs/module-map.md, all in the same change.
+// row in lib/documentation/adrs/darwin/module-map.md, all in the same change.
 
 enum Layer: String, CaseIterable { case infrastructure, data, business, presentation }
 

@@ -7,7 +7,7 @@ description: Turn an iStation spike's findings (from this conversation or an att
 
 A spike's findings become backlog documents, all of them in one pass. This writes documents only: no code, no MILESTONES entry, no SPEC change the user hasn't agreed.
 
-The docs home is [`documentation/istation/`](../../../documentation/istation/README.md); the backlog index is [`backlog/README.md`](../../../documentation/istation/backlog/README.md).
+The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the backlog index is [`backlog/darwin/README.md`](../../../lib/documentation/backlog/darwin/README.md).
 
 ## 1. Gather
 
@@ -40,6 +40,6 @@ To `/istation-backlog-create-item`'s bar (the format in the backlog README), plu
 
 ## 5. Validate and report
 
-- `python3 scripts/validate_docs.py documentation` (from the repository root) is clean; every number quoted matches the report.
+- `python3 lib/scripts/validate_docs.py lib/documentation` (from the repository root) is clean; every number quoted matches the report.
 - **Commit and push** (CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`.
 - Report: each document's path, id, position, gate and walls closed; decisions versus defaults; every `[user]` call; the docs updated; the validator's result.

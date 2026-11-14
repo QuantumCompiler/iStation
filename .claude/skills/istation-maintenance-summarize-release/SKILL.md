@@ -9,7 +9,7 @@ Release notes in the house format, delivered as a draft. Publishing (a GitHub re
 
 1. **Pin the release and its range.** The version (the release branch, e.g. `v0.1.0`) and the previous tag; the range is `git log --oneline v<previous>..HEAD` (the first release: everything).
 2. **Read the previous release notes** (GitHub releases, if any) as exemplars of tone and shape.
-3. **Gather the evidence**: the version's [ROADMAP](../../../documentation/istation/assistant/ROADMAP.md) section and its gate; the [MILESTONES](../../../documentation/istation/assistant/MILESTONES.md) entries shipped in the range; the range's commits; the [SPEC](../../../documentation/istation/assistant/SPEC.md)'s Distribution section for install and platforms; the [reference](../../../documentation/istation/reference/README.md) for any changed contract (emulator flags, the library file).
+3. **Gather the evidence**: the version's [ROADMAP](../../../lib/documentation/assistant/darwin/ROADMAP.md) section and its gate; the [MILESTONES](../../../lib/documentation/assistant/darwin/MILESTONES.md) entries shipped in the range; the range's commits; the [SPEC](../../../lib/documentation/assistant/darwin/SPEC.md)'s Distribution section for install and platforms; the [reference](../../../lib/documentation/reference/darwin/README.md) for any changed contract (emulator flags, the library file).
 4. **Write**:
    - **Title and theme** — `iStation v<x.y.z> — <the phase's theme>`.
    - **Intro** — two sentences, in plain words for someone who plays games, not someone who builds them.

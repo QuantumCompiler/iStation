@@ -7,7 +7,7 @@ description: The pre-merge documentation reconciliation for iStation — scope f
 
 The docs are the source of truth, so before a merge they must say what the code now does. Audit claims about **changed areas only** — no drive-by rewrites.
 
-The docs home is [`documentation/istation/`](../../../documentation/istation/README.md); the code is `src/istation/`; the base branch is `stable`.
+The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the code is `src/istation/`; the base branch is `stable`.
 
 ## 1. Scope from the diff
 
@@ -15,20 +15,20 @@ The docs home is [`documentation/istation/`](../../../documentation/istation/REA
 
 ## 2. Walk the documents against the diff
 
-- **Backlog** ([index](../../../documentation/istation/backlog/README.md)): **the cardinal violation is a completed item still in the backlog** — its work recorded in MILESTONES, its document and row deleted. Items being worked are 🚧; gates satisfied by shipped work are updated; decisions taken during the work are recorded in their documents; an emptied version table is retired (the Architecture and Maintenance tables never are); the "Ids spent so far" line is current.
-- **[MILESTONES.md](../../../documentation/istation/assistant/MILESTONES.md)**: every shipped item has its entry — goal, built, trade-offs, verified, decisions consumed.
-- **[ROADMAP.md](../../../documentation/istation/assistant/ROADMAP.md)**: shipped lines ticked and linked to their milestone; "Decisions needed" current.
-- **[CLAUDE.md](../../../documentation/istation/assistant/CLAUDE.md)**: the Codebase Map (one concern per row — a row that can't be written that way is a split waiting, ADR 0003); Stack & environment; a newly enforced rule promoted to `⚠`; style rules; the checklist.
-- **[DEVELOPER.md](../../../documentation/istation/assistant/DEVELOPER.md)**: the tree, each changed module's section, the commands, the test table, the recipes.
+- **Backlog** ([index](../../../lib/documentation/backlog/darwin/README.md)): **the cardinal violation is a completed item still in the backlog** — its work recorded in MILESTONES, its document and row deleted. Items being worked are 🚧; gates satisfied by shipped work are updated; decisions taken during the work are recorded in their documents; an emptied version table is retired (the Architecture and Maintenance tables never are); the "Ids spent so far" line is current.
+- **[MILESTONES.md](../../../lib/documentation/assistant/darwin/MILESTONES.md)**: every shipped item has its entry — goal, built, trade-offs, verified, decisions consumed.
+- **[ROADMAP.md](../../../lib/documentation/assistant/darwin/ROADMAP.md)**: shipped lines ticked and linked to their milestone; "Decisions needed" current.
+- **[CLAUDE.md](../../../lib/documentation/assistant/darwin/CLAUDE.md)**: the Codebase Map (one concern per row — a row that can't be written that way is a split waiting, ADR 0003); Stack & environment; a newly enforced rule promoted to `⚠`; style rules; the checklist.
+- **[DEVELOPER.md](../../../lib/documentation/assistant/darwin/DEVELOPER.md)**: the tree, each changed module's section, the commands, the test table, the recipes.
 - **Layer cards** (`src/istation/source/<layer>/CLAUDE.md`, `src/istation/tests/<layer>/CLAUDE.md`), **ADR 0002's table** and the Xcode scheme's test list (`iStation.xcodeproj/xcshareddata/xcschemes/iStation.xcscheme`) against the `modules` rows in `Package.swift`.
-- **[ADRs](../../../documentation/istation/adrs/README.md)**: a new standing rule gets a record; a changed one a superseding record (append-only — the old record's Status line is its only edit); each Enforcement section names the real check.
-- **[reference/](../../../documentation/istation/reference/README.md)** against the shipped contract: TraceKit's trace formats (`source/data/tracing/`, from item 3c), and any persisted format the apps write.
-- **[SPEC.md](../../../documentation/istation/assistant/SPEC.md)** only if scope moved, with a dated note.
+- **[ADRs](../../../lib/documentation/adrs/darwin/README.md)**: a new standing rule gets a record; a changed one a superseding record (append-only — the old record's Status line is its only edit); each Enforcement section names the real check.
+- **[reference/](../../../lib/documentation/reference/darwin/README.md)** against the shipped contract: TraceKit's trace formats (`source/data/tracing/`, from item 3c), and any persisted format the apps write.
+- **[SPEC.md](../../../lib/documentation/assistant/darwin/SPEC.md)** only if scope moved, with a dated note.
 - **The root `README.md`** if building, running or installing changed.
 
 ## 3. Validate mechanically
 
-- `python3 scripts/validate_docs.py documentation` (from the repository root).
+- `python3 lib/scripts/validate_docs.py lib/documentation` (from the repository root).
 - `cd src/istation && swift build --explicit-target-dependency-import-check=error`
 - `cd src/istation && swift test` — the layering and layer-context checks run inside it.
 

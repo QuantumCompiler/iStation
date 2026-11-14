@@ -10,8 +10,8 @@ A PR description written from evidence, delivered as text for the user to paste.
 ## 1. Gather the evidence
 
 - The range: `git log --oneline stable..HEAD`, `git diff --stat stable...HEAD`.
-- MILESTONES entries added on the branch: `git diff stable...HEAD -- documentation/istation/assistant/MILESTONES.md`.
-- Backlog documents deleted on the branch (their ids and titles): `git diff --name-status stable...HEAD -- documentation/istation/backlog/`.
+- MILESTONES entries added on the branch: `git diff stable...HEAD -- lib/documentation/assistant/darwin/MILESTONES.md`.
+- Backlog documents deleted on the branch (their ids and titles): `git diff --name-status stable...HEAD -- lib/documentation/backlog/darwin/`.
 - Decisions recorded on the branch: new dated lines in backlog documents, ADRs, SPEC, ROADMAP.
 - ADRs added or superseded; reference contracts changed (TraceKit's trace formats, from item 3c).
 
@@ -21,7 +21,7 @@ Run, and report the actual results:
 
 - `cd src/istation && swift build --explicit-target-dependency-import-check=error`
 - `cd src/istation && swift test` (with `ArchitectureTests`)
-- `python3 scripts/validate_docs.py documentation` (from the repository root)
+- `python3 lib/scripts/validate_docs.py lib/documentation` (from the repository root)
 
 A command not run is listed as not run.
 

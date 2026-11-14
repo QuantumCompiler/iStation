@@ -11,7 +11,7 @@ enum Repository {
     static let package = URL(fileURLWithPath: #filePath)
         .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
     static let root = package.deletingLastPathComponent().deletingLastPathComponent()
-    static let docs = root.appendingPathComponent("documentation/istation")
+    static let docs = root.appendingPathComponent("lib/documentation")
 
     /// Package.swift, or the planted copy named by ISTATION_ARCHITECTURE_MANIFEST. The override exists
     /// to prove the rules SwiftPM itself refuses to load (a cycle, styles leaning on a sibling): the

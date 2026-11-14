@@ -7,15 +7,15 @@ description: Build one iStation backlog item straight from its document — reso
 
 One item, built from its document, then shipped through the docs. Then stop.
 
-The docs home is [`documentation/istation/`](../../../documentation/istation/README.md); the code is `src/istation/`.
+The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the code is `src/istation/`.
 
 ## 1. Load the working process
 
-Read [CLAUDE.md](../../../documentation/istation/assistant/CLAUDE.md) in full — the invariants, code style, the per-change checklist (the definition of done) — and [SPEC.md](../../../documentation/istation/assistant/SPEC.md), [ROADMAP.md](../../../documentation/istation/assistant/ROADMAP.md), and [DEVELOPER.md](../../../documentation/istation/assistant/DEVELOPER.md) as needed. They override anything remembered.
+Read [CLAUDE.md](../../../lib/documentation/assistant/darwin/CLAUDE.md) in full — the invariants, code style, the per-change checklist (the definition of done) — and [SPEC.md](../../../lib/documentation/assistant/darwin/SPEC.md), [ROADMAP.md](../../../lib/documentation/assistant/darwin/ROADMAP.md), and [DEVELOPER.md](../../../lib/documentation/assistant/darwin/DEVELOPER.md) as needed. They override anything remembered.
 
 ## 2. Pick
 
-- A bare "Continue": the **topmost 🟢 row of the earliest version table** in [the index](../../../documentation/istation/backlog/README.md). Maintenance and Architecture items are taken by name.
+- A bare "Continue": the **topmost 🟢 row of the earliest version table** in [the index](../../../lib/documentation/backlog/darwin/README.md). Maintenance and Architecture items are taken by name.
 - A named item: verify its gate; if unmet, say so and stop.
 - **Re-read the live index** first: parallel sessions take items. A 🚧 row is someone else's.
 
@@ -40,7 +40,7 @@ It is the working spec. A **split first** item is groomed into its sub-documents
 - Done means green, with the real commands:
   - `cd src/istation && swift build --explicit-target-dependency-import-check=error`
   - `cd src/istation && swift test` (includes `ArchitectureTests`)
-  - `python3 scripts/validate_docs.py documentation` (from the repository root)
+  - `python3 lib/scripts/validate_docs.py lib/documentation` (from the repository root)
 - Changing repository settings, CI secrets, or anything else outward-facing (publishing, signing, force-pushing, touching `stable` or a tag) is asked first; pushing the release branch when the item ships is routine (§6).
 
 ## 6. Ship — the documentation and status flow, in the same change

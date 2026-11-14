@@ -35,4 +35,4 @@ jobs:
 
       - name: Docs validator
         working-directory: .
-        run: python3 scripts/validate_docs.py documentation
+        run: python3 lib/scripts/validate_docs.py lib/documentation

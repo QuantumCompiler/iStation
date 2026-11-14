@@ -49,7 +49,7 @@ import Testing
     @Test("ADR 0002's table equals the map")
     func theModuleMapADRMatchesTheMap() {
         var violations = Violations()
-        let path = "documentation/istation/adrs/module-map.md"
+        let path = "lib/documentation/adrs/darwin/module-map.md"
         guard let adr = Repository.text(Repository.root.appendingPathComponent(path)) else {
             violations.add("missing ADR", path, "unreadable")
             #expect(violations.isEmpty, "\(violations.report)")
@@ -122,7 +122,7 @@ import Testing
 
     @Test("ADR 0001 lists the layers in the map's order")
     func adr0001ListsTheLayersInOrder() {
-        let path = "documentation/istation/adrs/layer-enforcement.md"
+        let path = "lib/documentation/adrs/darwin/layer-enforcement.md"
         let adr = Repository.text(Repository.root.appendingPathComponent(path)) ?? ""
         let listed = Pattern.captures(#"^\d\. \*\*([A-Za-z]+)\*\*"#, in: adr, options: [.anchorsMatchLines])
             .compactMap { $0.first ?? nil }.map { $0.lowercased() }

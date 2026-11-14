@@ -3,7 +3,7 @@
 //
 // A headless libretro frontend that runs SwanStation — built unmodified, its source never read — and
 // records what any frontend can see: guest RAM after each frame, as the frame records of iStation's
-// trace format (documentation/istation/reference/trace-formats.md). Written only against libretro's
+// trace format (lib/documentation/reference/darwin/trace-formats.md). Written only against libretro's
 // public API (libretro.h from libretro-common, MIT). Every option key the core declares or asks for is
 // logged; an option offering "Interpreter" or "Software" is answered with it, a memory card option
 // with "None", every other option with its default — never with OpenBIOS. No controller is plugged in,

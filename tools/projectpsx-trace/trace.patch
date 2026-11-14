@@ -50,7 +50,7 @@ index 0000000..70e909c
 +//
 +// iStation's trace logging for ProjectPSX (tools/projectpsx-trace in the iStation repository): writes
 +// the instruction and frame records of iStation's trace format, version 1
-+// (documentation/istation/reference/trace-formats.md). Every integer little-endian; every checksum
++// (lib/documentation/reference/darwin/trace-formats.md). Every integer little-endian; every checksum
 +// FNV-1a 64.
 +
 +using System;

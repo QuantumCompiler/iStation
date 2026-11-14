@@ -1,6 +1,6 @@
 # JIT probe
 
-Does a macOS app built the App Store way — **App Sandbox on, hardened runtime, `com.apple.security.cs.allow-jit`, never `allow-unsigned-executable-memory` or `get-task-allow`** ([ADR 0016](../../documentation/istation/adrs/two-build-routines-and-a-fresh-start.md)) — get a `MAP_JIT` region and run code it wrote there? The PS2's code generator depends on the answer (v0.0.1 item 3a, the brief's first task).
+Does a macOS app built the App Store way — **App Sandbox on, hardened runtime, `com.apple.security.cs.allow-jit`, never `allow-unsigned-executable-memory` or `get-task-allow`** ([ADR 0016](../../lib/documentation/adrs/darwin/two-build-routines-and-a-fresh-start.md)) — get a `MAP_JIT` region and run code it wrote there? The PS2's code generator depends on the answer (v0.0.1 item 3a, the brief's first task).
 
 iStation's own code, MIT. No emulator code: Apple's APIs (`mmap` with `MAP_JIT`, `pthread_jit_write_protect_np`, `sys_icache_invalidate`) and two hand-written AArch64 instruction words, `mov w0, #42` (`0x52800540`) and `ret` (`0xD65F03C0`). Not part of any shipped app.
 

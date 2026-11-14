@@ -6,7 +6,7 @@ iStation ships no BIOS files or games: you import your own.
 
 ## Status
 
-v0.0.1, re-envisioned on 2026-11-07. JIT is verified under the App Store routine, and the skeleton is in place: the packages `PS1Core` and `EmuKit`, and the macOS and iOS apps, each in two build routines (App Store and personal). Both apps open to an empty player; the PS1's R3000A and the BIOS boot come next. See [the roadmap](documentation/istation/assistant/ROADMAP.md).
+v0.0.1, re-envisioned on 2026-11-07. JIT is verified under the App Store routine, and the skeleton is in place: the packages `PS1Core` and `EmuKit`, and the macOS and iOS apps, each in two build routines (App Store and personal). Both apps open to an empty player; the PS1's R3000A and the BIOS boot come next. See [the roadmap](lib/documentation/assistant/darwin/ROADMAP.md).
 
 ## Build and run
 
@@ -27,4 +27,4 @@ iStation's own code is MIT ([LICENSE](LICENSE)). Code ported from ProjectPSX kee
 
 ## Contributing
 
-The contributor docs start at [documentation/CLAUDE.md](documentation/CLAUDE.md).
+The contributor docs start at [lib/documentation/CLAUDE.md](lib/documentation/CLAUDE.md).

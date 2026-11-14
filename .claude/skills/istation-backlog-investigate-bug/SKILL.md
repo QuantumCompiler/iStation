@@ -7,13 +7,13 @@ description: Turn an iStation symptom into a root cause with evidence and a Main
 
 A symptom becomes a root cause with evidence, and a Maintenance item to fix it. Never fix it here.
 
-The docs home is [`documentation/istation/`](../../../documentation/istation/README.md); the code is `src/istation/`.
+The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the code is `src/istation/`.
 
 ## 1. Ground
 
-- [The backlog](../../../documentation/istation/backlog/README.md): an existing item that owns this seam gets the evidence added instead of a duplicate item.
-- [MILESTONES.md](../../../documentation/istation/assistant/MILESTONES.md): a regression against a recorded guarantee is worth saying.
-- [CLAUDE.md](../../../documentation/istation/assistant/CLAUDE.md): the invariants the fix must honor, and the codebase map to find the seam.
+- [The backlog](../../../lib/documentation/backlog/darwin/README.md): an existing item that owns this seam gets the evidence added instead of a duplicate item.
+- [MILESTONES.md](../../../lib/documentation/assistant/darwin/MILESTONES.md): a regression against a recorded guarantee is worth saying.
+- [CLAUDE.md](../../../lib/documentation/assistant/darwin/CLAUDE.md): the invariants the fix must honor, and the codebase map to find the seam.
 
 ## 2. Investigate
 
@@ -25,7 +25,7 @@ The docs home is [`documentation/istation/`](../../../documentation/istation/REA
 
 ## 3. Write the Maintenance item
 
-To `/istation-backlog-create-item`'s bar, in `backlog/maintenance/`, with the next `M<n>`, plus:
+To `/istation-backlog-create-item`'s bar, in `backlog/darwin/maintenance/`, with the next `M<n>`, plus:
 
 - **What / why** opens with the evidence and the root-cause chain.
 - **The guardrail pins the reproduction as a regression fixture** — the minimal case as a test in the seam module's `tests/<layer>/<module>/`.
@@ -35,7 +35,7 @@ Bigger than one focused session, or really a feature or product-shape question �
 
 ## 4. Place and validate
 
-The index row in the Maintenance table, a line in its preamble, the ROADMAP Maintenance line, the "Ids spent so far" line; never MILESTONES. `python3 scripts/validate_docs.py documentation` (from the repository root) is clean. **Commit and push** (CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`.
+The index row in the Maintenance table, a line in its preamble, the ROADMAP Maintenance line, the "Ids spent so far" line; never MILESTONES. `python3 lib/scripts/validate_docs.py lib/documentation` (from the repository root) is clean. **Commit and push** (CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`.
 
 ## 5. Report
 

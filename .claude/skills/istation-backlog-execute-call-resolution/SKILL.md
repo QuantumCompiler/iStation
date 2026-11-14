@@ -7,7 +7,7 @@ description: Groom a group of iStation backlog items (a version table, a track, 
 
 A group of items, groomed until it builds with nothing left to ask.
 
-The docs home is [`documentation/istation/`](../../../documentation/istation/README.md); the index is [`backlog/README.md`](../../../documentation/istation/backlog/README.md).
+The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the index is [`backlog/darwin/README.md`](../../../lib/documentation/backlog/darwin/README.md).
 
 ## 1. Inventory
 
@@ -40,6 +40,6 @@ For every answer, in the same pass:
 ## 4. Validate and report
 
 - A search of the group's documents shows no `[user]` or `[default:` left except deliberate skips.
-- `python3 scripts/validate_docs.py documentation` (from the repository root) is clean.
+- `python3 lib/scripts/validate_docs.py lib/documentation` (from the repository root) is clean.
 - **Commit and push** (CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`.
 - Report each call and its answer in one line, and what still blocks what.

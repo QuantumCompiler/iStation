@@ -13,14 +13,14 @@ The release model (the user's call, 2026-10-31): each version is built on its ow
 - The carriers of the live number:
   - the branch name;
   - `MARKETING_VERSION` (and `CURRENT_PROJECT_VERSION`) in `src/istation/apps/Config/Version.xcconfig`;
-  - [ROADMAP.md](../../../documentation/istation/assistant/ROADMAP.md)'s "In progress" heading and its Version scheme line;
-  - [CLAUDE.md](../../../documentation/istation/assistant/CLAUDE.md)'s Versioning section ("`v0.0.1` today") and the root `CLAUDE.md` ("today `v0.0.1`");
+  - [ROADMAP.md](../../../lib/documentation/assistant/darwin/ROADMAP.md)'s "In progress" heading and its Version scheme line;
+  - [CLAUDE.md](../../../lib/documentation/assistant/darwin/CLAUDE.md)'s Versioning section ("`v0.0.1` today") and the root `CLAUDE.md` ("today `v0.0.1`");
   - `.github/workflows/ci.yml` if it names a branch.
 - Search for any other occurrence: `grep -rn "0\.0\.1" --exclude-dir=.build --exclude-dir=.git .`
 
 ## 2. Gate: is the release actually done?
 
-The version's table in [the backlog index](../../../documentation/istation/backlog/README.md) is empty (every item shipped, or moved with `/istation-backlog-swap-item` by the user's decision), its ROADMAP gate line is ticked, and `/istation-maintenance-update-documents` has run clean. If not, report what remains and stop.
+The version's table in [the backlog index](../../../lib/documentation/backlog/darwin/README.md) is empty (every item shipped, or moved with `/istation-backlog-swap-item` by the user's decision), its ROADMAP gate line is ticked, and `/istation-maintenance-update-documents` has run clean. If not, report what remains and stop.
 
 ## 3. Sweep the carriers
 
@@ -28,7 +28,7 @@ For a release: the version's table retired from the index; ROADMAP's section mov
 
 ## 4. Validate
 
-- `python3 scripts/validate_docs.py documentation` (from the repository root).
+- `python3 lib/scripts/validate_docs.py lib/documentation` (from the repository root).
 - `cd src/istation && swift build --explicit-target-dependency-import-check=error && swift test`
 - `cd src/istation && ./scripts/archive-appstore.sh macOS` archives, and `defaults read "$PWD/build/macOS/iStation.xcarchive/Products/Applications/iStation.app/Contents/Info.plist" CFBundleShortVersionString` prints the new number.
 

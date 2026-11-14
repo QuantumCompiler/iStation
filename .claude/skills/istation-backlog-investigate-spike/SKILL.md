@@ -7,17 +7,17 @@ description: Investigate a design question about iStation with evidence, not opi
 
 A spike answers a design question **with evidence**. Its deliverable is a report in chat. It never builds code, never creates backlog documents, never edits SPEC, ROADMAP or the backlog index, and never saves a write-up file unless asked. "Execute the spike" afterwards means `/istation-backlog-create-spike` — create the documents — never implement.
 
-The docs home is [`documentation/istation/`](../../../documentation/istation/README.md); the code is `src/istation/`.
+The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the code is `src/istation/`.
 
 ## 1. Ground
 
 Read, before probing anything:
 
-1. [The backlog index](../../../documentation/istation/backlog/README.md) — what is queued, and where a split would land (Architecture `A<n>`, Maintenance `M<n>`, or a version table; the ids spent so far are listed there).
-2. [CLAUDE.md](../../../documentation/istation/assistant/CLAUDE.md) — the six `⚠` invariants, the codebase map, the layer law. A design that needs an upward edge, shipped code from a non-permissive source, any reading of a GPL emulator's source or disassembly, a debug tool reaching an App Store build, a Sony file in the repository, a UI import in a view-model, an incompatible library-file change, or a test touching the real home folder is colliding with an invariant: that collision is a finding.
-3. [SPEC.md](../../../documentation/istation/assistant/SPEC.md) — scope and **non-goals** (no GPL emulator's source read or copied, no Sony files, no PS3 core yet, no PS2 on iOS, no Intel Macs, no launching other emulators, Apple platforms only). A collision with a non-goal is itself a finding; changing SPEC is the user's call.
-4. [ROADMAP.md](../../../documentation/istation/assistant/ROADMAP.md) — the phase the question belongs to and its "Decisions needed".
-5. Precedents: [MILESTONES.md](../../../documentation/istation/assistant/MILESTONES.md), the [ADRs](../../../documentation/istation/adrs/README.md), the [reference contracts](../../../documentation/istation/reference/README.md), and external prior art (the emulators' own sources for any flag or config file).
+1. [The backlog index](../../../lib/documentation/backlog/darwin/README.md) — what is queued, and where a split would land (Architecture `A<n>`, Maintenance `M<n>`, or a version table; the ids spent so far are listed there).
+2. [CLAUDE.md](../../../lib/documentation/assistant/darwin/CLAUDE.md) — the six `⚠` invariants, the codebase map, the layer law. A design that needs an upward edge, shipped code from a non-permissive source, any reading of a GPL emulator's source or disassembly, a debug tool reaching an App Store build, a Sony file in the repository, a UI import in a view-model, an incompatible library-file change, or a test touching the real home folder is colliding with an invariant: that collision is a finding.
+3. [SPEC.md](../../../lib/documentation/assistant/darwin/SPEC.md) — scope and **non-goals** (no GPL emulator's source read or copied, no Sony files, no PS3 core yet, no PS2 on iOS, no Intel Macs, no launching other emulators, Apple platforms only). A collision with a non-goal is itself a finding; changing SPEC is the user's call.
+4. [ROADMAP.md](../../../lib/documentation/assistant/darwin/ROADMAP.md) — the phase the question belongs to and its "Decisions needed".
+5. Precedents: [MILESTONES.md](../../../lib/documentation/assistant/darwin/MILESTONES.md), the [ADRs](../../../lib/documentation/adrs/darwin/README.md), the [reference contracts](../../../lib/documentation/reference/darwin/README.md), and external prior art (the emulators' own sources for any flag or config file).
 
 ## 2. Probe the real thing
 

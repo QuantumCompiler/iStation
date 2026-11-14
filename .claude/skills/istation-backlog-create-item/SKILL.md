@@ -7,23 +7,23 @@ description: Spec one iStation work item into the backlog table the user names (
 
 One item, specced so an agent can build it straight from its document. Never start implementing.
 
-The docs home is [`documentation/istation/`](../../../documentation/istation/README.md); the index and the document format are in [`backlog/README.md`](../../../documentation/istation/backlog/README.md).
+The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the index and the document format are in [`backlog/darwin/README.md`](../../../lib/documentation/backlog/darwin/README.md).
 
 ## 1. The destination
 
-The user names the table (a version — `v0.0.1`, `v0.1.0` … `v2.0.0` per the [ROADMAP](../../../documentation/istation/assistant/ROADMAP.md) — or Maintenance, or Architecture) and the position. Ask only if they haven't. The id follows the index rules: a track letter for a release item, the next `M<n>`/`A<n>` for a standing one; never reuse a spent id.
+The user names the table (a version — `v0.0.1`, `v0.1.0` … `v2.0.0` per the [ROADMAP](../../../lib/documentation/assistant/darwin/ROADMAP.md) — or Maintenance, or Architecture) and the position. Ask only if they haven't. The id follows the index rules: a track letter for a release item, the next `M<n>`/`A<n>` for a standing one; never reuse a spent id.
 
 ## 2. Read before writing
 
 1. The backlog README — format, tags, gates, numbering, the ids spent.
-2. [CLAUDE.md](../../../documentation/istation/assistant/CLAUDE.md) — the `⚠` invariants, the codebase map, code style.
-3. [SPEC.md](../../../documentation/istation/assistant/SPEC.md) — a collision with a non-goal or a shape change → stop and raise it with the user first.
-4. [ROADMAP.md](../../../documentation/istation/assistant/ROADMAP.md) — the phase's checklist line it fulfils.
+2. [CLAUDE.md](../../../lib/documentation/assistant/darwin/CLAUDE.md) — the `⚠` invariants, the codebase map, code style.
+3. [SPEC.md](../../../lib/documentation/assistant/darwin/SPEC.md) — a collision with a non-goal or a shape change → stop and raise it with the user first.
+4. [ROADMAP.md](../../../lib/documentation/assistant/darwin/ROADMAP.md) — the phase's checklist line it fulfils.
 5. **Every existing item, for overlap**: one concern has one home — extend an existing document instead of writing a near-duplicate.
 
 ## 3. Write the document
 
-In the table's directory (`backlog/v<x.y.z>/`, `maintenance/` or `architecture/`), kebab-case filename, sections in the README's order, to this bar:
+In the table's directory (`backlog/darwin/v<x.y.z>/` (or `backlog/darwin/<os>/v<x.y.z>/` for one OS), `maintenance/` or `architecture/`), kebab-case filename, sections in the README's order, to this bar:
 
 - **What / why** concrete enough to build from, with evidence (`file:line`, measurements). Too big for one focused session → **split first**, listing the sub-documents.
 - **Core constraint(s)**: every invariant it touches. Typical for iStation: shipped code only from a permissive source (ProjectPSX, Play!, iStation's own, public documentation), each ported file naming its source and keeping its notice (ADRs 0013, 0014) — checked against the reference's and the oracle's traces, never against a GPL emulator's source; hot paths with concrete types (ADR 0015); tools only under `PERSONAL_BUILD` (ADR 0016); the library file read compatibly (ADR 0007) — a new field is `decodeIfPresent` with a recording; view-models UI-free and visuals from `styles` (ADR 0005); tests hermetic over a `Sandbox` (ADR 0004); a new dependency audited onto ADR 0013's allow-list.
@@ -41,4 +41,4 @@ The index row (in build order, the right status: 🟢, or 🔒 with its gate ids
 
 ## 5. Validate and report
 
-`python3 scripts/validate_docs.py documentation` (from the repository root) is clean. **Commit and push** (CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`. Report the path, id, position, gate, the docs updated, and every `[user]` call.
+`python3 lib/scripts/validate_docs.py lib/documentation` (from the repository root) is clean. **Commit and push** (CLAUDE.md → Committing and pushing): one commit, staging only this task's paths, its message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`. Report the path, id, position, gate, the docs updated, and every `[user]` call.

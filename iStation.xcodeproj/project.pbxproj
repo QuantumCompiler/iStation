@@ -234,14 +234,13 @@
 			children = (
 				78A092D37FCFAD13586085BD /* README.md */,
 				745F6B485D5BD2DE46697B2D /* CLAUDE.md */,
-				91C209E285D39CF19B111FF8 /* documentation */,
+				A7526703A356BF0351F244FA /* lib */,
 				C93B50687CCA325E43FBE332 /* istation */,
 				AE03C15C0D73E24C7B08CCB2 /* macOS */,
 				47C9A9AB5FE8344A3E6B47AE /* iOS */,
 				139363E72819083888FDEAE9 /* Shared */,
 				6EDE00FA7A261151470098F6 /* Config */,
 				926D2629A3CE7C67880DE5DC /* tools */,
-				E3BE17933804691C65DFA48C /* scripts */,
 				B30F8CCFE9400406E6DE2819 /* .github */,
 				26DA62B705DBE966229E5E3E /* .claude */,
 				D3C406288A12754B3E7173EC /* LICENSE */,
@@ -249,6 +248,15 @@
 				A40ED5F030BA3FCD8229A0E3 /* .gitignore */,
 				CC0F68FE2D81F9614883F277 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		A7526703A356BF0351F244FA /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				91C209E285D39CF19B111FF8 /* documentation */,
+				E3BE17933804691C65DFA48C /* scripts */,
+			);
+			path = lib;
 			sourceTree = "<group>";
 		};
 		AE03C15C0D73E24C7B08CCB2 /* macOS */ = {

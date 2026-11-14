@@ -7,11 +7,11 @@ description: Execute a whole iStation backlog table (a version like v0.1.0, or a
 
 A whole table, built unsupervised after one sitting of questions.
 
-The docs home is [`documentation/istation/`](../../../documentation/istation/README.md); the index is [`backlog/README.md`](../../../documentation/istation/backlog/README.md).
+The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the index is [`backlog/darwin/README.md`](../../../lib/documentation/backlog/darwin/README.md).
 
 ## 1. Read everything first
 
-Re-read the live index; take the named table's rows in order, skipping 🚧 rows (someone else's) and saying so. Read [CLAUDE.md](../../../documentation/istation/assistant/CLAUDE.md) in full, then **every document in the group** and its References, before building anything.
+Re-read the live index; take the named table's rows in order, skipping 🚧 rows (someone else's) and saying so. Read [CLAUDE.md](../../../lib/documentation/assistant/darwin/CLAUDE.md) in full, then **every document in the group** and its References, before building anything.
 
 ## 2. Ask every blocking question up front
 
@@ -25,7 +25,7 @@ Record every answer in its document, propagated (as `/istation-backlog-execute-c
 
 ## 3. Build each item, serially
 
-Each item to `/istation-backlog-execute-item`'s full bar: 🚧 first; the layer law and every invariant; hermetic tests; green with the real commands (`cd src/istation && swift build --explicit-target-dependency-import-check=error`, `swift test`, and `python3 scripts/validate_docs.py documentation` from the root); shipped through the documentation flow (MILESTONES, document and row deleted, gates updated, ROADMAP ticked, map/cards/ADR 0002/DEVELOPER/reference as needed).
+Each item to `/istation-backlog-execute-item`'s full bar: 🚧 first; the layer law and every invariant; hermetic tests; green with the real commands (`cd src/istation && swift build --explicit-target-dependency-import-check=error`, `swift test`, and `python3 lib/scripts/validate_docs.py lib/documentation` from the root); shipped through the documentation flow (MILESTONES, document and row deleted, gates updated, ROADMAP ticked, map/cards/ADR 0002/DEVELOPER/reference as needed).
 
 **Commit and push once per shipped item** (CLAUDE.md → Committing and pushing): staging only that item's paths, the message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`.
 
