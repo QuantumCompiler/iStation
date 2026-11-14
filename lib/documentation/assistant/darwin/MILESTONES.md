@@ -478,3 +478,20 @@ Decided by the hardware (2026-11-14, ps1-tests' `cop` and its `psx.log`, recorde
 **Decisions consumed.**
 
 - 2026-11-14: the tools in `lib/src/darwin/tools/`, the project in `lib/src/darwin/` with the whole repository in its navigator, `scripts/build.sh` over the two routines' scripts (the defaults, confirmed by the user); a scheme per Presentation module now (the user's veto of the default).
+
+## Milestone O — The release in `lib/release/VERSION`
+
+**Goal.** One file names the release, the apps' version follows it, a check guards it, and the merge into `stable` is the release — Apogee's procedure (v0.0.1 item 4c; the user's calls, 2026-11-14).
+
+**Built** (4c, 2026-11-14):
+
+- **`lib/release/VERSION`** (`0.0.1`) — the release, and the only thing that names one. `lib/src/darwin/scripts/build.sh` writes `MARKETING_VERSION` in `apps/Config/Version.xcconfig` from it, and `ArchitectureTests` (`theVersionFollowsTheRelease`) fail while `VERSION`, `MARKETING_VERSION` and ROADMAP's "In progress" heading disagree.
+- **`lib/scripts/version-check.sh`** — CI's `version bump`, on every pull request into `stable`: `VERSION` holds x.y.z, a release branch is named for it, and with the apps' code (`lib/src/`, `lib/release/`) changed since the latest release, `v<VERSION>` is unreleased — else the change would ship in no release; a documentation-only merge with a released `VERSION` publishes nothing and passes. It asks GitHub (gh) whether a version is released, else the tag on origin; "could not ask" fails.
+- **`lib/scripts/release-from-pr.sh`** — CI's `tag and release`, once a pull request into `stable` merges: the merge commit's `VERSION` names the release; a tag already at another commit means that version is out, and the merge publishes nothing; otherwise `gh release create` tags the merge commit `v<VERSION>` and publishes its source in one step. Without `--publish`, a rehearsal. `lib/scripts/latest-release.sh` finds the newest published release.
+- **`ci.yml`** gains both jobs (and runs on a pull request's `closed`, guarded so only a merge into `stable` releases); the update-release skill sweeps `VERSION` first and hands the user the pull request whose merge is the release; CLAUDE.md's Versioning and Release sections say so. The navigator shows `lib/release/`.
+
+**Verified** (2026-11-14): `version-check.sh` passes on the branch as it is ("merging publishes v0.0.1", no release yet) and fails on each plant — a branch named `v0.0.2`, a released version with the code changed, a `VERSION` of `0.1` — and passes a released version with only documentation changed; `release-from-pr.sh` refuses a missing pull request and a missing number; `theVersionFollowsTheRelease` fails on a planted `MARKETING_VERSION = 0.0.2`, and `build.sh` writes it back from `VERSION`; `swift test` (230 tests), the strict build and the macOS build green; the docs validator clean. The jobs themselves run first on the release's pull request.
+
+**Decisions consumed.**
+
+- 2026-11-14: a merge into `stable` is the release (the user's call); `build.sh` writes `MARKETING_VERSION` from `VERSION`, guarded by a test (the default, confirmed by the user).

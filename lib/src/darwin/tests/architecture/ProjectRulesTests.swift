@@ -44,6 +44,26 @@ import Testing
         #expect(violations.isEmpty, "\(violations.report)")
     }
 
+    @Test("The release names the apps' version and ROADMAP's live heading (lib/release/VERSION)")
+    func theVersionFollowsTheRelease() {
+        var violations = Violations()
+        let release = "lib/release/VERSION", config = "lib/src/darwin/apps/Config/Version.xcconfig"
+        let roadmap = "lib/documentation/assistant/darwin/ROADMAP.md"
+        let version = (Repository.text(Repository.root.appendingPathComponent(release)) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        if !Pattern.matches(#"^\d+\.\d+\.\d+$"#, in: version) {
+            violations.add("version", release, "holds \(version.isEmpty ? "nothing" : version), not x.y.z")
+        }
+        let marketing = Pattern.captures(#"^MARKETING_VERSION = (\S+)$"#, in: Repository.text(Repository.root.appendingPathComponent(config)) ?? "", options: [.anchorsMatchLines]).first?.first ?? nil
+        if marketing != version {
+            violations.add("version", config, "says MARKETING_VERSION \(marketing ?? "nothing"), the release is \(version) — scripts/build.sh writes it from \(release)")
+        }
+        let live = Pattern.captures(#"## In progress\s+### v(\d+\.\d+\.\d+)"#, in: Repository.text(Repository.root.appendingPathComponent(roadmap)) ?? "").first?.first ?? nil
+        if live != version {
+            violations.add("version", roadmap, "names v\(live ?? "nothing") in progress, the release is \(version)")
+        }
+        #expect(violations.isEmpty, "\(violations.report)")
+    }
+
     @Test("The repository holds no disc images, BIOS or system software")
     func noGameOrFirmwareFiles() {
         var violations = Violations()

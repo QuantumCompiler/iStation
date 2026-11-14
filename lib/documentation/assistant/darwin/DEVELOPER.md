@@ -12,7 +12,12 @@ LICENSE · LICENSES/            iStation's MIT licence; MIT.txt and BSD-2-Clause
 lib/
   documentation/               by kind, then platform: CLAUDE.md (the router); assistant/ backlog/ adrs/ reference/,
                                each a README.md and darwin/ (this application), with macos/ and ios/ beneath
-  scripts/validate_docs.py     the docs validator (each application's backlog index ↔ documents, every link)
+  release/VERSION              the release, and the only thing that names one; the apps' version follows it
+  scripts/
+    validate_docs.py           the docs validator (each application's backlog index ↔ documents, every link)
+    version-check.sh           CI's `version bump`: what merging into stable publishes, and whether VERSION allows it
+    release-from-pr.sh         CI's `tag and release`: tags a merged pull request's commit v<VERSION>, publishes its source
+    latest-release.sh          the newest published release's tag and commit
   src/darwin/                  the Apple apps, self-contained (Apogee's layout)
     Package.swift              the module map (ADR 0002), the products PS1Core, EmuKit and TraceKit, PERSONAL_BUILD in debug
     iStation.xcodeproj/        the two apps over the package; four app schemes (macOS/iOS × Personal/App Store) and one
@@ -68,6 +73,8 @@ From `lib/src/darwin/` unless noted.
 | The CPU check: one program on ProjectPSX and the Swift console, traces diffed (repo root) | `lib/src/darwin/tools/projectpsx-trace/build.sh && lib/src/darwin/tools/istation-run/cpu-check.sh` |
 | The gate, with your own BIOS (repo root; after both tools' `build.sh` and `lib/src/darwin/tools/ps1-tests/fetch.sh`) | `lib/src/darwin/tools/gate/run.sh <bios> [--scph1001] [--out <folder>]` |
 | Docs validator (repo root) | `python3 lib/scripts/validate_docs.py lib/documentation` |
+| What merging into stable would publish (repo root) | `lib/scripts/version-check.sh` |
+| Rehearse a pull request's release (repo root; `--publish` is CI's) | `lib/scripts/release-from-pr.sh <pr>` |
 | Lint / format | _TODO:_ none chosen |
 
 ## The two routines

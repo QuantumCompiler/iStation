@@ -1,14 +1,19 @@
 name: CI
 
 # Only for an open pull request (opened, new commits, reopened) and for a merge into stable;
-# pushes to release branches run nothing (the user's call, 2026-10-31).
+# pushes to release branches run nothing (the user's call, 2026-10-31). A merge into stable is the
+# release (the user's call, 2026-11-14): once a pull request into stable merges, `tag and release`
+# tags the merge commit v<lib/release/VERSION> and publishes its source; `version bump` checks first,
+# on every pull request into stable, that the merge would publish what changed.
 on:
   pull_request:
+    types: [opened, synchronize, reopened, closed]
   push:
     branches: [stable]
 
 jobs:
   build-and-test:
+    if: github.event.action != 'closed'
     runs-on: macos-15
     defaults:
       run:
@@ -35,3 +40,31 @@ jobs:
       - name: Docs validator
         working-directory: .
         run: python3 lib/scripts/validate_docs.py lib/documentation
+
+  version-bump:
+    name: version bump
+    if: github.event_name == 'pull_request' && github.event.action != 'closed' && github.base_ref == 'stable'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: What merging publishes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: lib/scripts/version-check.sh
+
+  tag-and-release:
+    name: tag and release
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.base_ref == 'stable'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Tag the merge commit and publish its release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: lib/scripts/release-from-pr.sh ${{ github.event.pull_request.number }} --publish
