@@ -77,6 +77,14 @@ failed() { printf -- '- %s exited %s (its output: `%s`)\n' "$1" "$2" "$3" >>"$FA
 # line ending in a newline (psx.log leaves out the programs' opening blank line, and access-time's its
 # last newline); nothing when the tool wrote none.
 text() { if [ -f "$1" ]; then tr -d '\r' <"$1" | awk 'NF || seen { seen = 1; print }' >"$2"; else : >"$2"; fi; }
+# A program's TTY from its test's title line on (psx.log's first line, cpu/<test>): before it come the
+# BIOS's banner and the SDK's ResetGraph messages, which the hardware logs leave out. Without the
+# title, all of it, so the difference shows.
+from_title() {
+    if [ -s "$2" ] && grep -qxF -- "$(head -n 1 "$2")" "$1"; then
+        awk -v title="$(head -n 1 "$2")" 'found || $0 == title { found = 1; print }' "$1" >"$1.from-title" && mv "$1.from-title" "$1"
+    fi
+}
 # The last line a tool printed: its frames, instructions, cycles and time.
 summary() { tail -n 1 "$1" 2>/dev/null || echo "(no output)"; }
 # Runs the oracle and writes its wall time into $1 (libretro reports no cycles).
@@ -124,11 +132,12 @@ for TEST in $CPU_TESTS; do
     echo "$TEST…"
     tnote "Program: \`${EXE#"$TESTS"/}\`; expected: its \`psx.log\`, recorded on a real PS1."
     tnote ""
-    text "$LOGS/$TEST.log" "$OUT/$TEST.expected"
+    # cop's psx.log prefixes every line with "% ", its capture tool's prompt.
+    text "$LOGS/$TEST.log" "$OUT/$TEST.expected.raw" && sed 's/^% //' "$OUT/$TEST.expected.raw" >"$OUT/$TEST.expected"
 
     # Each console's TTY starts at the EXE's entry: the BIOS's own messages before it aren't the test's.
     if "$RUN" run --bios "$BIOS" --exe "$EXE" --frames "$TEST_FRAMES" --tty "$OUT/$TEST.swift.tty" 2>"$OUT/$TEST.swift.out"; then
-        text "$OUT/$TEST.swift.tty" "$OUT/$TEST.swift.txt"
+        text "$OUT/$TEST.swift.tty" "$OUT/$TEST.swift.txt" && from_title "$OUT/$TEST.swift.txt" "$OUT/$TEST.expected"
         if diff "$OUT/$TEST.expected" "$OUT/$TEST.swift.txt" >"$OUT/$TEST.swift.diff"; then
             tnote "- **Swift console**: matches \`psx.log\`."
         else
@@ -158,7 +167,7 @@ for TEST in $CPU_TESTS; do
 
     if [ "$SCPH1001" = 1 ]; then
         if "$PROJECTPSX" --bios "$BIOS" --exe "$EXE" --frames "$TEST_FRAMES" --tty "$OUT/$TEST.projectpsx.tty" >"$OUT/$TEST.projectpsx.out" 2>&1; then
-            text "$OUT/$TEST.projectpsx.tty" "$OUT/$TEST.projectpsx.txt"
+            text "$OUT/$TEST.projectpsx.tty" "$OUT/$TEST.projectpsx.txt" && from_title "$OUT/$TEST.projectpsx.txt" "$OUT/$TEST.expected"
             if diff "$OUT/$TEST.expected" "$OUT/$TEST.projectpsx.txt" >"$OUT/$TEST.projectpsx.diff"; then
                 tnote "- **ProjectPSX**: matches \`psx.log\`."
             else

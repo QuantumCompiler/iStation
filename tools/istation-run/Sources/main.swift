@@ -5,7 +5,8 @@
 //
 //   istation-run cpu-check-image <out>          the CPU-check program, as a 512 KB image built here
 //   istation-run run --bios <image> [--exe <file>] [--frames <n>] [--instructions <trace>]
-//                    [--full-state-interval <n>] [--frame-trace <trace>] [--tty <file>]
+//                    [--full-state-interval <n>] [--frame-trace <trace>] [--tty <file>] [--ram-dump <file>]
+//                    [--trace-from <frame>]
 //   istation-run diff <left> <right> [--ignore-cycles] [--min-records <n>]
 //   istation-run frames <trace>…                 frame traces side by side: one line per frame
 //
@@ -33,18 +34,26 @@ struct Counter: Counting {
     mutating func retired(_ instruction: RetiredInstruction) { count &+= 1 }
 }
 
+/// When a recorder starts writing: from power-on, or from a frame (`--trace-from`), to see a late
+/// stretch of a long run without tracing all of it.
+final class RecordingStart {
+    var on: Bool
+    init(on: Bool) { self.on = on }
+}
+
 /// Writes TraceKit's instruction records, and a full-state record every `interval` of them.
 struct Recorder: Counting {
     static var isEnabled: Bool { true }
     let writer: TraceWriter
     let interval: UInt32
+    let start: RecordingStart
     var count: UInt64 = 0
     var sinceFullState: UInt32 = 0
     var failure: (any Error)?
 
     mutating func retired(_ instruction: RetiredInstruction) {
         count &+= 1
-        guard failure == nil else { return }
+        guard failure == nil, start.on else { return }
         let gpr = UnsafeBufferPointer(start: instruction.gpr, count: 32)
         do {
             try writer.append(InstructionRecord(
@@ -96,18 +105,20 @@ func number<Value: FixedWidthInteger>(_ options: [String: String], _ name: Strin
     return parsed
 }
 
-func run<Tracer: Counting>(_ options: [String: String], bios: [UInt8], tracer: Tracer) throws -> PS1Machine<Tracer> {
+func run<Tracer: Counting>(_ options: [String: String], bios: [UInt8], tracer: Tracer, recordingStart: RecordingStart? = nil) throws -> PS1Machine<Tracer> {
     let machine = try PS1Machine(bios: bios, tracer: tracer, capturesBIOSPutchar: options["tty"] != nil)
     if let path = options["exe"] {
         machine.boot(try PSEXE(bytes: Array(try Data(contentsOf: URL(fileURLWithPath: path)))))
     }
     let frames: Int = number(options, "frames", default: 60)
+    let traceFrom: Int = number(options, "trace-from", default: 0)
     let frameWriter = try options["frame-trace"].map {
         try TraceWriter(url: URL(fileURLWithPath: $0), header: TraceHeader(granularity: .frame))
     }
     // Only the console's own time counts toward the rate: a frame record's 2 MB checksum is the tool's.
     var emulation = Duration.zero
     for frame in 0..<frames {
+        if frame == traceFrom { recordingStart?.on = true }
         let start = ContinuousClock.now
         machine.runFrame()
         emulation += ContinuousClock.now - start
@@ -124,6 +135,7 @@ func run<Tracer: Counting>(_ options: [String: String], bios: [UInt8], tracer: T
         let tty = options["exe"] == nil ? machine.tty : machine.bootIsPending ? "" : machine.ttySinceEXE
         try Data(tty.utf8).write(to: URL(fileURLWithPath: path))
     }
+    if let path = options["ram-dump"] { try machine.bus.withRAM { Data($0) }.write(to: URL(fileURLWithPath: path)) }
     let instructions = machine.cpu.tracer.count
     let seconds = Double(emulation.components.seconds) + Double(emulation.components.attoseconds) / 1e18
     let rate = seconds > 0 ? Double(instructions) / seconds / 1e6 : 0
@@ -152,13 +164,14 @@ do {
         try Data(CPUCheck.image).write(to: URL(fileURLWithPath: path))
 
     case "run":
-        let options = options(arguments.dropFirst(), known: ["bios", "exe", "frames", "instructions", "full-state-interval", "frame-trace", "tty"])
+        let options = options(arguments.dropFirst(), known: ["bios", "exe", "frames", "instructions", "full-state-interval", "frame-trace", "tty", "ram-dump", "trace-from"])
         guard let biosPath = options["bios"] else { fail("usage: istation-run run --bios <image> …") }
         let bios = Array(try Data(contentsOf: URL(fileURLWithPath: biosPath)))
         if let path = options["instructions"] {
             let interval: UInt32 = number(options, "full-state-interval", default: 0)
             let writer = try TraceWriter(url: URL(fileURLWithPath: path), header: TraceHeader(granularity: .instruction, fullStateInterval: interval))
-            let machine = try run(options, bios: bios, tracer: Recorder(writer: writer, interval: interval))
+            let start = RecordingStart(on: number(options, "trace-from", default: 0) == 0)
+            let machine = try run(options, bios: bios, tracer: Recorder(writer: writer, interval: interval, start: start), recordingStart: start)
             if let failure = machine.cpu.tracer.failure { throw failure }
             try writer.finish()
             if machine.bootIsPending { neverStarted(options) }

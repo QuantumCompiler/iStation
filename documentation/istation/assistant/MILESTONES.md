@@ -391,3 +391,33 @@ Decided by the hardware (2026-11-14, ps1-tests' `cop` and its `psx.log`, recorde
 
 - 2026-11-07: one console module, devices carved out only behind the trace harness (ADR 0015).
 - 2026-11-07: the stubs answer as psx-spx documents each device's power-on state; NTSC only; what `access-time` and `io-access-bitwidth` need — wait states, register widths — ported here (the defaults, confirmed by the user).
+
+## Milestone K — The reference and the oracle
+
+**Goal.** The two references the Swift PS1 core is checked against, able to trace: ProjectPSX, the MIT reference it is ported from, instruction by instruction with trace logging added to its source; and SwanStation, the more accurate GPL oracle, built unmodified and recorded from outside through libretro's public API — then both run on the user's own BIOS images (v0.0.1 item 3d; [ADR 0013](../adrs/shipped-code-derives-only-from-permissive-references.md)).
+
+**Built** (3d, 2026-11-07 to 2026-11-14, by a session that has never read a GPL emulator's source; nothing here ships, every build lives in a git-ignored `.build/`):
+
+- **`tools/projectpsx-trace/`** — ProjectPSX pinned at `f4dc13aea42d`, cloned and patched by `build.sh`. `trace.patch` adds `IStationTrace.cs` (MIT, iStation's own), which writes TraceKit's instruction, full-state and frame records and the TTY, and hooks it into ProjectPSX: the retired instruction, the BIOS's putchar and expansion 2's DUART (from an EXE's entry point on), a settable BIOS path, readable guest RAM, both controller slots empty. `host/` is a headless runner: it opens the CD-ROM's lid (ProjectPSX's CD has no tracks without a disc image, and a BIOS's GetID would throw), answers ProjectPSX's waits for console input, checks its arguments, and exits 3 or 4, keeping what was recorded, when ProjectPSX throws or an EXE never starts. The .NET 10 SDK is Homebrew's checksummed package unpacked into `.build/dotnet/`.
+- **`tools/swanstation-oracle/`** — SwanStation pinned at `631f0fb31b80`, cloned and built unmodified by `build.sh`, its build output kept to a log no core-writing session opens; `frontend.c` (MIT), a headless libretro frontend written only against libretro-common's `libretro.h` (`d9597c359a5c`): it learns the core's options from its requests (the interpreter, the software renderer, no memory cards, never OpenBIOS), plugs no controller in, links the BIOS under the names the core asks for, and writes frame records — guest RAM's checksum — and, on request, a RAM dump.
+- **`tools/istation-run/`** — the Swift console from the command line: `run` (instruction, full-state and frame traces, the TTY, a RAM dump, tracing from a given frame, instructions per second), `diff`, `frames` and `cpu-check-image`; `cpu-check.sh` runs one program built in code on ProjectPSX and the Swift console and diffs their traces.
+- **`tools/ps1-tests/fetch.sh`** — ps1-tests' release `build-158` and its four CPU tests' hardware `psx.log` files.
+- **In the package**, for the comparisons: `PS1Machine.ttySinceEXE` and `bootIsPending` (an EXE's own output, not its BIOS's), `Expansion2.ttyCount`, and `PortsStub`'s controller port answering as an empty one, as ProjectPSX's and SwanStation's do with nothing plugged in (Milestone J).
+
+**Trade-offs.** SwanStation's TTY can't be heard: the core passes none to libretro's log, so its tests are judged by others' output, and its traces by guest RAM alone — the picture and sound checksums wait for v0.1.0 and v0.2.0 (the user's call, 2026-11-14). ProjectPSX runs an EXE only on SCPH-1001, whose LoadRunShell it patches. With the lid open, a BIOS sees no disc in a way an empty closed drive wouldn't show, which can send ProjectPSX's boot down another path. Every frame record checksums 2 MB, outside the instructions-per-second figure.
+
+**Verified** (2026-11-07 to 2026-11-14, M3 Max, macOS 27):
+
+- **Clean checkouts**: both `build.sh` scripts build from a fresh copy (SwanStation's by the helper session, which relayed numbers only: 45 seconds, HEAD at the pin, the clone unchanged).
+- **The CPU check** (3e's guardrail): one program built in code — 1,162 instructions, psx-spx's division edge cases among them — agrees on ProjectPSX and the Swift console for all 18,833 instructions of ProjectPSX's frame, registers and cycles; SwanStation's frame records on the same image match the Swift console's.
+- **The user's BIOS images** (2026-11-14, the agent's run by the user's call): 23 PS1 BIOS images, v1.0 J to v4.5 E — named in reports only by version and hash — each through `tools/gate/run.sh`:
+  - every tool's boot traces read cleanly with `DataTracing`: ProjectPSX per instruction (608,384–625,057 instructions in its 60 frames, 15 MB) and per frame, SwanStation per frame (1,200 frames, 39,616 bytes), and the Swift console's (1.64–1.66 M instructions in 60 frames, 41.5 MB);
+  - **ProjectPSX agrees with the Swift console on every instruction of its 60 traced frames, on all 23 images** — 14.3 million instructions — but for one 14-instruction stretch: the BIOS's read of an expansion ROM's licence header at 0x1F000084, where ProjectPSX returns 0 from its RAM mirror and the Swift console all ones, nothing being attached (psx-spx doesn't say); control flow never parts;
+  - **the boot**, 1,200 frames: the Swift console runs 430.8–440.2 M instructions (NTSC BIOSes) or 510.4–511.8 M (PAL) in 2.6–3.1 s; ProjectPSX takes 4.3–5.1 s and SwanStation 4–5 s;
+  - **the TTYs against `psx.log`**, from each test's title line: ProjectPSX (on SCPH-1001) fails 8 of `cop`'s 17 checks — its no-op COP1, COP3 and LWCn/SWCn, its COP0 commands, its COP2 — and resets in `code-in-io` once code runs from the scratchpad: its known gaps. SwanStation's isn't heard: its known gap. The Swift console's are 3g's.
+- **Three adversarial reviews** of the tools before their commit found 30, 25 and 14 defects, all fixed; the strict build, `swift test` (228 tests in 11 runs) and the docs validator green.
+
+**Decisions consumed.**
+
+- 2026-11-07: ProjectPSX traced from inside its source; SwanStation only from outside, unmodified, guest state only (the user's brief); pinned commits moved only by a dated decision; per-frame records from the oracle (the defaults, confirmed by the user).
+- 2026-11-14: the .NET SDK unpacked locally, and the per-frame comparison guest RAM's until v0.1.0 and v0.2.0 (the defaults, confirmed by the user); the user's images include SCPH-1001, so ProjectPSX's TTY was compared and the default for a BIOS without it wasn't needed; the agent makes the BIOS runs with the files the user names (the user's call).

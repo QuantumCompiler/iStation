@@ -13,8 +13,10 @@ The frontend learns the core's options from the requests it makes, never from it
 
 ```sh
 ./build.sh
-.build/oracle .build/build/swanstation_libretro.dylib --bios <image> [--exe <file>] [--frames <n>] [--frame-trace <trace>] [--log <file>]
+.build/oracle .build/build/swanstation_libretro.dylib --bios <image> [--exe <file>] [--frames <n>] [--frame-trace <trace>] [--log <file>] [--ram-dump <file>]
 ```
+
+`--ram-dump` writes guest RAM's 2 MB after the last frame, as `istation-run run --ram-dump` does, so two consoles' RAM can be compared byte for byte where a checksum only says they differ.
 
 `../istation-run/.build/release/istation-run diff <its trace> <the Swift console's> --min-records <frames>` compares its frame trace with the Swift console's; `--min-records` keeps a run cut short from reading as agreement. The frontend refuses an unknown flag and a bad number (exit 2), and a BIOS that isn't a 512 KB file — the core would run on without it — and fails loudly when the core refuses to start or a file can't be written (exit 1). Its temporary system folder is removed on every exit and on Ctrl-C or a kill. On the CPU-check image (`../istation-run/.build/release/istation-run cpu-check-image`, R3000A code built in code, never Sony's) the two are identical over 5 frames.
 

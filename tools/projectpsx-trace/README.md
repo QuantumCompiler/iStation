@@ -29,7 +29,7 @@ The CPU check — the same program on ProjectPSX and the Swift console — is `.
 
 A BIOS dump is yours to supply and to run; it is passed by path and never copied. With `BIOS=/path/to/your/bios.bin`:
 
-1. **The boot**, per instruction and per frame. ProjectPSX's devices run three times faster than its CPU, so a frame holds at most about 190,000 instructions: 60 frames is at most about 11.5 million records, some 290 MB.
+1. **The boot**, per instruction and per frame. ProjectPSX's devices run three times faster than its CPU, so its frames are short, and the BIOS's first ones run from slow ROM: on 23 BIOS images, 60 frames held 608,384–625,057 instructions, 15 MB.
    `./run.sh --bios "$BIOS" --frames 60 --instructions /tmp/projectpsx-boot.trace --frame-trace /tmp/projectpsx-boot-frames.trace`
 2. **ps1-tests' `cop` and `code-in-io`**, after `../ps1-tests/fetch.sh`, their TTY compared with each test's `psx.log`. **This needs an SCPH-1001 dump**: ProjectPSX side-loads an EXE by patching that BIOS's LoadRunShell at 0xBFC06FF0, which is other code in any other BIOS.
    `./run.sh --bios "$BIOS" --exe ../ps1-tests/.build/tests/cpu/cop/cop.exe --frames 600 --tty /tmp/projectpsx-cop.tty`

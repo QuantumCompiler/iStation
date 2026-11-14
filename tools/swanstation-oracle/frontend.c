@@ -11,6 +11,7 @@
 // BIOS choices), the user's BIOS is linked into the system folder under that name.
 //
 //   oracle <core.dylib> --bios <file> [--exe <file>] [--frames <n>] [--frame-trace <out>] [--log <out>]
+//          [--ram-dump <out>]   guest RAM's 2 MB after the last frame, to find what a checksum can't say
 //
 // The BIOS is the user's own dump: it is linked into a temporary system folder, never copied.
 
@@ -197,7 +198,7 @@ static void removeOnSignal(int signal) {
 
 static int usage(const char *why) {
     if (why) fprintf(stderr, "oracle: %s\n", why);
-    fprintf(stderr, "usage: oracle <core.dylib> --bios <file> [--exe <file>] [--frames <n>] [--frame-trace <out>] [--log <out>]\n");
+    fprintf(stderr, "usage: oracle <core.dylib> --bios <file> [--exe <file>] [--frames <n>] [--frame-trace <out>] [--log <out>] [--ram-dump <out>]\n");
     return 2;
 }
 
@@ -205,7 +206,8 @@ static int usage(const char *why) {
     if (!p_##name) { fprintf(stderr, "the core has no %s\n", #name); return 1; }
 
 int main(int argc, char **argv) {
-    const char *corePath = argc > 1 ? argv[1] : NULL, *bios = NULL, *exe = NULL, *frameTrace = NULL, *logPath = NULL;
+    const char *corePath = argc > 1 ? argv[1] : NULL, *bios = NULL, *exe = NULL, *frameTrace = NULL, *logPath = NULL,
+               *ramDump = NULL;
     long frames = 60;
     // A misspelled flag or a bad number is an error, never a default: a short run would read as agreement.
     for (int i = 2; i < argc; i += 2) {
@@ -215,6 +217,7 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--exe")) exe = value;
         else if (!strcmp(argv[i], "--frame-trace")) frameTrace = value;
         else if (!strcmp(argv[i], "--log")) logPath = value;
+        else if (!strcmp(argv[i], "--ram-dump")) ramDump = value;
         else if (!strcmp(argv[i], "--frames")) {
             char *end;
             frames = strtol(value, &end, 10);
@@ -309,6 +312,12 @@ int main(int argc, char **argv) {
     }
     if (trace && (ferror(trace) || fclose(trace) != 0)) { perror(frameTrace); return 1; }
     note("[oracle] %ld frames, RAM %zu bytes\n", frames, p_retro_get_memory_size(RETRO_MEMORY_SYSTEM_RAM));
+    if (ramDump) {
+        const uint8_t *ram = p_retro_get_memory_data(RETRO_MEMORY_SYSTEM_RAM);
+        size_t size = p_retro_get_memory_size(RETRO_MEMORY_SYSTEM_RAM);
+        FILE *dump = fopen(ramDump, "wb");
+        if (!dump || !ram || fwrite(ram, 1, size, dump) != size || fclose(dump) != 0) { perror(ramDump); return 1; }
+    }
 
     p_retro_unload_game();
     p_retro_deinit();

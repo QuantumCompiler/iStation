@@ -5,7 +5,7 @@ A personal tool outside the iStation package (it depends on the package's `PS1Co
 ```sh
 swift build -c release
 .build/release/istation-run cpu-check-image <out>
-.build/release/istation-run run --bios <image> [--exe <file>] [--frames <n>] [--instructions <trace>] [--full-state-interval <n>] [--frame-trace <trace>] [--tty <file>]
+.build/release/istation-run run --bios <image> [--exe <file>] [--frames <n>] [--instructions <trace>] [--full-state-interval <n>] [--frame-trace <trace>] [--tty <file>] [--ram-dump <file>] [--trace-from <frame>]
 .build/release/istation-run diff <left> <right> [--ignore-cycles] [--min-records <n>]
 .build/release/istation-run frames <trace>…
 ```
@@ -14,6 +14,7 @@ Exit status: 0 done (`diff`: the traces agree), 1 `diff` found a divergence or a
 
 - **`cpu-check-image`** writes `CPUCheck.swift`'s program — R3000A code built here, never Sony's — as a 512 KB image, its code at the reset vector, so both consoles start it from the same state. It covers the ALU, shifts, comparisons, multiply and divide with psx-spx's division edge cases (by zero, signed and unsigned, and 0x80000000 ÷ −1), every load and store width with the load-delay slot, LWL/LWR/SWL/SWR, every branch and jump with its delay slot, code copied to and run from RAM, the COP0 moves, SYSCALL and BREAK through a handler and RFE, and a counted loop — and none of the places iStation departs from ProjectPSX on psx-spx's evidence.
 - **`run`** boots a BIOS image (yours, or one built in code), or starts a PS-EXE once the BIOS reaches its shell (any BIOS: it watches for the shell's address); `--tty` writes what the console printed, the BIOS's putchar included, to a file — with `--exe`, only what was printed once the EXE started, and nothing if it never did. Its last line gives the instructions run and the instructions per second, counting the emulation's time alone, not the frame records' checksums.
+- **`--ram-dump`** writes guest RAM's 2 MB after the last frame, and **`--trace-from`** starts the instruction trace at a frame — to see what a frame checksum can't say, as in 3g's run, where they showed the shell waiting on GPUSTAT's VRAM-read bit.
 - **`frames`** prints frame traces side by side: a line per frame, each trace's RAM checksum — `-` past a trace's end, `?` where it can't be read (named on stderr, exit 2), so one bad trace never hides the others.
 - **`diff`** streams both traces and prints the first divergence by field; agreeing to the shorter trace's end exits 0, unless the shorter one has fewer than `--min-records`.
 
