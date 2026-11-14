@@ -95,7 +95,7 @@ Presentation is EmuKit: one module per user-facing place, each **`Views/` + `Vie
 
 **Sub-rules.**
 - Hermetic tests build their programs and memory images in code inside a `Sandbox`; open test suites (ps1-tests MIT, ps2autotests ISC) run in personal builds, and are committed only beside their licence through an allow-list.
-- A run with the user's own BIOS dump is the user's to start.
+- A run with the user's own BIOS dump is the user's to start: the user runs it, or tells the agent to and gives the files' paths (the user's call, 2026-11-14). Either way each file stays where the user keeps it, passed by path, never copied or committed, and named in reports only by its size and hash.
 - No Sony logos or artwork; describe compatibility only ("plays PS2 games").
 
 **Enforcement.** `ArchitectureTests/ProjectRulesTests.swift` fails on any `.iso .bin .img .cue .m3u .chd .cso .zso .gz .pbp .ecm .pup .rom .mec .nvm` file in the repository outside build output.
@@ -171,7 +171,7 @@ The products: `PS1Core` (`r3000a`, `ps1`), `EmuKit` (`styles`, `player`, `acknow
 
 Take the **topmost 🟢 item** of the earliest version table, or the item the user names. Read its document — it is the working spec. Before writing code, resolve its **Open calls**: every `[user]` call answered by the user, every `[default: …]` taken and recorded as a dated decision. One item at a time; when it ships, stop and wait to be asked to continue. A bare "Continue" means: re-read this file, then take the topmost claimable item.
 
-Runs against the user's real games, BIOS files or signing identity are the user's to start: an item that needs one says so, and the agent prepares the run and records its result rather than starting it. Building and running the references and oracles on open content (homebrew, the open suites, content built in code) is not such a run: the agent does it, under `tools/` or in a scratch folder — and a GPL oracle only unmodified, never reading its source.
+Runs against the user's real games, BIOS files or signing identity are the user's to start: an item that needs one says so, and the agent prepares the run and records its result rather than starting it — unless the user tells it to make the run and gives it the files' paths (2026-11-14). Building and running the references and oracles on open content (homebrew, the open suites, content built in code) is not such a run: the agent does it, under `tools/` or in a scratch folder — and a GPL oracle only unmodified, never reading its source.
 
 ### Decisions and questions
 
