@@ -8,3 +8,8 @@ xcuserdata/
 DerivedData/
 *.profraw
 /lib/src/darwin/apps/Config/Local.xcconfig
+# Superpowers' working files (its plan workspaces and brainstorm mockups), its worktrees under
+# .claude/worktrees/, and each machine's own settings.
+.superpowers/
+.claude/worktrees/
+.claude/settings.local.json

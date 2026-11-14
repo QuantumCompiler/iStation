@@ -513,3 +513,63 @@ Decided by the hardware (2026-11-14, ps1-tests' `cop` and its `psx.log`, recorde
 **Decisions consumed.**
 
 - 2026-11-14: the newest Xcode image (`xcode-27`); no packaged artifact until v1.0.0; required checks proposed by the script and applied by the user (the defaults, confirmed by the user).
+
+## Milestone Q — Superpowers inside the lifecycle, and application-aware skills
+
+**Goal.** Apogee's agentic procedure (v0.0.1 item 4e; the user's call, 2026-11-14): Superpowers enabled and mapped onto the docs-first lifecycle, and every skill starting by working out which application it is for.
+
+**Built** (4e, 2026-11-14):
+
+- **`.claude/settings.json`**, as Apogee's: `superpowers@claude-plugins-official` enabled, `worktree.baseRef: head`. **`.gitignore`** gains `.superpowers/`, `.claude/worktrees/` and `.claude/settings.local.json`.
+- **CLAUDE.md → Working process → "Superpowers fits the docs-first lifecycle"**: the one-time setup (the user's), a table mapping each Superpowers skill onto a lifecycle step with where iStation's rule wins, and "What else holds". Where iStation differs from Apogee: the agent makes and pushes the one squash commit; the clean room covers every subagent Superpowers dispatches (ADR 0013 §2–§3); the tests are `lib/scripts/cicd.sh --test`. Checking it against the installed Superpowers 7.0.2 shaped the landing: ExitWorktree `keep`, then the index's 🚧 edit undone, `git merge --squash`, `cicd.sh --test` on the squashed result, the commit and push, then `git worktree remove` and `git branch -D`. ExitWorktree's `remove` refuses a squash-landed branch. It also shaped the rest: per-task commits stay on the item branch; a residual Critical or Important review finding stops the landing; `systematic-debugging`'s working examples and references are only the permissive ones; and each `Ruling:` is carried into the item's MILESTONES entry, since the ship deletes the document that holds **Decisions made**.
+- **The 13 skills** (`.claude/skills/istation-*/SKILL.md`):
+  - Each opens with "0. Which application?", the same text in every skill. It resolves `darwin` (today's one application) and, for work that binds one OS, its `macos/` or `ios/` folder, from the arguments, then the conversation. It asks when that is still ambiguous, or when a request names an application with no folder yet.
+  - Docs paths are written `lib/documentation/<kind>/<app>/…`. The only links are the router and the repo-wide sections of darwin's CLAUDE.md (Committing and pushing, Superpowers, Versioning, Release and Install).
+  - Each was compared with its Apogee twin (`update-release` has none) and took what fits, while keeping iStation's commit-and-push and clean-room steps:
+    - each skill's Superpowers step;
+    - execute-group's batch contract (the answers committed before the first item, a stopped item's worktree kept and named, the sanctioned acts);
+    - create-item's bar per section and its link depths;
+    - investigate-bug's sandboxed reproduction and its fixture rule;
+    - swap-item's and swap-version's reference surveys and ordered replaces;
+    - summarize-pull-request's and summarize-release's evidence commands and leak check;
+    - update-documents' walk of the skills and the pipeline.
+- **Fixed in passing**:
+  - The library-era references (ADR 0007, `library.json`, `Locations.sandbox`, `CFFIXED_USER_HOME`) became today's support modules (`SupportSandbox`, `SupportMIPS`, `SupportDiscFixtures`) and tools.
+  - Two clean-room hazards are gone: investigate-bug's "read the emulator's source instead" and investigate-spike's "the emulators' own sources" now point to ProjectPSX, Play! and psx-spx.
+  - The `iStation.xcscheme` that no longer exists became the `macOS Personal` scheme's tests, in CLAUDE.md's checklist and two skills.
+  - The backlog index states its link depths correctly.
+  - A trace, RAM dump or log from a run over the user's BIOS or a game is never committed as a fixture.
+  - Release tags are read from origin.
+  - update-release keeps ROADMAP's heading on the release until the next version's first commit, as `theVersionFollowsTheRelease` requires; a `## Shipped` section, between In progress and Planned, is created then. It rehearses the sweep with `pr-ci.sh --uncommitted`.
+- **`ArchitectureTests`**: the repository walks in `noGameOrFirmwareFiles` and `appStoreEntitlementsAreClean` skip `worktrees`, so a Superpowers worktree under `.claude/worktrees/` isn't walked as part of this checkout. Each worktree runs its own suite.
+- **The Xcode navigator** lists `.claude/` as `settings.json` plus a synchronized `skills/`, no longer the whole folder, so `.claude/worktrees/` (whole checkouts) stays out of it, as the tools' `.build/` folders do (DEVELOPER.md).
+
+**Left out from Apogee's skills** (the default, confirmed 2026-11-14: named here):
+- Apogee's other applications and their cross-queue siblings (`cli`, `mod`, `design`, `gui/`, `unix/`, `windows/`, its lettered GUI tracks).
+- Its dev channel: `apogee-dev`, `~/.apogee-dev`, `make install MODE=dev`. iStation's counterpart is 4f.
+- Real-model weights and the model-family rules; probes over `APOGEE_HOME` and the installed `apogee` binary.
+- `lib/design/` and its design canvas.
+- The CLI's C++ paths, its completion audit, its model rosters and its layer cards.
+- Its "Stable: CI must pass" ruleset checks, and its install and platform texts for release notes.
+- "The user makes the commit" and "pushing is on the user's word".
+- Closing an id's gap when an item moves (swap-item), and track numbers moving with their version (swap-version): iStation never reuses or renumbers ids.
+
+**Trade-offs.**
+- The ladder repeats in every skill (Apogee's way), so changing it means editing 13 files.
+- With one application, the ladder's question is nearly always about the OS folder.
+- Every `Ruling:` goes into MILESTONES, not only the load-bearing ones. That is the conservative choice, so nothing is lost, and it is open to veto.
+- The library-era trigger phrases stay in the descriptions.
+- The item's guardrail, "no `lib/documentation` path in `.claude/skills/`", was itself rewritten by 4a's migration from the old `documentation/istation`. It is checked as: no `documentation/istation` path, and no docs path naming `darwin` outside the ladder and the repo-wide links.
+
+**Verified** (2026-11-14):
+- `python3 lib/scripts/validate_docs.py lib/documentation`: ALL CLEAN, 347 links across 63 files, every SKILL.md included.
+- A script finds, in all 13 skills, the ladder word for word, no hard-coded darwin docs path, no `documentation/istation`, no Apogee name, and every anchor naming a real CLAUDE.md heading.
+- A dry run of `/istation-backlog-investigate-spike` asks before reading anything. "Spike adding controller remapping" gets the question of macOS, iOS or both; "spike a Windows build of iStation" gets the question of which application.
+- `lib/scripts/cicd.sh --test`: the strict build, then 230 tests in 11 runs, all passing.
+- Two independent review passes: a consistency critic over the 13 skills, then a check of the skills and of the mapping against the installed Superpowers 7.0.2. They raised 39 findings, all fixed.
+- Not done: installing the plugin (the user's); no item has been built in a Superpowers worktree yet.
+
+**Decisions consumed.**
+
+- 2026-11-14: mimic Apogee's agentic procedure, adapted for iStation (the user's call); every task still ends with one commit and a push (2026-11-07, not reopened).
+- 2026-11-14: a Superpowers worktree item lands as one squash commit on the release branch, then is pushed; each skill takes what fits from its Apogee twin, and what only fits Apogee is named above (the defaults, confirmed by the user).

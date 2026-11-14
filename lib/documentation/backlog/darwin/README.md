@@ -55,7 +55,7 @@ Every item follows this shape (sections in order; omit one only when it is genui
 | **File** | The document, linked into its table's subdirectory. |
 | **Status** | 🟢 workable now · 🔒 blocked on the ids named · 🚧 in progress · ❌ cancelled. |
 
-Rows are in suggested build order. **Gates** name only pending items; an item builds on everything shipped plus its gate chain; no cycles. **Split first** items are groomed into their sub-documents before anyone builds. Moving an item between tables is a `git mv`, its row, its Version cell and its links. Same-table links are bare filenames; cross-table links `../<table-dir>/<file>`; links out of the backlog `../../assistant/…`.
+Rows are in suggested build order. **Gates** name only pending items; an item builds on everything shipped plus its gate chain; no cycles. **Split first** items are groomed into their sub-documents before anyone builds. Moving an item between tables is a `git mv`, its row, its Version cell and its links. Same-table links are bare filenames; cross-table links `../<table-dir>/<file>`; links out of the backlog climb to `lib/documentation/` — `../../../assistant/darwin/…` from a table's directory, one `../` more from an OS folder's (this index itself: `../../assistant/darwin/…`).
 
 **Ids spent so far:** track 1 (`1a`), track 2 (`2a`–`2e`, cancelled), track 3 (`3a`–`3g`), track 4 (`4a`–`4f`); `M1`, `M2` (cancelled); `A1` (cancelled), `A2`.
 
@@ -83,5 +83,4 @@ Track 4 comes from the user's call of 2026-11-14: mimic the directory structure 
 
 | # | Item | Version | File | Status |
 |---|---|---|---|---|
-| 4e | Superpowers inside the lifecycle, and the skills in Apogee's form — settings, the mapping table, the "Which application?" ladder | v0.0.1 | [`v0.0.1/superpowers-and-app-aware-skills.md`](v0.0.1/superpowers-and-app-aware-skills.md) | 🟢 |
 | 4f | Development runs on the personal channel — personal builds get their own identity, so they never touch the App Store install | v0.0.1 | [`v0.0.1/development-on-the-personal-channel.md`](v0.0.1/development-on-the-personal-channel.md) | 🟢 |

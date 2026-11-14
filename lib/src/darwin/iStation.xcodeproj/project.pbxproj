@@ -16,6 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8625B66556D2368A0FF1F457 /* settings.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = settings.json; sourceTree = "<group>"; };
 		0B4F69351F4B941255C33F1E /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		209DB850E2B5BB905DF90F3F /* fetch.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = fetch.sh; sourceTree = "<group>"; };
 		25E2934C2EA1AE5BD0ABAF06 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -66,9 +67,9 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
-		26DA62B705DBE966229E5E3E /* .claude */ = {
+		726D2D4BF0A24C2DA0523ADA /* skills */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = .claude;
+			path = skills;
 			sourceTree = "<group>";
 		};
 		887F19413DF108751B11C9C5 /* LICENSES */ = {
@@ -135,6 +136,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		26DA62B705DBE966229E5E3E /* .claude */ = {
+			isa = PBXGroup;
+			children = (
+				8625B66556D2368A0FF1F457 /* settings.json */,
+				726D2D4BF0A24C2DA0523ADA /* skills */,
+			);
+			path = .claude;
+			sourceTree = "<group>";
+		};
 		0C28B4358E618CCC863CBA2E /* ps1-tests */ = {
 			isa = PBXGroup;
 			children = (

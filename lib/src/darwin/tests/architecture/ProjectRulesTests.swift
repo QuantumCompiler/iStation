@@ -68,7 +68,7 @@ import Testing
     func noGameOrFirmwareFiles() {
         var violations = Violations()
         let banned: Set<String> = ["iso", "bin", "img", "cue", "m3u", "chd", "cso", "zso", "gz", "pbp", "ecm", "pup", "rom", "mec", "nvm"]
-        let skipped: Set<String> = [".git", ".build", ".swiftpm", "build", "DerivedData"]
+        let skipped: Set<String> = [".git", ".build", ".swiftpm", "build", "DerivedData", "worktrees"]
         let root = Repository.root.standardizedFileURL
         let enumerator = FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil)
         while let url = enumerator?.nextObject() as? URL {
@@ -134,7 +134,7 @@ import Testing
         // macOS spells the debugging key com.apple.security.get-task-allow, iOS plain get-task-allow.
         let forbidden = ["com.apple.security.cs.allow-unsigned-executable-memory", "com.apple.security.get-task-allow", "<key>get-task-allow</key>"]
         let root = Repository.root.standardizedFileURL
-        let skipped: Set<String> = [".git", ".build", ".swiftpm", "build", "DerivedData"]
+        let skipped: Set<String> = [".git", ".build", ".swiftpm", "build", "DerivedData", "worktrees"]
         let enumerator = FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil)
         var appStoreFiles = 0
         while let url = enumerator?.nextObject() as? URL {
