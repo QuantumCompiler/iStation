@@ -8,7 +8,7 @@ The module-by-module reference: the tree, each module's files and interfaces, th
 CLAUDE.md                      root pointer → documentation/CLAUDE.md
 README.md                      public overview
 LICENSE · LICENSES/            iStation's MIT licence; MIT.txt and BSD-2-Clause.txt for the SPDX headers
-iStation.xcodeproj/            the two apps over the package; four shared schemes (macOS/iOS × Personal/App Store)
+iStation.xcodeproj/            the two apps over the package; four shared schemes (macOS/iOS × Personal/App Store); its navigator shows the whole repository
 .github/workflows/ci.yml       strict build, swift test, both apps' personal builds, docs validator
 scripts/validate_docs.py       the docs validator (backlog index ↔ documents, links)
 documentation/                 the router and this docs home
@@ -172,6 +172,10 @@ In its module's `Views/`, one top-level view per file, bound to that module's vi
 ### Adding a debug view or a tool
 
 A debug view goes in its module's `Debug/` and opens with `#if PERSONAL_BUILD`; an import of TraceKit (`DataTracing`) sits inside `#if PERSONAL_BUILD`. `ArchitectureTests` fails on either outside the guard.
+
+### Adding a file Xcode's navigator should show
+
+`iStation.xcodeproj` shows the whole repository, not only the apps: the README and CLAUDE.md, `documentation/`, the package, the apps' groups, `tools/`, `scripts/`, `.github/`, `.claude/`, the licences and `.gitignore`. Most folders are synchronized (blue in the navigator), so a new file in them appears by itself: `documentation/`, `scripts/`, `.github/`, `.claude/`, `LICENSES/`, `tools/gate/`, and each tool's source folders (`Sources/`, `host/`). Each tool's top level is listed file by file instead, because every tool builds into a hidden `.build/` and a synchronized folder shows hidden folders too — SwanStation's clone and its GPL source among them, which no one opens. So a new file at a tool's top level is added to that tool's group under `tools` by hand (File ▸ Add Files to "iStation", no target), and a tool folder is never added whole; a new top-level folder in the repository gets its own synchronized group.
 
 ### Adding or promoting a shared component
 
