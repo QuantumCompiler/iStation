@@ -8,7 +8,8 @@ Measured, not guessed (2026-11-14, `git grep` outside the Xcode project): `src/i
 
 **Seam + files.** No module changes.
 - `git mv src/istation lib/src/darwin` (package, `apps/`, `scripts/`, `source/`, `tests/`); `git mv iStation.xcodeproj lib/src/darwin/iStation.xcodeproj`, its groups and package reference re-pointed and its navigator still showing the whole repository; `git mv tools lib/src/darwin/tools`.
-- `lib/src/darwin/scripts/build.sh`: the one entry point from outside, Apogee's form, over today's `build-personal.sh` and `archive-appstore.sh` (which it calls or replaces).
+- `lib/src/darwin/scripts/build.sh`: the one entry point from outside, Apogee's form, over today's `build-personal.sh` and `archive-appstore.sh` (which it calls).
+- A shared Xcode scheme per Presentation module — `styles`, `player`, `acknowledgements` — building the module and running its tests, as Apogee's darwin ADR 0004 gives each; the scheme check covers them.
 - Path anchors: `tests/architecture/Repository.swift`, the tools' scripts (`tools/*/build.sh`, `run.sh`, `fetch.sh`, `gate/run.sh`), `.gitignore` (`lib/src/darwin/build/`, the tools' `.build/`), `ci.yml`.
 - Docs: DEVELOPER.md's tree, commands and recipes; CLAUDE.md's stack and codebase map; the layer cards; the root README; the skills' commands.
 
@@ -16,12 +17,12 @@ Measured, not guessed (2026-11-14, `git grep` outside the Xcode project): `src/i
 
 **Decisions made** (dated):
 - 2026-11-14: mimic Apogee's directory structure, adapted for iStation (the user's call).
+- 2026-11-14: the tools move to `lib/src/darwin/tools/` — they serve this codebase alone (the default, confirmed by the user).
+- 2026-11-14: the Xcode project moves into `lib/src/darwin/` as Apogee's does, its navigator still showing the whole repository through a group at the repository root (the default, confirmed by the user).
+- 2026-11-14: `scripts/build.sh <routine> <platform>` is the one entry point, calling today's two scripts as helpers until 4d makes `cicd.sh` the one path (the default, confirmed by the user).
+- 2026-11-14: per-module Xcode schemes now, as Apogee gives every Presentation module one (its darwin ADR 0004) — each of iStation's Presentation modules (`styles`, `player`, `acknowledgements`) gets its own shared scheme (the user's veto of the default to wait for a second module; the default also miscounted them as one).
 
-**Open calls:**
-- [default: the tools move to `lib/src/darwin/tools/` — they serve this codebase alone, and Apogee keeps an app's own scripts inside its folder] Where the tools go.
-- [default: the Xcode project moves into `lib/src/darwin/` as Apogee's does, and its navigator keeps the whole repository through a group at the repository root] The project's place.
-- [default: `scripts/build.sh <routine> <platform>` calls today's two scripts, which stay as its helpers until 4d makes `cicd.sh` the one path] The build entry point.
-- [default: no per-module Xcode schemes yet — Apogee gives every Presentation module one (its darwin ADR 0004); iStation has a single Presentation module today, so this waits for the second] Per-module schemes.
+**Open calls:** none — all answered 2026-11-14.
 
 **Guardrail(s).** `swift test` (all architecture checks, the scheme check, the provenance and routine checks) passes from the new root; every scheme builds; `tools/istation-run/cpu-check.sh` and the gate's dry run work from their new place; a planted stale path in a tool script fails its own run.
 
@@ -30,5 +31,6 @@ Measured, not guessed (2026-11-14, `git grep` outside the Xcode project): `src/i
 - [ ] `swift test`, the strict build and all four schemes pass from the new layout; the navigator still shows the whole repository.
 - [ ] `git grep -E 'src/istation|(^|[^/])tools/'` finds only history.
 - [ ] DEVELOPER.md, CLAUDE.md, the cards, the README and the skills name the new paths.
+- [ ] Each Presentation module has its own shared scheme, which builds and tests it.
 
 **Scope note.** v0.0.1, track 4; gated on 4a. 4c, 4d, 4e and 4f build on the new paths. Out of scope: changing any module, the build system (the package stays SwiftPM with a thin Xcode project), or the routines.

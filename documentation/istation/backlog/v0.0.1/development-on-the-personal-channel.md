@@ -14,10 +14,10 @@
 
 **Decisions made** (dated):
 - 2026-11-14: mimic Apogee's agentic procedure, adapted for iStation (the user's call).
+- 2026-11-14: the personal identities are `local.istation.macos.personal` and `local.istation.ios.personal`, displayed as "iStation Personal" (the default, confirmed by the user).
+- 2026-11-14: the App Store identifiers stay `local.istation.macos` and `local.istation.ios` until the user's App Store Connect identifiers exist (v1.0.0) (the default, confirmed by the user).
 
-**Open calls:**
-- [default: `local.istation.macos.personal` and `local.istation.ios.personal`, displayed as "iStation Personal"] The personal identity.
-- [default: the App Store identifiers stay `local.istation.macos` and `local.istation.ios` until the user's App Store Connect identifiers exist (v1.0.0)] The release identity.
+**Open calls:** none — all answered 2026-11-14.
 
 **Guardrail(s).** The check fails on a planted personal identifier equal to the App Store one; a personal build launched beside an App Store build of the same app keeps separate containers (seen once and recorded in MILESTONES).
 

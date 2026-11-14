@@ -18,11 +18,11 @@ Measured, not guessed (2026-11-14): Apogee's `lib/scripts/` holds 17 scripts, am
 
 **Decisions made** (dated):
 - 2026-11-14: mimic Apogee's agentic procedure, adapted for iStation (the user's call).
+- 2026-11-14: CI runs on the newest Xcode image GitHub offers (Apogee's `xcode-27`) (the default, confirmed by the user).
+- 2026-11-14: no packaged artifact until v1.0.0; `.github/actions/package/` waits (the default, confirmed by the user).
+- 2026-11-14: required checks are proposed by `required-checks.py --pr <N>` and applied by the user (the default, confirmed by the user).
 
-**Open calls:**
-- [default: the newest Xcode image GitHub offers (Apogee's `xcode-27`), so CI builds with the SDK the development host uses (Xcode 27.1)] The runner.
-- [default: no packaged artifact until v1.0.0 — the apps ship through the App Stores, and an unsigned build helps no one; `.github/actions/package/` waits] Packaging.
-- [default: required checks are proposed by `required-checks.py --pr <N>` and applied by the user] Required checks.
+**Open calls:** none — all answered 2026-11-14.
 
 **Guardrail(s).** A documentation-only pull request builds no app and passes; a planted failing test fails `darwin.yml` and `pr-ci.sh` alike; `changed.sh darwin` reports "changed" for a planted edit under `lib/src/darwin/` and "unchanged" for one under `lib/documentation/`.
 

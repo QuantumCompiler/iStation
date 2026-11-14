@@ -11,16 +11,17 @@ Measured, not guessed (2026-11-14): Apogee's `lib/release/VERSION` holds `0.2.0`
 - `lib/src/darwin/apps/Config/Version.xcconfig` follows it — written from it by `scripts/build.sh`, or checked equal by a test.
 - `lib/scripts/version-check.sh`: fails a pull request into `stable` whose `VERSION` is not newer than the latest release tag, and a release branch whose name disagrees with `VERSION`.
 - `ArchitectureTests` or the validator: `VERSION`, `MARKETING_VERSION`, the branch and ROADMAP's heading agree.
+- `lib/scripts/release-from-pr.sh` and a job on a merge into `stable`: tag `v<x.y.z>` from `VERSION` and publish a GitHub release of the source — the merge is the release (the user's call, 2026-11-14).
 - `/istation-maintenance-update-release`: sweeps `VERSION` first; CLAUDE.md's Versioning and Release sections.
 
 **Reference.** Apogee: `lib/release/VERSION`, `lib/scripts/version-check.sh`, `lib/scripts/release-from-pr.sh`, its CLI docs' Versioning ("two versions, one job each"; "the merge IS the release"). In-house: the update-release skill; CLAUDE.md → Versioning.
 
 **Decisions made** (dated):
 - 2026-11-14: mimic Apogee's agentic procedure, adapted for iStation (the user's call).
+- 2026-11-14: a merge into `stable` is the release, as in Apogee: when a pull request merges, CI tags `v<x.y.z>` from `VERSION` and publishes a GitHub release of the source; App Store submission stays the user's (the user's call).
+- 2026-11-14: `scripts/build.sh` writes `MARKETING_VERSION` from `VERSION`, so there is one place to edit, and a test fails if they ever differ (the default, confirmed by the user).
 
-**Open calls:**
-- [user] Should a merge into `stable` *be* the release — CI tagging `v<x.y.z>` and publishing a GitHub release with the source automatically, as in Apogee — or should the merge and the tag stay yours to make by hand, as today? (App Store submission stays yours either way.)
-- [default: `scripts/build.sh` writes `MARKETING_VERSION` from `VERSION`, so there is one place to edit; a test fails if they ever differ] How the apps follow `VERSION`.
+**Open calls:** none — all answered 2026-11-14.
 
 **Guardrail(s).** `version-check.sh` fails on a planted unbumped `VERSION` against the latest tag, and on a branch name that disagrees; the agreement check fails on a planted `MARKETING_VERSION` that differs.
 
@@ -28,6 +29,7 @@ Measured, not guessed (2026-11-14): Apogee's `lib/release/VERSION` holds `0.2.0`
 - [ ] `lib/release/VERSION` names the release; nothing else does by hand.
 - [ ] The apps' version always equals it — checked.
 - [ ] `version-check.sh` runs in CI on every pull request into `stable`.
-- [ ] The update-release skill and CLAUDE.md describe the new carriers, and the `[user]` answer on the merge-is-the-release law.
+- [ ] A merge into `stable` tags the release and publishes its source on GitHub, by CI.
+- [ ] The update-release skill and CLAUDE.md describe the new carriers and the merge-is-the-release law.
 
 **Scope note.** v0.0.1, track 4; gated on 4b (the paths). 4d runs the check in CI. Out of scope: App Store submission (v1.0.0), any binary release artifact (iStation's apps ship through the App Stores).

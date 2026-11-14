@@ -17,11 +17,11 @@ Measured, not guessed (2026-11-14, `git ls-files` and `git grep` in both reposit
 
 **Decisions made** (dated):
 - 2026-11-14: mimic Apogee's directory structure and agentic procedure, adapted for iStation, as v0.0.1 items (the user's call).
+- 2026-11-14: the root `CLAUDE.md` stays, as a pointer to `lib/documentation/CLAUDE.md` with the hard rules at its top — Apogee has none at its root, but iStation's carries the clean-room rule every session must see first (the default, confirmed by the user).
+- 2026-11-14: iStation's one application is `darwin`, with `macos/` and `ios/` subfolders in each kind and no `ipados/` until an iPad-specific item exists (the default, confirmed by the user).
+- 2026-11-14: it lands after 3g, so the BIOS work in flight isn't moved under it — met: 3g shipped 2026-11-14 (the default, confirmed by its condition).
 
-**Open calls:**
-- [default: keep the root `CLAUDE.md` as a pointer to `lib/documentation/CLAUDE.md` — Apogee has none at its root, but iStation's carries the clean-room rule every session must see before reading anything] The root CLAUDE.md.
-- [default: `darwin` for iStation's one application, with `macos/` and `ios/` subfolders; no `ipados/` until an iPad-specific item exists] The platform folders.
-- [default: after 3g, so the BIOS work in flight — its documents, MILESTONES and `tools/gate` — isn't moved under it] When.
+**Open calls:** none — all answered 2026-11-14.
 
 **Guardrail(s).** The validator, moved and extended, checks every backlog index in the new layout and every relative link, and fails on a planted index row whose document is missing and on a planted broken link; `swift test`'s architecture checks still find ADR 0001 and ADR 0002 at their new paths.
 

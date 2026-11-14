@@ -20,10 +20,10 @@ iStation's 13 skills name `documentation/istation/…` directly and have no ladd
 **Decisions made** (dated):
 - 2026-11-14: mimic Apogee's agentic procedure, adapted for iStation (the user's call).
 - 2026-11-07: every task ends with one commit and a push, `v<x.y.z> : Title Case Summary` (the user's call) — consumed here, not reopened.
+- 2026-11-14: a Superpowers worktree item lands as one squash commit on the release branch, then is pushed (the default, confirmed by the user).
+- 2026-11-14: each skill is compared with its Apogee twin and gains what iStation can use; a step that only fits Apogee is left out and named in MILESTONES (the default, confirmed by the user).
 
-**Open calls:**
-- [default: a Superpowers worktree item lands as one squash commit on the release branch, then pushed — Apogee's landing with iStation's push] Landing.
-- [default: each skill is compared with its Apogee twin and gains what iStation can use; a step that only fits Apogee (its CLI, the dev channel's binary, its design prototype) is left out and named in MILESTONES] How far the skills follow Apogee's.
+**Open calls:** none — all answered 2026-11-14.
 
 **Guardrail(s).** The validator checks every skill's links; a search finds no `documentation/istation` path in `.claude/skills/`; a dry `/istation-backlog-investigate-spike` with an ambiguous request asks which application before reading anything.
 
