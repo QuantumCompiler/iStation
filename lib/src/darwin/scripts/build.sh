@@ -4,7 +4,7 @@
 #
 # The Apple apps' one build entry point (Apogee's form): a routine and a platform.
 #
-#   lib/src/darwin/scripts/build.sh personal macOS|iOS    the personal routine (build-personal.sh)
+#   lib/src/darwin/scripts/build.sh personal macOS|iOS [--unsigned]   the personal routine (build-personal.sh)
 #   lib/src/darwin/scripts/build.sh appstore macOS|iOS    the App Store routine (archive-appstore.sh)
 #
 # The two routines' scripts stay its helpers until lib/scripts/cicd.sh becomes the one path (4d).
@@ -23,7 +23,7 @@ fi
 routine="${1:-}"
 platform="${2:-}"
 case "$routine" in
-    personal) exec "$here/build-personal.sh" "$platform" ;;
+    personal) exec "$here/build-personal.sh" "$platform" "${3:-}" ;;
     appstore) exec "$here/archive-appstore.sh" "$platform" ;;
-    *) echo "usage: $0 personal|appstore macOS|iOS" >&2; exit 2 ;;
+    *) echo "usage: $0 personal macOS|iOS [--unsigned] | appstore macOS|iOS" >&2; exit 2 ;;
 esac

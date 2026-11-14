@@ -83,6 +83,5 @@ Track 4 comes from the user's call of 2026-11-14: mimic the directory structure 
 
 | # | Item | Version | File | Status |
 |---|---|---|---|---|
-| 4d | One build path and a pipeline per app — `cicd.sh`, `changed.sh`, `pr-ci.sh` and `darwin.yml` | v0.0.1 | [`v0.0.1/one-build-path-and-a-pipeline-per-app.md`](v0.0.1/one-build-path-and-a-pipeline-per-app.md) | 🟢 |
 | 4e | Superpowers inside the lifecycle, and the skills in Apogee's form — settings, the mapping table, the "Which application?" ladder | v0.0.1 | [`v0.0.1/superpowers-and-app-aware-skills.md`](v0.0.1/superpowers-and-app-aware-skills.md) | 🟢 |
 | 4f | Development runs on the personal channel — personal builds get their own identity, so they never touch the App Store install | v0.0.1 | [`v0.0.1/development-on-the-personal-channel.md`](v0.0.1/development-on-the-personal-channel.md) | 🟢 |

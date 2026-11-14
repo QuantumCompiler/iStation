@@ -495,3 +495,21 @@ Decided by the hardware (2026-11-14, ps1-tests' `cop` and its `psx.log`, recorde
 **Decisions consumed.**
 
 - 2026-11-14: a merge into `stable` is the release (the user's call); `build.sh` writes `MARKETING_VERSION` from `VERSION`, guarded by a test (the default, confirmed by the user).
+
+## Milestone P — One build path and a pipeline per app
+
+**Goal.** Apogee's pipeline shape (v0.0.1 item 4d; the user's call, 2026-11-14): one build path a developer and CI share, a pipeline per application beside the repository's, and a local rehearsal before a pull request.
+
+**Built** (4d, 2026-11-14):
+
+- **`lib/scripts/cicd.sh`** — the one build path: `--app darwin` builds both Apple apps' personal routine unsigned through the app's own `scripts/build.sh` (which gained `--unsigned`: CI never signs), `--test` runs the strict build and `swift test`, `--docs` the validator, `--all` everything.
+- **`lib/scripts/changed.sh`** — what each pipeline is built from, declared once (darwin: `lib/src/darwin/`, `lib/release/VERSION`, `cicd.sh`, `changed.sh`, `darwin.yml`), and whether it changed between two commits; documentation builds no app.
+- **Two pipelines**: `ci.yml`, the repository's (`docs`, `version bump`, `tag and release`), and `darwin.yml`, the Apple apps' (`what changed (darwin)` against the latest release, then `build darwin` — `cicd.sh --app darwin --test` on GitHub's `xcode-27` image, or the same job passing empty on Linux when nothing changed). Required jobs carry no job-level `if:`; their steps are skipped instead. Still only for a pull request and a merge into `stable`.
+- **`lib/scripts/pr-ci.sh`** — rehearses a pull request's run on the test merge into `origin/stable`, in a temporary worktree, each job through the script its workflow calls; `--uncommitted` includes what isn't committed, new files too. **`lib/scripts/required-checks.py`** — proposes `stable`'s required checks from a pull request's passing jobs; `--apply`, which changes the repository's settings, is the user's.
+- CLAUDE.md's checklist asks for the rehearsal before a pull request, and its CI bullet describes both pipelines; DEVELOPER has the commands and a "Changing the pipeline" recipe.
+
+**Verified** (2026-11-14): `cicd.sh --all` green end to end in 52 seconds (the strict build, 230 tests, both apps unsigned, the validator); `changed.sh darwin` answers false for a planted documentation commit and true for a planted code commit; `pr-ci.sh --uncommitted` passes every job on the test merge, and with a planted failing test fails `build darwin`, as CI would; the first rehearsal found two of its own bugs — new files missing from `--uncommitted`, and a missing `changed.sh` read as "unchanged" — both fixed; `required-checks.py --verify` reads `stable` as unprotected, and it refuses a pull request that doesn't exist. The workflows run first on the release's pull request.
+
+**Decisions consumed.**
+
+- 2026-11-14: the newest Xcode image (`xcode-27`); no packaged artifact until v1.0.0; required checks proposed by the script and applied by the user (the defaults, confirmed by the user).

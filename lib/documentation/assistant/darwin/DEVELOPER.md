@@ -8,12 +8,17 @@ The module-by-module reference: the tree, each module's files and interfaces, th
 CLAUDE.md                      root pointer → lib/documentation/CLAUDE.md
 README.md                      public overview
 LICENSE · LICENSES/            iStation's MIT licence; MIT.txt and BSD-2-Clause.txt for the SPDX headers
-.github/workflows/ci.yml       strict build, swift test, both apps' personal builds, docs validator
+.github/workflows/ci.yml       the repository's pipeline: docs, version bump, tag and release
+.github/workflows/darwin.yml   the Apple apps' pipeline: what changed, then build darwin (cicd.sh --app darwin --test)
 lib/
   documentation/               by kind, then platform: CLAUDE.md (the router); assistant/ backlog/ adrs/ reference/,
                                each a README.md and darwin/ (this application), with macos/ and ios/ beneath
   release/VERSION              the release, and the only thing that names one; the apps' version follows it
   scripts/
+    cicd.sh                    the one build path, a developer's and CI's: --app darwin, --test, --docs, --all
+    changed.sh                 what each pipeline is built from, and whether it changed since the latest release
+    pr-ci.sh                   rehearses a pull request's CI run on the test merge into stable
+    required-checks.py         proposes stable's required checks from a pull request's passing jobs (--apply: yours)
     validate_docs.py           the docs validator (each application's backlog index ↔ documents, every link)
     version-check.sh           CI's `version bump`: what merging into stable publishes, and whether VERSION allows it
     release-from-pr.sh         CI's `tag and release`: tags a merged pull request's commit v<VERSION>, publishes its source
@@ -72,6 +77,9 @@ From `lib/src/darwin/` unless noted.
 | The whole console's speed (the same loop, 600 frames) | `ISTATION_BENCHMARK=1 swift test -c release --filter BusinessPS1Tests.BenchmarkTests` |
 | The CPU check: one program on ProjectPSX and the Swift console, traces diffed (repo root) | `lib/src/darwin/tools/projectpsx-trace/build.sh && lib/src/darwin/tools/istation-run/cpu-check.sh` |
 | The gate, with your own BIOS (repo root; after both tools' `build.sh` and `lib/src/darwin/tools/ps1-tests/fetch.sh`) | `lib/src/darwin/tools/gate/run.sh <bios> [--scph1001] [--out <folder>]` |
+| Everything CI runs, the one build path (repo root) | `lib/scripts/cicd.sh --all` (or `--app darwin`, `--test`, `--docs`) |
+| Rehearse a pull request's CI run (repo root) | `lib/scripts/pr-ci.sh` (`--uncommitted` to include what isn't committed) |
+| Has the apps' source changed since the latest release? (repo root) | `lib/scripts/changed.sh darwin <from> HEAD` |
 | Docs validator (repo root) | `python3 lib/scripts/validate_docs.py lib/documentation` |
 | What merging into stable would publish (repo root) | `lib/scripts/version-check.sh` |
 | Rehearse a pull request's release (repo root; `--publish` is CI's) | `lib/scripts/release-from-pr.sh <pr>` |
@@ -209,6 +217,10 @@ Settings, memory cards and save states: a new field decodes with a default; a sa
 ### Adding a disc format
 
 A new Data module per format (e.g. `chd`); its fixtures are built in memory in `SupportDiscFixtures` — never a real image.
+
+### Changing the pipeline
+
+Each application has its own pipeline (`darwin.yml` for the Apple apps) beside the repository's (`ci.yml`), and every job builds through `lib/scripts/cicd.sh` — never a command of its own. What a pipeline is built from is declared once, in `lib/scripts/changed.sh`; a new application adds its entry there and its own workflow. A required job never gets a job-level `if:` — it would report skipped and never pass — so its steps are skipped instead (as `build darwin`'s are when nothing changed). After adding, removing or renaming a job: once the pull request's run passes, `lib/scripts/required-checks.py --pr <N>` proposes the required checks, and `--apply` sets them — it changes the repository's settings, so it is the user's to run.
 
 ### Proving an architecture rule
 

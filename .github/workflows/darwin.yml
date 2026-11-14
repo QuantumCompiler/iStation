@@ -1,0 +1,70 @@
+# The Apple apps' pipeline (v0.0.1 item 4d, Apogee's shape): macOS and iOS, one Swift codebase,
+# lib/src/darwin. It builds and tests only when what the apps are built from changed since the latest
+# release — lib/scripts/changed.sh darwin declares that, once. When nothing did, `build darwin` still
+# runs under its required name, on a Linux runner with nothing in it, and passes.
+#
+# One build path: the job calls lib/scripts/cicd.sh --app darwin --test, the command a developer runs,
+# which calls the app's own scripts/build.sh. CI never signs: both apps' personal routine is built
+# unsigned, and the App Store routine is checked for its entitlements by the architecture checks.
+# No packaged artifact until v1.0.0 (the user's call, 2026-11-14): the apps ship through the App Stores.
+#
+# The runner: the newest Xcode image GitHub offers, `xcode-27`, so CI builds with the SDK the
+# development host uses (Xcode 27.1; the user's call, 2026-11-14).
+#
+# WHEN YOU CHANGE A JOB, the required checks follow (ci.yml's header says how); a required job never
+# gets a job-level `if:`.
+name: Darwin
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [stable]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: darwin-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: what changed (darwin)
+    runs-on: ubuntu-latest
+    outputs:
+      darwin: ${{ steps.diff.outputs.darwin }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Have the apps changed since the latest release?
+        id: diff
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          found="$(lib/scripts/latest-release.sh)"
+          commit=""
+          [ -z "$found" ] || read -r _ commit <<<"$found"
+          lib/scripts/changed.sh darwin "$commit" HEAD
+
+  build:
+    name: build darwin
+    needs: changes
+    runs-on: ${{ needs.changes.outputs.darwin == 'true' && 'xcode-27' || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+        if: needs.changes.outputs.darwin == 'true'
+      - name: Toolchain
+        if: needs.changes.outputs.darwin == 'true'
+        run: |
+          xcodebuild -version
+          swift --version
+      - name: Build and test (the strict build, swift test, both apps unsigned)
+        if: needs.changes.outputs.darwin == 'true'
+        run: lib/scripts/cicd.sh --app darwin --test
+      - name: Unchanged
+        if: needs.changes.outputs.darwin != 'true'
+        run: echo "the apps are unchanged since the latest release — nothing to build"

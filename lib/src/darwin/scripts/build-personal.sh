@@ -4,10 +4,13 @@
 #
 #   ./scripts/build-personal.sh macOS     signed to run locally; open the printed .app
 #   ./scripts/build-personal.sh iOS       for the iOS Simulator
+#   … --unsigned                          no signing at all, as CI builds it (lib/scripts/cicd.sh)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 platform="${1:-}"
+signing=()
+[ "${2:-}" != --unsigned ] || signing=(CODE_SIGNING_ALLOWED=NO)
 case "$platform" in
     macOS) destination="platform=macOS"; products="Debug" ;;
     iOS) destination="generic/platform=iOS Simulator"; products="Debug-iphonesimulator" ;;
@@ -15,5 +18,6 @@ case "$platform" in
 esac
 
 derived="build/DerivedData"
-xcodebuild build -project iStation.xcodeproj -scheme "$platform Personal" -destination "$destination" -derivedDataPath "$derived"
+xcodebuild build -project iStation.xcodeproj -scheme "$platform Personal" -destination "$destination" -derivedDataPath "$derived" \
+    ${signing[@]+"${signing[@]}"}
 echo "Built $PWD/$derived/Build/Products/$products/iStation.app"
