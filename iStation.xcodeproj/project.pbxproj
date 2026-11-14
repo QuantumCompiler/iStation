@@ -16,17 +16,17 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		37E2B4C2DF614925F6F0F02E /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>";};
-		709E55BF70A90526914A009D /* AppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppStore.xcconfig; sourceTree = "<group>";};
-		793F257C7B9F24D70B6489A5 /* Personal.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Personal.xcconfig; sourceTree = "<group>";};
-		810518D886B08192A47FF3ED /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>";};
-		88BD3A181616833AB9BEF9E5 /* Personal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Personal.entitlements; sourceTree = "<group>";};
-		8FD962B3E5E8ADFA2AAFA4B2 /* Personal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Personal.entitlements; sourceTree = "<group>";};
-		93C35005D98FB9608FCA73A8 /* Acknowledgements.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Acknowledgements.json; sourceTree = "<group>";};
-		C93B50687CCA325E43FBE332 /* istation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = istation; path = src/istation; sourceTree = "<group>";};
-		CA40BD3FDD20857ACBA75FC5 /* iStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iStation.app; sourceTree = BUILT_PRODUCTS_DIR;};
-		D1BF349F3CDBE7800DB129C8 /* iStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iStation.app; sourceTree = BUILT_PRODUCTS_DIR;};
-		F9CE25CE884AB8737F0AA626 /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>";};
+		37E2B4C2DF614925F6F0F02E /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
+		709E55BF70A90526914A009D /* AppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppStore.xcconfig; sourceTree = "<group>"; };
+		793F257C7B9F24D70B6489A5 /* Personal.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Personal.xcconfig; sourceTree = "<group>"; };
+		810518D886B08192A47FF3ED /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>"; };
+		88BD3A181616833AB9BEF9E5 /* Personal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Personal.entitlements; sourceTree = "<group>"; };
+		8FD962B3E5E8ADFA2AAFA4B2 /* Personal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Personal.entitlements; sourceTree = "<group>"; };
+		93C35005D98FB9608FCA73A8 /* Acknowledgements.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Acknowledgements.json; sourceTree = "<group>"; };
+		C93B50687CCA325E43FBE332 /* istation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = istation; path = src/istation; sourceTree = "<group>"; };
+		CA40BD3FDD20857ACBA75FC5 /* iStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iStation.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1BF349F3CDBE7800DB129C8 /* iStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iStation.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F9CE25CE884AB8737F0AA626 /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>"; };
 		30881AC3376BE5E4D7A46710 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		9B14CD9CB122FAFD8E5199F1 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		E425F813682F096029F53E1B /* cpu-check.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = cpu-check.sh; sourceTree = "<group>"; };
@@ -150,7 +150,7 @@
 			path = src/istation/apps/ios;
 			sourceTree = "<group>";
 		};
-		6EDE00FA7A261151470098F6 /* Config */ = {
+		6EDE00FA7A261151470098F6 /* src/istation/apps/Config */ = {
 			isa = PBXGroup;
 			children = (
 				37E2B4C2DF614925F6F0F02E /* Version.xcconfig */,
@@ -171,7 +171,7 @@
 				AE03C15C0D73E24C7B08CCB2 /* macOS */,
 				47C9A9AB5FE8344A3E6B47AE /* iOS */,
 				139363E72819083888FDEAE9 /* Shared */,
-				6EDE00FA7A261151470098F6 /* Config */,
+				6EDE00FA7A261151470098F6 /* src/istation/apps/Config */,
 				926D2629A3CE7C67880DE5DC /* tools */,
 				E3BE17933804691C65DFA48C /* scripts */,
 				B30F8CCFE9400406E6DE2819 /* .github */,
@@ -402,7 +402,10 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = local.istation.ios;
 				PRODUCT_NAME = iStation;
 				SDKROOT = iphoneos;
@@ -425,7 +428,10 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = local.istation.ios;
 				PRODUCT_NAME = iStation;
 				SDKROOT = iphoneos;
@@ -458,7 +464,10 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = iStation;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_BUNDLE_IDENTIFIER = local.istation.macos;
 				PRODUCT_NAME = iStation;
@@ -491,7 +500,10 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = iStation;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_BUNDLE_IDENTIFIER = local.istation.macos;
 				PRODUCT_NAME = iStation;
@@ -551,7 +563,6 @@
 			productName = EmuKit;
 		};
 /* End XCSwiftPackageProductDependency section */
-
 	};
 	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
 }

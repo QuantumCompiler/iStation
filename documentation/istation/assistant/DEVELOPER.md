@@ -81,6 +81,8 @@ From `src/istation/` unless noted.
 
 `CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO` in the App Store routine keeps local signing from adding `get-task-allow`. The window or navigation title of a personal build reads "iStation — Personal build".
 
+**Signing with your team.** Your development team never enters the repository (the user's call, 2026-11-14). Both routines' xcconfigs end with `#include? "Local.xcconfig"`, and `src/istation/apps/Config/Local.xcconfig`, git-ignored, holds `DEVELOPMENT_TEAM = <your team ID>` on your Mac; without the file nothing changes, and `scripts/archive-appstore.sh`'s `ISTATION_TEAM_ID` still overrides it. Set the team there, not in Xcode's Signing & Capabilities pane: the pane writes `DEVELOPMENT_TEAM` into `project.pbxproj`, which is committed — if it does, move the value to `Local.xcconfig` and delete the line from the project.
+
 ## The test table
 
 Every test target is Swift Testing, named `<Layer><Module>Tests`, at `tests/<layer>/<module>/`, and listed in the `macOS Personal` scheme's tests.

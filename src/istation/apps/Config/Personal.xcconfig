@@ -10,3 +10,7 @@ SWIFT_OPTIMIZATION_LEVEL = -Onone
 ONLY_ACTIVE_ARCH = YES
 ENABLE_TESTABILITY = YES
 DEBUG_INFORMATION_FORMAT = dwarf
+
+// The signing team is the user's, never committed: Local.xcconfig, beside this file and git-ignored,
+// sets DEVELOPMENT_TEAM (DEVELOPER.md → Signing with your team). Without it, nothing changes.
+#include? "Local.xcconfig"

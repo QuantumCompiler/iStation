@@ -13,3 +13,7 @@ DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
 VALIDATE_PRODUCT = YES
 // Local signing would otherwise inject get-task-allow, which an App Store build never carries.
 CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO
+
+// The signing team is the user's, never committed: Local.xcconfig, beside this file and git-ignored,
+// sets DEVELOPMENT_TEAM (DEVELOPER.md → Signing with your team). Without it, nothing changes.
+#include? "Local.xcconfig"

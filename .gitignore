@@ -7,3 +7,4 @@
 xcuserdata/
 DerivedData/
 *.profraw
+/src/istation/apps/Config/Local.xcconfig
