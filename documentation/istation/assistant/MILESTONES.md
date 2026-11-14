@@ -421,3 +421,26 @@ Decided by the hardware (2026-11-14, ps1-tests' `cop` and its `psx.log`, recorde
 
 - 2026-11-07: ProjectPSX traced from inside its source; SwanStation only from outside, unmodified, guest state only (the user's brief); pinned commits moved only by a dated decision; per-frame records from the oracle (the defaults, confirmed by the user).
 - 2026-11-14: the .NET SDK unpacked locally, and the per-frame comparison guest RAM's until v0.1.0 and v0.2.0 (the defaults, confirmed by the user); the user's images include SCPH-1001, so ProjectPSX's TTY was compared and the default for a BIOS without it wasn't needed; the agent makes the BIOS runs with the files the user names (the user's call).
+
+## Milestone L — The BIOS boots
+
+**Goal.** v0.0.1's PS1 gate (item 3g, the user's brief): the Swift console boots real BIOS images to the shell, passes ps1-tests' CPU tests against their hardware logs up to known gaps, and agrees with ProjectPSX instruction by instruction — on the user's own BIOS images, which never enter the repository.
+
+**Built** (3g, 2026-11-07 to 2026-11-14):
+
+- **`tools/gate/run.sh`** — one run per BIOS image: the boot on the Swift console, ProjectPSX and SwanStation (1,200 frames per frame, the first 60 per instruction), ps1-tests' four CPU tests on each, every TTY against its hardware `psx.log` from the test's title line on, and `report.md` and `frames.tsv`. A tool that fails is listed, and a trace cut short never reads as agreement.
+- **The coprocessors as the hardware has them** (Milestone I): COP1, COP3 and LWCn/SWCn raise Coprocessor Unusable while their CU bit is clear and do nothing while it is set, and a COP0 command other than RFE and the TLB commands does nothing — what `cop`'s hardware log showed, against ProjectPSX's and the review's readings.
+
+**Verified** (2026-11-14, the agent's run with the user's 23 PS1 BIOS images, v1.0 J to v4.5 E, named only by version and hash; M3 Max, macOS 27):
+
+- **The BIOS reaches its shell on all 23 images**: each starts ps1-tests' programs, as the shell's entry at 0x80030000 starts an EXE.
+- **ps1-tests against the hardware logs**, on all 23: `code-in-io` matches. `cop` matches but for the three checks that need a GTE (`testCop2Enabled`, `testCop2InvalidOpcode`, `testSwc2Enabled`). `io-access-bitwidth` matches but for open-bus values (T0_TARGET's and I_MASK's upper halves, expansion 3), SIO1's 0x1F80105C, which reads 0xC0C0 on hardware, GPUSTAT's bit 31, the line parity at the moment of the read (psx-spx: it flips every scanline in 240-line mode), and, on v4.0 J alone, the BIOS's own first word, the log having been recorded on another BIOS. `access-time` comes within about a cycle everywhere — RAM 5.8 against 5.1–5.3, I/O 3.2–3.3 against 3.1–3.8, the scratchpad 1.0 against 0.9–1.5 — but for psx-spx's formula for expansion 2 (15–57 against 11–56), the SPU and the CD-ROM; the cycle comes from the timers advancing once per ~100-cycle slice, ProjectPSX's run loop, so a read inside a slice sees a stale count. These are the known gaps (the user's call).
+- **ProjectPSX agrees on every instruction** of its 60 traced frames on all 23 images — 14.3 million — but for one 14-instruction stretch, the expansion ROM header read at 0x1F000084 (Milestone K).
+- **Instructions per second for the boot** (ADR 0015's enforcement from here on): 164 M across the 23 images' 1,200-frame boots, 10.5 billion instructions in 64 seconds of emulation — 2.6–3.1 s a boot, about 4.8 times the PS1's 33.8688 MHz in instructions.
+- **SwanStation, frame by frame**: the RAM of both consoles is zero at power-on and differs from the first frame. The boot runs at another pace — on SCPH-5501 the Swift console has written 3,028 non-zero bytes by frame 1 against SwanStation's 711 — and converges: by frame 600 they differ in 1,424 of 2,097,152 bytes. Then SwanStation's shell keeps running and the Swift console's waits: it polls GPUSTAT's bit 27 at 0x800509DC for a VRAM-to-CPU transfer, and the GPU consumes GP0 unread until v0.1.0. The frame-by-frame match is v0.1.0's gate (the user's call).
+- The strict build, `swift test` (228 tests in 11 runs), the CPU check and the docs validator green.
+
+**Decisions consumed.**
+
+- 2026-11-07: the milestone is the brief's (the user's brief); OpenBIOS not used (ADR 0013 §6); every CPU test's expected output its hardware `psx.log` (the user's call, 2026-11-07).
+- 2026-11-14: "boots" means the BIOS reaches its shell; the frame-by-frame match with SwanStation moves to v0.1.0, after the GPU's VRAM transfers; the remaining differences are recorded as known gaps (the user's calls); the agent makes the BIOS runs with the files the user names (the user's call).

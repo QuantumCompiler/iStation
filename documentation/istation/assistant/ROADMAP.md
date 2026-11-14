@@ -22,7 +22,7 @@ The brief's first three tasks: prove JIT works under the App Store routine, lay 
 - [x] **The reference and the oracle** — ProjectPSX with trace logging; SwanStation unmodified, recorded from outside ([Milestone K](MILESTONES.md#milestone-k--the-reference-and-the-oracle))
 - [x] **The R3000A interpreter** — ported from ProjectPSX, generic over its bus ([Milestone I](MILESTONES.md#milestone-i--the-r3000a-interpreter))
 - [x] **The PS1 console** — memory map, interrupt controller, timers, DMA and the devices the BIOS needs ([Milestone J](MILESTONES.md#milestone-j--the-ps1-console))
-- [ ] **Gate: the BIOS boots** — ps1-tests' CPU tests pass and the guest-state trace matches SwanStation's (the user's run, with their BIOS) ([3g](../backlog/v0.0.1/bios-boots.md))
+- [x] **Gate: the BIOS boots** — the BIOS reaches its shell on the user's 23 BIOS images, ps1-tests' CPU tests pass up to known gaps, and ProjectPSX agrees instruction by instruction ([Milestone L](MILESTONES.md#milestone-l--the-bios-boots))
 
 Then the repository takes the layout and procedure of the user's Apogee repository, adapted for iStation (the user's call, 2026-11-14):
 
@@ -41,6 +41,7 @@ Then the repository takes the layout and procedure of the user's Apogee reposito
 - [ ] DMA and timers in full
 - [ ] The narrow core interface ([ADR 0015](../adrs/a-core-is-a-cpu-module-and-a-console-module.md) §5) and EmuKit's Metal presentation of frames
 - [ ] Per-frame VRAM recorded from SwanStation and compared
+- [ ] The boot's guest RAM matching SwanStation's frame by frame, moved from v0.0.1's gate (the user's call, 2026-11-14): the shell waits on the GPU's VRAM transfers, and the boot's pace needs closer timing — the instruction cache, timer reads within a slice ([Milestone L](MILESTONES.md#milestone-l--the-bios-boots))
 - [ ] Gate: the BIOS's shell and a homebrew PS-EXE draw in the macOS app, VRAM matching SwanStation's frame by frame
 
 ### v0.2.0 — PS1 games boot
