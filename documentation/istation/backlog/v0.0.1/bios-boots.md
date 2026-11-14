@@ -36,6 +36,6 @@ Checked 2026-11-07: ps1-tests (MIT) has four CPU tests — `access-time`, `code-
 - [ ] ps1-tests' `access-time`, `code-in-io`, `cop` and `io-access-bitwidth` print their hardware `psx.log`, or differ only where a known gap explains it, each difference listed in MILESTONES.
 - [ ] Every divergence from ProjectPSX's per-instruction trace is fixed or listed with psx-spx's evidence.
 - [ ] Instructions per second for the boot are recorded in MILESTONES (ADR 0015's enforcement from here on).
-- [ ] Shipping this item empties v0.0.1's table.
+- [ ] Shipping this item opens track 4 (Apogee's layout, 2026-11-14), which is gated on it; v0.0.1 is released when that track has shipped too.
 
 **Scope note.** v0.0.1, track 3, last: gated on 3d (the reference's and the oracle's traces); 3f (the console) shipped 2026-11-07. The runner has what it needs in `PS1Machine`: `boot(_:)` for a PS-EXE after the BIOS, `capturesBIOSPutchar` for the TTY ps1-tests print through the BIOS, and a generic tracer. Known gaps it should expect: psx-spx's access-time formula misses the hardware log for expansion 2, the CD-ROM and the SPU; the CD-ROM, SPU, MDEC and pads are stubs; there is no GTE until v0.2.0, so COP2 raises Coprocessor Unusable; and two of ProjectPSX's behaviours are kept for this comparison to settle — the vertical blank's interrupt at the field's end whatever GP1(07h)'s Y2 holds, and linked-list DMA's 0xFFFF-node guard ([Milestone J](../../assistant/MILESTONES.md#milestone-j--the-ps1-console)). Out of scope: anything drawn on screen (v0.1.0) and games (v0.2.0).

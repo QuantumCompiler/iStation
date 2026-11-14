@@ -24,6 +24,15 @@ The brief's first three tasks: prove JIT works under the App Store routine, lay 
 - [x] **The PS1 console** — memory map, interrupt controller, timers, DMA and the devices the BIOS needs ([Milestone J](MILESTONES.md#milestone-j--the-ps1-console))
 - [ ] **Gate: the BIOS boots** — ps1-tests' CPU tests pass and the guest-state trace matches SwanStation's (the user's run, with their BIOS) ([3g](../backlog/v0.0.1/bios-boots.md))
 
+Then the repository takes the layout and procedure of the user's Apogee repository, adapted for iStation (the user's call, 2026-11-14):
+
+- [ ] **Documentation by kind, then platform** — `lib/documentation/{assistant,backlog,adrs,reference}/darwin/`, the router and the validator ([4a](../backlog/v0.0.1/documentation-by-kind-then-platform.md))
+- [ ] **The code under `lib/src/darwin/`** — the package, the apps, the Xcode project, the scripts and the tools ([4b](../backlog/v0.0.1/code-under-lib-src-darwin.md))
+- [ ] **The release in `lib/release/VERSION`** — one file names the release, the apps follow it, a check guards it ([4c](../backlog/v0.0.1/release-version-file.md))
+- [ ] **One build path and a pipeline per app** — `cicd.sh`, `changed.sh`, `pr-ci.sh` and `darwin.yml` ([4d](../backlog/v0.0.1/one-build-path-and-a-pipeline-per-app.md))
+- [ ] **Superpowers inside the lifecycle, and application-aware skills** ([4e](../backlog/v0.0.1/superpowers-and-app-aware-skills.md))
+- [ ] **Development runs on the personal channel** — personal builds get their own identity ([4f](../backlog/v0.0.1/development-on-the-personal-channel.md))
+
 ## Planned
 
 ### v0.1.0 — The first picture
