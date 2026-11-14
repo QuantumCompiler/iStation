@@ -3,6 +3,15 @@
 // views. Never distributed. Build with scripts/build-personal.sh.
 #include "Version.xcconfig"
 
+// The personal channel (CLAUDE.md → Development runs on the personal channel): its own identity, so a
+// personal build never reads or writes the App Store app's container, defaults or bookmarks — and its own
+// name, "iStation Personal" (the bundle, the menu bar, the Home Screen), so it's never mistaken for it.
+PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*] = local.istation.macos.personal
+PRODUCT_BUNDLE_IDENTIFIER[sdk=iphone*] = local.istation.ios.personal
+PRODUCT_NAME = iStation Personal
+PRODUCT_MODULE_NAME = iStation
+INFOPLIST_KEY_CFBundleDisplayName = iStation Personal
+
 CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = apps/macos/Personal.entitlements
 CODE_SIGN_ENTITLEMENTS[sdk=iphone*] = apps/ios/Personal.entitlements
 SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) DEBUG PERSONAL_BUILD

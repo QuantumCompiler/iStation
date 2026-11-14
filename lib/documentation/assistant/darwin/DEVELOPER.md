@@ -34,7 +34,7 @@ lib/
       ios/                     Sources/iStationApp.swift · AppStore.entitlements · Personal.entitlements
     scripts/
       build.sh                 the one entry point: build.sh personal|appstore macOS|iOS
-      build-personal.sh        the personal routine: one app, Debug, into build/DerivedData
+      build-personal.sh        the personal routine: one app, Debug, as "iStation Personal.app" into build/DerivedData
       archive-appstore.sh      the App Store routine: one app, Release, archived into build/<platform>/
     source/
       infrastructure/          CLAUDE.md · bytes/

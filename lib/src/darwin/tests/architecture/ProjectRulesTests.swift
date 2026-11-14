@@ -128,6 +128,59 @@ import Testing
         #expect(violations.isEmpty, "\(violations.report)")
     }
 
+    /// Each app and the SDK its routines' identifiers are conditioned on.
+    static let appSDKs: [(app: String, sdk: String)] = [("macos", "macosx*"), ("ios", "iphone*")]
+
+    /// What is wrong with the routines' identities (CLAUDE.md → Development runs on the personal channel):
+    /// each app's personal and App Store bundle identifiers set in the routines' xcconfigs and different;
+    /// the personal build named as one; and no target setting in the project overriding either routine.
+    static func routineIdentityViolations(personal: String, appStore: String, project: String) -> Violations {
+        var violations = Violations()
+        func setting(_ key: String, in config: String) -> String? {
+            Pattern.captures("^" + NSRegularExpression.escapedPattern(for: key) + #" = (.+?)\s*$"#, in: config, options: [.anchorsMatchLines]).first?.first ?? nil
+        }
+        for (app, sdk) in appSDKs {
+            let key = "PRODUCT_BUNDLE_IDENTIFIER[sdk=\(sdk)]"
+            let personalID = setting(key, in: personal), appStoreID = setting(key, in: appStore)
+            if personalID == nil { violations.add("routine identity", "apps/Config/Personal.xcconfig", "sets no \(key) for the \(app) app") }
+            if appStoreID == nil { violations.add("routine identity", "apps/Config/AppStore.xcconfig", "sets no \(key) for the \(app) app") }
+            if let id = personalID, id == appStoreID {
+                violations.add("routine identity", "apps/Config", "the \(app) app's personal and App Store routines share \(id): a personal build would read and write the App Store app's container")
+            }
+        }
+        for key in ["PRODUCT_NAME", "INFOPLIST_KEY_CFBundleDisplayName"] where !(setting(key, in: personal)?.contains("Personal") ?? false) {
+            violations.add("routine identity", "apps/Config/Personal.xcconfig", "\(key) doesn't name the personal build as one")
+        }
+        for key in ["PRODUCT_BUNDLE_IDENTIFIER", "PRODUCT_NAME", "INFOPLIST_KEY_CFBundleDisplayName"] where Pattern.matches(#"^\s*"# + key + " = ", in: project) {
+            violations.add("routine identity", "iStation.xcodeproj/project.pbxproj", "a target sets \(key), which overrides both routines' xcconfigs")
+        }
+        return violations
+    }
+
+    @Test("Each app's personal and App Store routines have their own identity, and the personal build says so")
+    func routinesHaveTheirOwnIdentity() {
+        let config = Repository.package.appendingPathComponent("apps/Config")
+        let violations = Self.routineIdentityViolations(
+            personal: Repository.text(config.appendingPathComponent("Personal.xcconfig")) ?? "",
+            appStore: Repository.text(config.appendingPathComponent("AppStore.xcconfig")) ?? "",
+            project: Repository.text(Repository.package.appendingPathComponent("iStation.xcodeproj/project.pbxproj")) ?? "")
+        #expect(violations.isEmpty, "\(violations.report)")
+    }
+
+    @Test("The identity check fails on a personal identifier equal to the App Store one, and on a target override")
+    func theIdentityCheckCatchesItsViolations() {
+        let appStore = "PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*] = local.istation.macos\nPRODUCT_BUNDLE_IDENTIFIER[sdk=iphone*] = local.istation.ios\n"
+        let named = "PRODUCT_NAME = iStation Personal\nINFOPLIST_KEY_CFBundleDisplayName = iStation Personal\n"
+        let shared = Self.routineIdentityViolations(
+            personal: "PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*] = local.istation.macos\nPRODUCT_BUNDLE_IDENTIFIER[sdk=iphone*] = local.istation.ios.personal\n" + named,
+            appStore: appStore, project: "")
+        #expect(shared.lines.count == 1 && shared.report.contains("macos app's personal and App Store routines share local.istation.macos"), "\(shared.report)")
+        let overridden = Self.routineIdentityViolations(
+            personal: "PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*] = local.istation.macos.personal\nPRODUCT_BUNDLE_IDENTIFIER[sdk=iphone*] = local.istation.ios.personal\n" + named,
+            appStore: appStore, project: "\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = local.istation.macos;\n")
+        #expect(overridden.lines.count == 1 && overridden.report.contains("overrides both routines"), "\(overridden.report)")
+    }
+
     @Test("App Store entitlements never allow unsigned executable memory or debugging, and every app has both routines")
     func appStoreEntitlementsAreClean() {
         var violations = Violations()

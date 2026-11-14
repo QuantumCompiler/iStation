@@ -31,7 +31,7 @@ Then the repository takes the layout and procedure of the user's Apogee reposito
 - [x] **The release in `lib/release/VERSION`** — one file names the release, the apps follow it, a check guards it ([Milestone O](MILESTONES.md#milestone-o--the-release-in-libreleaseversion))
 - [x] **One build path and a pipeline per app** — `cicd.sh`, `changed.sh`, `pr-ci.sh` and `darwin.yml` ([Milestone P](MILESTONES.md#milestone-p--one-build-path-and-a-pipeline-per-app))
 - [x] **Superpowers inside the lifecycle, and application-aware skills** — `.claude/settings.json`, the mapping in CLAUDE.md, the "Which application?" ladder ([Milestone Q](MILESTONES.md#milestone-q--superpowers-inside-the-lifecycle-and-application-aware-skills))
-- [ ] **Development runs on the personal channel** — personal builds get their own identity ([4f](../../backlog/darwin/v0.0.1/development-on-the-personal-channel.md))
+- [x] **Development runs on the personal channel** — personal builds get their own identity, "iStation Personal" ([Milestone R](MILESTONES.md#milestone-r--development-on-the-personal-channel))
 
 ## Planned
 

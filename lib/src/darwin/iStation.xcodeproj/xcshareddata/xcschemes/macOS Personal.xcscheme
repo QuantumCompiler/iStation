@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B806710A481F978F97249349"
-               BuildableName = "iStation.app"
+               BuildableName = "iStation Personal.app"
                BlueprintName = "iStation macOS"
                ReferencedContainer = "container:iStation.xcodeproj">
             </BuildableReference>
@@ -156,7 +156,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B806710A481F978F97249349"
-            BuildableName = "iStation.app"
+            BuildableName = "iStation Personal.app"
             BlueprintName = "iStation macOS"
             ReferencedContainer = "container:iStation.xcodeproj">
          </BuildableReference>
@@ -173,7 +173,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B806710A481F978F97249349"
-            BuildableName = "iStation.app"
+            BuildableName = "iStation Personal.app"
             BlueprintName = "iStation macOS"
             ReferencedContainer = "container:iStation.xcodeproj">
          </BuildableReference>

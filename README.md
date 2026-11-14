@@ -17,7 +17,7 @@ In Xcode, open `lib/src/darwin/iStation.xcodeproj` and pick a scheme: `macOS Per
 ```bash
 cd lib/src/darwin
 swift test                              # every module's tests, plus the architecture checks
-./scripts/build-personal.sh macOS       # the personal routine (or iOS, for the Simulator)
+./scripts/build-personal.sh macOS       # the personal routine, "iStation Personal" (or iOS, for the Simulator)
 ./scripts/archive-appstore.sh macOS     # an App Store archive; signing and uploading are yours
 ```
 

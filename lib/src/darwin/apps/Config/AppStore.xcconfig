@@ -3,6 +3,13 @@
 // entitlements. Archive with scripts/archive-appstore.sh.
 #include "Version.xcconfig"
 
+// The App Store identity: placeholders until the user's App Store Connect identifiers exist (v1.0.0).
+PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*] = local.istation.macos
+PRODUCT_BUNDLE_IDENTIFIER[sdk=iphone*] = local.istation.ios
+PRODUCT_NAME = iStation
+PRODUCT_MODULE_NAME = iStation
+INFOPLIST_KEY_CFBundleDisplayName = iStation
+
 CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = apps/macos/AppStore.entitlements
 CODE_SIGN_ENTITLEMENTS[sdk=iphone*] = apps/ios/AppStore.entitlements
 SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited)

@@ -573,3 +573,35 @@ Decided by the hardware (2026-11-14, ps1-tests' `cop` and its `psx.log`, recorde
 
 - 2026-11-14: mimic Apogee's agentic procedure, adapted for iStation (the user's call); every task still ends with one commit and a push (2026-11-07, not reopened).
 - 2026-11-14: a Superpowers worktree item lands as one squash commit on the release branch, then is pushed; each skill takes what fits from its Apogee twin, and what only fits Apogee is named above (the defaults, confirmed by the user).
+
+## Milestone R — Development on the personal channel
+
+**Goal.** Apogee's "Development runs on the dev channel", for the Apple apps (v0.0.1 item 4f; the user's call, 2026-11-14). Until now each app had one bundle identifier for both routines, so a personal build and an App Store install shared their container, defaults and imported-file bookmarks. Once the apps import BIOS files and games (v0.2.0), development would have read and changed the user's real library.
+
+**Built** (4f, 2026-11-14):
+
+- **`apps/Config/Personal.xcconfig`**: `PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*] = local.istation.macos.personal`, `[sdk=iphone*] = local.istation.ios.personal`, `PRODUCT_NAME` and `CFBundleDisplayName` "iStation Personal", and `PRODUCT_MODULE_NAME = iStation`, which keeps the Swift module's name.
+- **`apps/Config/AppStore.xcconfig`**: the App Store identity, unchanged (`local.istation.macos`, `local.istation.ios`, named "iStation").
+- **`iStation.xcodeproj`**: the four app configurations no longer set `PRODUCT_BUNDLE_IDENTIFIER`, `PRODUCT_NAME` or `INFOPLIST_KEY_CFBundleDisplayName`, which would override both xcconfigs. The two Personal schemes name `iStation Personal.app`, and `scripts/build-personal.sh` prints that path.
+- **`ProjectRulesTests`** has two new tests:
+  - `routinesHaveTheirOwnIdentity` fails when an app's two routines share an identifier or leave one unset, when the personal build isn't named as one, or when a target setting overrides them.
+  - `theIdentityCheckCatchesItsViolations` runs that check against planted text: a shared identifier, and a target override.
+- **CLAUDE.md → Working process → "Development runs on the personal channel"**: live passes, smoke tests and "try it" steps use the personal build; the App Store routine is built and archived, never launched against the user's data. The Stack paragraph, README, DEVELOPER and the four skills that make live runs (execute-item, execute-group, investigate-bug, investigate-spike) point to it.
+
+**Trade-offs.**
+
+- On macOS a non-localized `CFBundleDisplayName` changes nothing the user sees: Finder, Spotlight and the menu bar showed plain "iStation" (`kMDItemDisplayName`, measured on the build). `INFOPLIST_KEY_CFBundleName` is ignored by Xcode's generated Info.plist. So the personal routine renames the product itself, and the bundle is `iStation Personal.app`, with the module name pinned.
+- On iOS the Home Screen shortens the name to "iStation Personal" in one line, as the screenshot showed.
+- The personal macOS routine isn't sandboxed (ADR 0016), so it keeps its defaults under its own identifier, not in a container. The App Store routine's container is `~/Library/Containers/local.istation.macos`, which development never opens.
+
+**Verified** (2026-11-14):
+
+- All four routines built unsigned. Their `Info.plist`s read `local.istation.macos.personal` / `local.istation.ios.personal` named "iStation Personal", and `local.istation.macos` / `local.istation.ios` named "iStation".
+- The guardrail's side-by-side run was made on an iOS 18.5 Simulator, which touches no real install: both iOS routines installed together and launched at once (two processes), each with its own data container. Before this, installing one would have replaced the other. The Home Screen showed "iStation Personal" beside "iStation". The two apps were then uninstalled and the Simulator shut down.
+- `routinesHaveTheirOwnIdentity` fails, naming the shared identifier, when the macOS personal identifier is set to `local.istation.macos` in the real xcconfig; that change was restored.
+- `lib/scripts/cicd.sh --all` passed end to end in 19 seconds: the strict build, 232 tests in 11 runs, both apps' personal routine unsigned (each printed as `iStation Personal.app`), and the validator.
+
+**Decisions consumed.**
+
+- 2026-11-14: mimic Apogee's agentic procedure, adapted for iStation (the user's call).
+- 2026-11-14: the personal identities are `local.istation.macos.personal` and `local.istation.ios.personal`, displayed as "iStation Personal"; the App Store identifiers stay `local.istation.macos` and `local.istation.ios` until the user's App Store Connect identifiers exist (v1.0.0) (the defaults, confirmed by the user).

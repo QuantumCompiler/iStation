@@ -20,4 +20,4 @@ esac
 derived="build/DerivedData"
 xcodebuild build -project iStation.xcodeproj -scheme "$platform Personal" -destination "$destination" -derivedDataPath "$derived" \
     ${signing[@]+"${signing[@]}"}
-echo "Built $PWD/$derived/Build/Products/$products/iStation.app"
+echo "Built $PWD/$derived/Build/Products/$products/iStation Personal.app"
