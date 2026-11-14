@@ -54,13 +54,42 @@ import Testing
         #expect(cpu.epc == origin)
     }
 
-    @Test(arguments: [MIPS.nop, 0x4400_0000, 0x4C00_0000, 0xC000_0000, 0xC400_0000, 0xCC00_0000, 0xE000_0000, 0xE400_0000, 0xEC00_0000])
-    func cop1AndCop3AndTheirLoadsAndStoresDoNothing(word: UInt32) {
-        // ProjectPSX treats COP1, COP3, LWC0/1/3 and SWC0/1/3 as NOPs.
+    /// COP1, COP3, and LWC0/1/3 and SWC0/1/3, each with the coprocessor it names.
+    static let unitlessCoprocessors: [(word: UInt32, unit: UInt32)] = [
+        (0x4400_0000, 1), (0x4C00_0000, 3), (0xC000_0000, 0), (0xC400_0000, 1), (0xCC00_0000, 3),
+        (0xE000_0000, 0), (0xE400_0000, 1), (0xEC00_0000, 3),
+    ]
+
+    @Test(arguments: unitlessCoprocessors)
+    func cop1AndCop3AndTheirLoadsAndStoresAreUnusableWhileTheirCUBitIsClear(word: UInt32, unit: UInt32) {
+        // ps1-tests' cop on hardware (psx.log): testCop1Disabled, testCop3Disabled, testSwc0Disabled and
+        // testSwc3Disabled raise Coprocessor Unusable — SWC0 even in kernel mode. ProjectPSX runs NOPs.
         let cpu = makeCPU([word])
+        cpu.step()
+        #expect(cpu.exceptionCode == ExceptionCode.coprocessorUnusable.rawValue)
+        #expect(cpu.exceptionCoprocessor == unit)
+        #expect(cpu.epc == origin)
+    }
+
+    @Test(arguments: unitlessCoprocessors)
+    func cop1AndCop3AndTheirLoadsAndStoresDoNothingWithTheirCUBitSet(word: UInt32, unit: UInt32) {
+        // ps1-tests' cop on hardware: testCop1Enabled, testCop3Enabled, testSwc0Enabled, testSwc3Enabled.
+        let cpu = makeCPU([word])
+        cpu.setCOP0Register(COP0Register.sr, 0x1000_0000 << unit)
         cpu.step()
         #expect(cpu.pc == origin + 4)
         #expect(cpu.exceptionCode == 0)
+    }
+
+    @Test func aCOP0CommandOtherThanRFEAndTheTLBsDoesNothing() {
+        // ps1-tests' cop on hardware: testCop0InvalidOpcode runs COP0 with rs 1Fh and function 0, and
+        // nothing is raised. ProjectPSX raises Reserved Instruction.
+        let cpu = makeCPU([0x10 << 26 | 0x1F << 21])
+        cpu.setCOP0Register(COP0Register.sr, 0x3C)
+        cpu.step()
+        #expect(cpu.pc == origin + 4)
+        #expect(cpu.exceptionCode == 0)
+        #expect(cpu.sr == 0x3C)
     }
 
     @Test(arguments: [MIPS.cop0(0x01), MIPS.cop0(0x02), MIPS.cop0(0x06), MIPS.cop0(0x08)])

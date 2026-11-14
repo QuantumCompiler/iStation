@@ -294,13 +294,17 @@ Added by the review (2026-11-07):
 - **The exception entry.** An interrupt taken just after a branch records the branch's destination in TAR (ProjectPSX writes `pc`), and nothing at the vector is in a delay slot: the branch flags are cleared.
 - **SWL and SWR** merge their bytes into a peek of memory, not a load: no load's time, no device's read side effects, and a device gets one byte store per lane. ProjectPSX loads the whole word.
 
+Decided by the hardware (2026-11-14, ps1-tests' `cop` and its `psx.log`, recorded on a real PS1, in 3g's runs with the user's BIOS images):
+
+- **COP1 and COP3, and LWC0/1/3 and SWC0/1/3**, raise Coprocessor Unusable while SR's CUn bit is clear — LWC0 and SWC0 even in kernel mode, where MFC0 and MTC0 still work — and do nothing while it is set. ProjectPSX ran them all as NOPs, a quirk kept until a trace decided; psx-spx has LWC0 and SWC0 always raise it, which the hardware log contradicts with CU0 set. LWC1, SWC1 and LWC3 aren't tested and follow the others.
+- **A COP0 command other than RFE and the four TLB commands** does nothing: `cop` runs one with rs 1Fh and function 0 on hardware without an exception, where the review had made every such command a Reserved Instruction.
+
 **ProjectPSX's quirks kept until SwanStation's trace (3d) decides:**
 
 - BLTZAL/BGEZAL write r31 directly rather than through write-back.
 - Enabling interrupts by MTC0 with a software interrupt pending sets EPC to the instruction after the next one, which never runs.
 - An interrupt waits while the next instruction is a COP2 one.
 - LWL and LWR ignore cache isolation.
-- COP1, COP3 and the LWC0/1/3 and SWC0/1/3 encodings are NOPs.
 
 **Trade-offs.**
 

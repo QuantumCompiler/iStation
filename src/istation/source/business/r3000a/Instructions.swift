@@ -38,7 +38,7 @@ extension R3000A {
         case 0x0E: setGPR(Self.rt(w), reg(Self.rs(w)) ^ Self.imm(w))
         case 0x0F: setGPR(Self.rt(w), Self.imm(w) << 16)
         case 0x10: cop0Instruction(w)
-        case 0x11, 0x13: break // COP1 and COP3: no coprocessor; ProjectPSX treats them as NOPs.
+        case 0x11, 0x13: unitlessCoprocessor(w) // COP1 and COP3
         case 0x12: cop2Instruction(w)
         case 0x20: loadByte(w, signed: true)
         case 0x21: loadHalf(w, signed: true)
@@ -52,7 +52,7 @@ extension R3000A {
         case 0x2A: storeWordLeft(w)
         case 0x2B: storeWord(w)
         case 0x2E: storeWordRight(w)
-        case 0x30, 0x31, 0x33, 0x38, 0x39, 0x3B: break // LWC0/1/3 and SWC0/1/3: NOPs, as in ProjectPSX.
+        case 0x30, 0x31, 0x33, 0x38, 0x39, 0x3B: unitlessCoprocessor(w) // LWC0/1/3 and SWC0/1/3
         case 0x32: loadWordToCop2(w)
         case 0x3A: storeWordFromCop2(w)
         default: raise(.reservedInstruction, coprocessor: Self.id(w))
@@ -391,10 +391,38 @@ extension R3000A {
         // psx-spx: BC0F and BC0T aren't supported and raise Coprocessor Unusable; ProjectPSX raises
         // Reserved Instruction.
         case 0b0_1000 where Self.rt(w) <= 1: raise(.coprocessorUnusable, coprocessor: 0)
-        // psx-spx: RFE (10h) is the only COP0 command, and TLBR, TLBWI, TLBWR and TLBP are Reserved
-        // Instructions; ProjectPSX runs every command as RFE.
-        case 0b1_0000 where w & 0x3F == 0x10: returnFromException()
+        case let rs where rs & 0b1_0000 != 0: cop0Command(w)
         default: raise(.reservedInstruction, coprocessor: Self.id(w))
+        }
+    }
+
+    /// A COP0 command (bit 25 set). psx-spx: RFE (10h) is the only one, and TLBR, TLBWI, TLBWR and TLBP
+    /// (01h, 02h, 06h, 08h) are Reserved Instructions. Any other does nothing: on hardware, ps1-tests'
+    /// `cop` runs one with rs 1Fh and function 0 without an exception (its psx.log). ProjectPSX runs
+    /// rs 10h's commands as RFE and raises Reserved Instruction for the others.
+    @inlinable
+    func cop0Command(_ w: UInt32) {
+        guard cop0Usable else {
+            raise(.coprocessorUnusable, coprocessor: 0)
+            return
+        }
+        switch w & 0x3F {
+        case 0x10: returnFromException()
+        case 0x01, 0x02, 0x06, 0x08: raise(.reservedInstruction, coprocessor: 0)
+        default: break
+        }
+    }
+
+    /// COP1 and COP3, and LWC0/1/3 and SWC0/1/3: the PS1 has no such coprocessor's data. On hardware
+    /// (ps1-tests' `cop`, its psx.log) each raises Coprocessor Unusable while SR's CUn is clear — COP0's
+    /// LWC0 and SWC0 too, even in kernel mode, where MFC0 and MTC0 still work — and does nothing while
+    /// it is set. ProjectPSX runs every one as a NOP; psx-spx has LWC0 and SWC0 always raise it, which
+    /// the hardware log contradicts with CU0 set. LWC1, SWC1 and LWC3 follow the tested ones.
+    @inlinable
+    func unitlessCoprocessor(_ w: UInt32) {
+        let unit = Self.id(w)
+        if cop0[COP0Register.sr] & (0x1000_0000 << unit) == 0 {
+            raise(.coprocessorUnusable, coprocessor: unit)
         }
     }
 
