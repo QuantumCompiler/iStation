@@ -16,38 +16,38 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0B4F69351F4B941255C33F1E /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
+		209DB850E2B5BB905DF90F3F /* fetch.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = fetch.sh; sourceTree = "<group>"; };
+		25E2934C2EA1AE5BD0ABAF06 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		2850EF5F0D0D10F9FE84ECFB /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
+		30881AC3376BE5E4D7A46710 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		31C6C4B12B6697A33297CE98 /* NoJIT.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NoJIT.entitlements; sourceTree = "<group>"; };
 		37E2B4C2DF614925F6F0F02E /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 		709E55BF70A90526914A009D /* AppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppStore.xcconfig; sourceTree = "<group>"; };
+		745F6B485D5BD2DE46697B2D /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
+		78A092D37FCFAD13586085BD /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		793F257C7B9F24D70B6489A5 /* Personal.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Personal.xcconfig; sourceTree = "<group>"; };
 		810518D886B08192A47FF3ED /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>"; };
+		83A31A17D85787D8F147F070 /* trace.patch */ = {isa = PBXFileReference; lastKnownFileType = text; path = trace.patch; sourceTree = "<group>"; };
+		864FEB15C2523DE68F3690AB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		875AFCAB9A090DA68F00CACA /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		88BD3A181616833AB9BEF9E5 /* Personal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Personal.entitlements; sourceTree = "<group>"; };
 		8FD962B3E5E8ADFA2AAFA4B2 /* Personal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Personal.entitlements; sourceTree = "<group>"; };
 		93C35005D98FB9608FCA73A8 /* Acknowledgements.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Acknowledgements.json; sourceTree = "<group>"; };
+		9B14CD9CB122FAFD8E5199F1 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		9DA34DB9C0D5DC06B370C7E4 /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>"; };
+		A30E39450C380D2CDC6CD682 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		A40ED5F030BA3FCD8229A0E3 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		C93B50687CCA325E43FBE332 /* istation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = istation; path = src/istation; sourceTree = "<group>"; };
 		CA40BD3FDD20857ACBA75FC5 /* iStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iStation.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D1BF349F3CDBE7800DB129C8 /* iStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iStation.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		F9CE25CE884AB8737F0AA626 /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>"; };
-		30881AC3376BE5E4D7A46710 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
-		9B14CD9CB122FAFD8E5199F1 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		E425F813682F096029F53E1B /* cpu-check.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = cpu-check.sh; sourceTree = "<group>"; };
-		EC4566141DD56FB973C6B6EC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		2850EF5F0D0D10F9FE84ECFB /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
-		EE71E3B914B002B140A727DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9DA34DB9C0D5DC06B370C7E4 /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>"; };
-		31C6C4B12B6697A33297CE98 /* NoJIT.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NoJIT.entitlements; sourceTree = "<group>"; };
-		A30E39450C380D2CDC6CD682 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		875AFCAB9A090DA68F00CACA /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		CCDA0073D61BBB7F3097E139 /* run.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = run.sh; sourceTree = "<group>"; };
-		83A31A17D85787D8F147F070 /* trace.patch */ = {isa = PBXFileReference; lastKnownFileType = text; path = trace.patch; sourceTree = "<group>"; };
-		25E2934C2EA1AE5BD0ABAF06 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		209DB850E2B5BB905DF90F3F /* fetch.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = fetch.sh; sourceTree = "<group>"; };
-		864FEB15C2523DE68F3690AB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		0B4F69351F4B941255C33F1E /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
-		FFB4B4CADA500FF4AE35204F /* frontend.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = frontend.c; sourceTree = "<group>"; };
-		78A092D37FCFAD13586085BD /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		745F6B485D5BD2DE46697B2D /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
+		D1BF349F3CDBE7800DB129C8 /* iStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iStation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D3C406288A12754B3E7173EC /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		A40ED5F030BA3FCD8229A0E3 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		E425F813682F096029F53E1B /* cpu-check.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "cpu-check.sh"; sourceTree = "<group>"; };
+		EC4566141DD56FB973C6B6EC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		EE71E3B914B002B140A727DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F9CE25CE884AB8737F0AA626 /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>"; };
+		FFB4B4CADA500FF4AE35204F /* frontend.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = frontend.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -61,39 +61,9 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
-		EBB960E4A172BF5F4A17D2D7 /* gate */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = gate;
-			sourceTree = "<group>";
-		};
 		248403D7631EDB3967705DD8 /* Sources */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Sources;
-			sourceTree = "<group>";
-		};
-		C70FBD823A1E1C4743114BA9 /* Sources */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Sources;
-			sourceTree = "<group>";
-		};
-		C16FDF7C1648C4C1D5B669C6 /* host */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = host;
-			sourceTree = "<group>";
-		};
-		91C209E285D39CF19B111FF8 /* documentation */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = documentation;
-			sourceTree = "<group>";
-		};
-		E3BE17933804691C65DFA48C /* scripts */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = scripts;
-			sourceTree = "<group>";
-		};
-		B30F8CCFE9400406E6DE2819 /* .github */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = .github;
 			sourceTree = "<group>";
 		};
 		26DA62B705DBE966229E5E3E /* .claude */ = {
@@ -104,6 +74,36 @@
 		887F19413DF108751B11C9C5 /* LICENSES */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = LICENSES;
+			sourceTree = "<group>";
+		};
+		91C209E285D39CF19B111FF8 /* documentation */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = documentation;
+			sourceTree = "<group>";
+		};
+		B30F8CCFE9400406E6DE2819 /* .github */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = .github;
+			sourceTree = "<group>";
+		};
+		C16FDF7C1648C4C1D5B669C6 /* host */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = host;
+			sourceTree = "<group>";
+		};
+		C70FBD823A1E1C4743114BA9 /* Sources */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		E3BE17933804691C65DFA48C /* scripts */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = scripts;
+			sourceTree = "<group>";
+		};
+		EBB960E4A172BF5F4A17D2D7 /* gate */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = gate;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -130,6 +130,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C28B4358E618CCC863CBA2E /* ps1-tests */ = {
+			isa = PBXGroup;
+			children = (
+				25E2934C2EA1AE5BD0ABAF06 /* README.md */,
+				209DB850E2B5BB905DF90F3F /* fetch.sh */,
+			);
+			path = "ps1-tests";
+			sourceTree = "<group>";
+		};
 		139363E72819083888FDEAE9 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
@@ -150,7 +159,41 @@
 			path = src/istation/apps/ios;
 			sourceTree = "<group>";
 		};
-		6EDE00FA7A261151470098F6 /* src/istation/apps/Config */ = {
+		4A6152CBAB7A287632385418 /* swanstation-oracle */ = {
+			isa = PBXGroup;
+			children = (
+				864FEB15C2523DE68F3690AB /* README.md */,
+				0B4F69351F4B941255C33F1E /* build.sh */,
+				FFB4B4CADA500FF4AE35204F /* frontend.c */,
+			);
+			path = "swanstation-oracle";
+			sourceTree = "<group>";
+		};
+		5294CE81026D3B7C55B6FA4A /* istation-run */ = {
+			isa = PBXGroup;
+			children = (
+				30881AC3376BE5E4D7A46710 /* Package.swift */,
+				9B14CD9CB122FAFD8E5199F1 /* README.md */,
+				E425F813682F096029F53E1B /* cpu-check.sh */,
+				248403D7631EDB3967705DD8 /* Sources */,
+			);
+			path = "istation-run";
+			sourceTree = "<group>";
+		};
+		641BE41984AE489D4165FF82 /* jit-probe */ = {
+			isa = PBXGroup;
+			children = (
+				EC4566141DD56FB973C6B6EC /* README.md */,
+				2850EF5F0D0D10F9FE84ECFB /* build.sh */,
+				EE71E3B914B002B140A727DC /* Info.plist */,
+				9DA34DB9C0D5DC06B370C7E4 /* AppStore.entitlements */,
+				31C6C4B12B6697A33297CE98 /* NoJIT.entitlements */,
+				C70FBD823A1E1C4743114BA9 /* Sources */,
+			);
+			path = "jit-probe";
+			sourceTree = "<group>";
+		};
+		6EDE00FA7A261151470098F6 /* Config */ = {
 			isa = PBXGroup;
 			children = (
 				37E2B4C2DF614925F6F0F02E /* Version.xcconfig */,
@@ -159,6 +202,31 @@
 			);
 			name = Config;
 			path = src/istation/apps/Config;
+			sourceTree = "<group>";
+		};
+		8211F74D66B537C097FB7C5B /* projectpsx-trace */ = {
+			isa = PBXGroup;
+			children = (
+				A30E39450C380D2CDC6CD682 /* README.md */,
+				875AFCAB9A090DA68F00CACA /* build.sh */,
+				CCDA0073D61BBB7F3097E139 /* run.sh */,
+				83A31A17D85787D8F147F070 /* trace.patch */,
+				C16FDF7C1648C4C1D5B669C6 /* host */,
+			);
+			path = "projectpsx-trace";
+			sourceTree = "<group>";
+		};
+		926D2629A3CE7C67880DE5DC /* tools */ = {
+			isa = PBXGroup;
+			children = (
+				EBB960E4A172BF5F4A17D2D7 /* gate */,
+				5294CE81026D3B7C55B6FA4A /* istation-run */,
+				641BE41984AE489D4165FF82 /* jit-probe */,
+				8211F74D66B537C097FB7C5B /* projectpsx-trace */,
+				0C28B4358E618CCC863CBA2E /* ps1-tests */,
+				4A6152CBAB7A287632385418 /* swanstation-oracle */,
+			);
+			path = tools;
 			sourceTree = "<group>";
 		};
 		956934E60556FDCE0710C957 = {
@@ -171,7 +239,7 @@
 				AE03C15C0D73E24C7B08CCB2 /* macOS */,
 				47C9A9AB5FE8344A3E6B47AE /* iOS */,
 				139363E72819083888FDEAE9 /* Shared */,
-				6EDE00FA7A261151470098F6 /* src/istation/apps/Config */,
+				6EDE00FA7A261151470098F6 /* Config */,
 				926D2629A3CE7C67880DE5DC /* tools */,
 				E3BE17933804691C65DFA48C /* scripts */,
 				B30F8CCFE9400406E6DE2819 /* .github */,
@@ -201,74 +269,6 @@
 				D1BF349F3CDBE7800DB129C8 /* iStation.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		5294CE81026D3B7C55B6FA4A /* istation-run */ = {
-			isa = PBXGroup;
-			children = (
-				30881AC3376BE5E4D7A46710 /* Package.swift */,
-				9B14CD9CB122FAFD8E5199F1 /* README.md */,
-				E425F813682F096029F53E1B /* cpu-check.sh */,
-				248403D7631EDB3967705DD8 /* Sources */,
-			);
-			path = istation-run;
-			sourceTree = "<group>";
-		};
-		641BE41984AE489D4165FF82 /* jit-probe */ = {
-			isa = PBXGroup;
-			children = (
-				EC4566141DD56FB973C6B6EC /* README.md */,
-				2850EF5F0D0D10F9FE84ECFB /* build.sh */,
-				EE71E3B914B002B140A727DC /* Info.plist */,
-				9DA34DB9C0D5DC06B370C7E4 /* AppStore.entitlements */,
-				31C6C4B12B6697A33297CE98 /* NoJIT.entitlements */,
-				C70FBD823A1E1C4743114BA9 /* Sources */,
-			);
-			path = jit-probe;
-			sourceTree = "<group>";
-		};
-		8211F74D66B537C097FB7C5B /* projectpsx-trace */ = {
-			isa = PBXGroup;
-			children = (
-				A30E39450C380D2CDC6CD682 /* README.md */,
-				875AFCAB9A090DA68F00CACA /* build.sh */,
-				CCDA0073D61BBB7F3097E139 /* run.sh */,
-				83A31A17D85787D8F147F070 /* trace.patch */,
-				C16FDF7C1648C4C1D5B669C6 /* host */,
-			);
-			path = projectpsx-trace;
-			sourceTree = "<group>";
-		};
-		0C28B4358E618CCC863CBA2E /* ps1-tests */ = {
-			isa = PBXGroup;
-			children = (
-				25E2934C2EA1AE5BD0ABAF06 /* README.md */,
-				209DB850E2B5BB905DF90F3F /* fetch.sh */,
-			);
-			path = ps1-tests;
-			sourceTree = "<group>";
-		};
-		4A6152CBAB7A287632385418 /* swanstation-oracle */ = {
-			isa = PBXGroup;
-			children = (
-				864FEB15C2523DE68F3690AB /* README.md */,
-				0B4F69351F4B941255C33F1E /* build.sh */,
-				FFB4B4CADA500FF4AE35204F /* frontend.c */,
-			);
-			path = swanstation-oracle;
-			sourceTree = "<group>";
-		};
-		926D2629A3CE7C67880DE5DC /* tools */ = {
-			isa = PBXGroup;
-			children = (
-				EBB960E4A172BF5F4A17D2D7 /* gate */,
-				5294CE81026D3B7C55B6FA4A /* istation-run */,
-				641BE41984AE489D4165FF82 /* jit-probe */,
-				8211F74D66B537C097FB7C5B /* projectpsx-trace */,
-				0C28B4358E618CCC863CBA2E /* ps1-tests */,
-				4A6152CBAB7A287632385418 /* swanstation-oracle */,
-			);
-			path = tools;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
