@@ -2,9 +2,9 @@
 .DS_Store
 .build/
 .swiftpm/
-/src/istation/build/
-/src/istation/Packages/
+/lib/src/darwin/build/
+/lib/src/darwin/Packages/
 xcuserdata/
 DerivedData/
 *.profraw
-/src/istation/apps/Config/Local.xcconfig
+/lib/src/darwin/apps/Config/Local.xcconfig

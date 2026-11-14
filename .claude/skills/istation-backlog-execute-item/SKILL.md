@@ -7,7 +7,7 @@ description: Build one iStation backlog item straight from its document — reso
 
 One item, built from its document, then shipped through the docs. Then stop.
 
-The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the code is `src/istation/`.
+The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the code is `lib/src/darwin/`.
 
 ## 1. Load the working process
 
@@ -34,12 +34,12 @@ It is the working spec. A **split first** item is groomed into its sub-documents
 
 - Mark the row 🚧 (and save the index) before the first code change.
 - One item. Honor its constraints and every `⚠` invariant.
-- **The layer law**: a new module brings its `Module(…)` row in `src/istation/Package.swift`, its source and test directories, its layer card's Modules line, its ADR 0002 table row, its test target in the Xcode scheme (`iStation.xcodeproj/xcshareddata/xcschemes/iStation.xcscheme`) and its Codebase Map row — in the same change.
+- **The layer law**: a new module brings its `Module(…)` row in `lib/src/darwin/Package.swift`, its source and test directories, its layer card's Modules line, its ADR 0002 table row, its test target in the Xcode scheme (`lib/src/darwin/iStation.xcodeproj/xcshareddata/xcschemes/iStation.xcscheme`) and its Codebase Map row — in the same change.
 - **Hermetic tests per its guardrails**: files only in a `Sandbox`, never the real home, never Launch Services, a real emulator or a real game.
 - An item that needs a real run (the user's emulators, games, BIOS, signing identity) is prepared by you and run by the user; record what they report.
 - Done means green, with the real commands:
-  - `cd src/istation && swift build --explicit-target-dependency-import-check=error`
-  - `cd src/istation && swift test` (includes `ArchitectureTests`)
+  - `cd lib/src/darwin && swift build --explicit-target-dependency-import-check=error`
+  - `cd lib/src/darwin && swift test` (includes `ArchitectureTests`)
   - `python3 lib/scripts/validate_docs.py lib/documentation` (from the repository root)
 - Changing repository settings, CI secrets, or anything else outward-facing (publishing, signing, force-pushing, touching `stable` or a tag) is asked first; pushing the release branch when the item ships is routine (§6).
 

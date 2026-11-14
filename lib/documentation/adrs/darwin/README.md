@@ -26,3 +26,4 @@ The standing rules of iStation's architecture, each written once, dated, and kep
 | [0014](own-code-is-mit-and-derived-code-keeps-its-notice.md) | iStation's own code is MIT; derived code keeps its reference's notice (supersedes 0011) |
 | [0015](a-core-is-a-cpu-module-and-a-console-module.md) | A core is a CPU module and a console module behind one narrow interface; hot paths use concrete types (supersedes 0012) |
 | [0016](two-build-routines-and-a-fresh-start.md) | Every app has an App Store routine and a personal routine; the library app is retired (supersedes 0007) |
+| [0017](every-presentation-module-has-its-scheme.md) | Every Presentation module has its own shared Xcode scheme, which builds it and tests it alone |

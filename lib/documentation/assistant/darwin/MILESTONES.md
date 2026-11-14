@@ -460,3 +460,21 @@ Decided by the hardware (2026-11-14, ps1-tests' `cop` and its `psx.log`, recorde
 **Decisions consumed.**
 
 - 2026-11-14: mimic Apogee's layout, adapted for iStation (the user's call); the root `CLAUDE.md` stays as a pointer, the one application is `darwin` with `macos/` and `ios/`, and the move lands after 3g (the defaults, confirmed by the user).
+
+## Milestone N — The code under `lib/src/darwin/`
+
+**Goal.** The Apple apps' code self-contained under `lib/src/darwin/`, as the user's Apogee repository keeps its own (v0.0.1 item 4b; the user's call, 2026-11-14), with each Presentation module given its own scheme (the user's call, vetoing the default to wait).
+
+**Built** (4b, 2026-11-14):
+
+- **The move**: `src/istation` → `lib/src/darwin` (the package, `apps/`, `scripts/`, `source/`, `tests/`), `iStation.xcodeproj` → `lib/src/darwin/iStation.xcodeproj` beside the package, and `tools/` → `lib/src/darwin/tools/` — whole directories, so the git-ignored `Local.xcconfig` and every tool's `.build/` (the ProjectPSX clone, the .NET SDK, SwanStation's build) moved with them, unopened.
+- **The project**: the package referenced at its own folder (`.`), the schemes' package references at `container:`, the apps' groups at `apps/`, the routines' entitlements relative to the project, and an "iStation repository" group at `../../..` keeping the whole repository in the navigator (the user's call of 2026-11-14, kept).
+- **Per-module schemes** ([ADR 0017](../../adrs/darwin/every-presentation-module-has-its-scheme.md)): `PresentationStyles`, `PresentationPlayer` and `PresentationAcknowledgements`, each building its module and running its bundle; `everyPresentationModuleHasItsScheme` checks them.
+- **`scripts/build.sh personal|appstore macOS|iOS`** — the one entry point, over the two routines' scripts, which now run from `lib/src/darwin/`.
+- **Every anchor and path**: the architecture checks find the repository three levels above the package; `istation-run` depends on `../..` (the package `darwin`); `.gitignore`, `ci.yml` (`working-directory: lib/src/darwin`), the docs, the cards, the skills, the root `README.md` and the tools' READMEs name the new places — links recomputed, present-tense mentions rewritten, MILESTONES' and dated decisions' kept.
+
+**Verified** (2026-11-14): from `lib/src/darwin/`, the strict build (from a fresh build cache) and `swift test` (229 tests in 11 runs, the architecture checks reading the new root and the new scheme check among them) green; all four app schemes build, and each module scheme's tests pass in Xcode (2, 1 and 5); removing `PresentationPlayer.xcscheme` fails the new check; `cpu-check.sh` still agrees with ProjectPSX (37,666 records) and the gate runs from its new place; the docs validator clean; `git grep src/istation` finds only history.
+
+**Decisions consumed.**
+
+- 2026-11-14: the tools in `lib/src/darwin/tools/`, the project in `lib/src/darwin/` with the whole repository in its navigator, `scripts/build.sh` over the two routines' scripts (the defaults, confirmed by the user); a scheme per Presentation module now (the user's veto of the default).

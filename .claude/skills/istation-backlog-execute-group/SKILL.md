@@ -25,7 +25,7 @@ Record every answer in its document, propagated (as `/istation-backlog-execute-c
 
 ## 3. Build each item, serially
 
-Each item to `/istation-backlog-execute-item`'s full bar: 🚧 first; the layer law and every invariant; hermetic tests; green with the real commands (`cd src/istation && swift build --explicit-target-dependency-import-check=error`, `swift test`, and `python3 lib/scripts/validate_docs.py lib/documentation` from the root); shipped through the documentation flow (MILESTONES, document and row deleted, gates updated, ROADMAP ticked, map/cards/ADR 0002/DEVELOPER/reference as needed).
+Each item to `/istation-backlog-execute-item`'s full bar: 🚧 first; the layer law and every invariant; hermetic tests; green with the real commands (`cd lib/src/darwin && swift build --explicit-target-dependency-import-check=error`, `swift test`, and `python3 lib/scripts/validate_docs.py lib/documentation` from the root); shipped through the documentation flow (MILESTONES, document and row deleted, gates updated, ROADMAP ticked, map/cards/ADR 0002/DEVELOPER/reference as needed).
 
 **Commit and push once per shipped item** (CLAUDE.md → Committing and pushing): staging only that item's paths, the message exactly `v<x.y.z> : Title Case Summary` — no body, no trailers — then `git push origin v<x.y.z>`.
 

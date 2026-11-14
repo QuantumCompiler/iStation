@@ -1,0 +1,15 @@
+# The Business layer
+
+**Position.** Third of the four ([ADR 0001](../../../../documentation/adrs/darwin/layer-enforcement.md)): the cores — what a console does. Today the R3000A interpreter and the PS1 console, both ported from ProjectPSX: the console's memory map, interrupts, timers, DMA and GPU timing, with the other devices stubbed until their versions.
+
+**Modules:** `r3000a` (the R3000A interpreter: the PS1's CPU and the PS2's I/O processor), `ps1` (the PS1 console: memory map, devices, the run loop, PS-EXE loading)
+
+**May depend on:** Business, Data and Infrastructure — and no UI or Apple framework: the Swift standard library, and nothing else without a recorded reason ([ADR 0015](../../../../documentation/adrs/darwin/a-core-is-a-cpu-module-and-a-console-module.md)). A CPU family is one module generic over its bus; a console is one module owning its memory map; hot paths use concrete types or `@inlinable` generics, never protocol-typed values, and a class's stored `var`s on a hot path are `@exclusivity(unchecked)` (the dynamic check cost the R3000A 15×). Shipped code comes only from permissive sources, with its notice ([ADR 0013](../../../../documentation/adrs/darwin/shipped-code-derives-only-from-permissive-references.md), [ADR 0014](../../../../documentation/adrs/darwin/own-code-is-mit-and-derived-code-keeps-its-notice.md)).
+
+**Enforced by:** one SwiftPM target per module, generated from the module map in `lib/src/darwin/Package.swift`, and `ArchitectureTests` (`lib/src/darwin/tests/architecture/`), run by `swift test`.
+
+**Changing this layer:**
+- A new module: its directory `source/business/<module>/`, its `Module(.business, "<Name>", uses: […])` row in `Package.swift`, its tests in `tests/business/<module>/` (and in the `macOS Personal` scheme of `lib/src/darwin/iStation.xcodeproj`), its name on this card and in [ADR 0002](../../../../documentation/adrs/darwin/module-map.md)'s table — in the same change.
+- A core reaches TraceKit only through a generic tracer a release build specializes to nothing, its imports under `#if PERSONAL_BUILD` ([ADR 0016](../../../../documentation/adrs/darwin/two-build-routines-and-a-fresh-start.md)).
+
+**Depth:** [the ADRs](../../../../documentation/adrs/darwin/README.md) · [CLAUDE.md](../../../../documentation/assistant/darwin/CLAUDE.md) · [DEVELOPER.md](../../../../documentation/assistant/darwin/DEVELOPER.md).

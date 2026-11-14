@@ -7,7 +7,7 @@ description: Turn an iStation symptom into a root cause with evidence and a Main
 
 A symptom becomes a root cause with evidence, and a Maintenance item to fix it. Never fix it here.
 
-The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the code is `src/istation/`.
+The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the code is `lib/src/darwin/`.
 
 ## 1. Ground
 

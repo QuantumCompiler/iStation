@@ -27,7 +27,7 @@ The brief's first three tasks: prove JIT works under the App Store routine, lay 
 Then the repository takes the layout and procedure of the user's Apogee repository, adapted for iStation (the user's call, 2026-11-14):
 
 - [x] **Documentation by kind, then platform** — `lib/documentation/{assistant,backlog,adrs,reference}/darwin/`, the router and the validator ([Milestone M](MILESTONES.md#milestone-m--documentation-by-kind-then-platform))
-- [ ] **The code under `lib/src/darwin/`** — the package, the apps, the Xcode project, the scripts and the tools ([4b](../../backlog/darwin/v0.0.1/code-under-lib-src-darwin.md))
+- [x] **The code under `lib/src/darwin/`** — the package, the apps, the Xcode project, the scripts and the tools ([Milestone N](MILESTONES.md#milestone-n--the-code-under-libsrcdarwin))
 - [ ] **The release in `lib/release/VERSION`** — one file names the release, the apps follow it, a check guards it ([4c](../../backlog/darwin/v0.0.1/release-version-file.md))
 - [ ] **One build path and a pipeline per app** — `cicd.sh`, `changed.sh`, `pr-ci.sh` and `darwin.yml` ([4d](../../backlog/darwin/v0.0.1/one-build-path-and-a-pipeline-per-app.md))
 - [ ] **Superpowers inside the lifecycle, and application-aware skills** ([4e](../../backlog/darwin/v0.0.1/superpowers-and-app-aware-skills.md))
@@ -66,7 +66,7 @@ Then the repository takes the layout and procedure of the user's Apogee reposito
 
 ### v1.0.0 — Release: PS1 on the App Stores
 
-- [ ] The acknowledgements screen in both apps, from the acknowledgements list (`src/istation/apps/Acknowledgements.json`, Milestone H)
+- [ ] The acknowledgements screen in both apps, from the acknowledgements list (`lib/src/darwin/apps/Acknowledgements.json`, Milestone H)
 - [ ] Check App Review Guidelines section 4.7 for iOS and for the Mac App Store
 - [ ] Remove Sony logos and run a trademark check on "iStation"
 - [ ] App Store Connect, signing and submission (the user's)
@@ -91,7 +91,7 @@ Nothing queued: M1 and M2 were the library app's, and retired with it.
 
 Each `[user]`:
 
-- **If JIT fails under the App Sandbox (3a), how does the PS2 reach the Mac App Store** — interpreter only, or outside the store? Blocks v2.x. (2026-11-07) *Not raised yet: 3a's run (1) passed on macOS 27.0.1, ad-hoc signed ([Milestone E](MILESTONES.md#milestone-e--jit-under-the-app-store-routine)); it stays open until your runs (2) and (3) in `tools/jit-probe/README.md`.*
+- **If JIT fails under the App Sandbox (3a), how does the PS2 reach the Mac App Store** — interpreter only, or outside the store? Blocks v2.x. (2026-11-07) *Not raised yet: 3a's run (1) passed on macOS 27.0.1, ad-hoc signed ([Milestone E](MILESTONES.md#milestone-e--jit-under-the-app-store-routine)); it stays open until your runs (2) and (3) in `lib/src/darwin/tools/jit-probe/README.md`.*
 - **A PS1 high-level-emulated BIOS**, written from documentation (never from OpenBIOS), so App Store users need no BIOS dump? Unscheduled. (2026-11-07)
 
 ## Ideas

@@ -1,6 +1,6 @@
 # The trace formats
 
-The files every trace source writes and TraceKit (`DataTracing`, product `TraceKit`, personal builds only) reads, compares and reduces: the Swift port, ProjectPSX with trace logging, and SwanStation recorded from outside (v0.0.1 items 3d–3g). iStation's own format, MIT. Implemented in `src/istation/source/data/tracing/`, pinned byte for byte by `DataTracingTests` (version 1, 2026-11-07).
+The files every trace source writes and TraceKit (`DataTracing`, product `TraceKit`, personal builds only) reads, compares and reduces: the Swift port, ProjectPSX with trace logging, and SwanStation recorded from outside (v0.0.1 items 3d–3g). iStation's own format, MIT. Implemented in `lib/src/darwin/source/data/tracing/`, pinned byte for byte by `DataTracingTests` (version 1, 2026-11-07).
 
 Every integer is **little-endian**. Every checksum is **FNV-1a 64**: start at `0xCBF29CE484222325`; for each byte, XOR it into the value, then multiply by `0x00000100000001B3` modulo 2⁶⁴. A 32-bit word is hashed as its four little-endian bytes.
 

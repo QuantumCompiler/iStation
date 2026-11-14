@@ -27,7 +27,7 @@ In the table's directory (`backlog/darwin/v<x.y.z>/` (or `backlog/darwin/<os>/v<
 
 - **What / why** concrete enough to build from, with evidence (`file:line`, measurements). Too big for one focused session → **split first**, listing the sub-documents.
 - **Core constraint(s)**: every invariant it touches. Typical for iStation: shipped code only from a permissive source (ProjectPSX, Play!, iStation's own, public documentation), each ported file naming its source and keeping its notice (ADRs 0013, 0014) — checked against the reference's and the oracle's traces, never against a GPL emulator's source; hot paths with concrete types (ADR 0015); tools only under `PERSONAL_BUILD` (ADR 0016); the library file read compatibly (ADR 0007) — a new field is `decodeIfPresent` with a recording; view-models UI-free and visuals from `styles` (ADR 0005); tests hermetic over a `Sandbox` (ADR 0004); a new dependency audited onto ADR 0013's allow-list.
-- **Seam + files**: the **layer and module** from the codebase map (or a new module with its `Module(.<layer>, "<Name>", uses: […])` row), the interfaces it extends, the planned files and their tests in `src/istation/tests/<layer>/<module>/`.
+- **Seam + files**: the **layer and module** from the codebase map (or a new module with its `Module(.<layer>, "<Name>", uses: […])` row), the interfaces it extends, the planned files and their tests in `lib/src/darwin/tests/<layer>/<module>/`.
 - **Reference**: in-house precedents and prior art, and each deliberate divergence.
 - **Decisions made**, dated and attributed — including this placement.
 - **Open calls**, every one tagged: `[user]` (blocks the build), `[default: …]` (taken by the builder, veto-able), `(consumed decision)` (owned elsewhere — cite the owner).

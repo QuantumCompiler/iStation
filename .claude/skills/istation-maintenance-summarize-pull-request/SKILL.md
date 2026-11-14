@@ -19,8 +19,8 @@ A PR description written from evidence, delivered as text for the user to paste.
 
 Run, and report the actual results:
 
-- `cd src/istation && swift build --explicit-target-dependency-import-check=error`
-- `cd src/istation && swift test` (with `ArchitectureTests`)
+- `cd lib/src/darwin && swift build --explicit-target-dependency-import-check=error`
+- `cd lib/src/darwin && swift test` (with `ArchitectureTests`)
 - `python3 lib/scripts/validate_docs.py lib/documentation` (from the repository root)
 
 A command not run is listed as not run.

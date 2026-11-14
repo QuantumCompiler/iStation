@@ -10,7 +10,7 @@ A test tree with its own geography answers "where is this tested?" with a search
 
 **The test tree follows the architecture, and a test is written in the layer of the thing it tests.**
 
-- `src/istation/tests/<layer>/<module>/` mirrors `src/istation/source/<layer>/<module>/`; a new module brings its test directory in the same change.
+- `lib/src/darwin/tests/<layer>/<module>/` mirrors `lib/src/darwin/source/<layer>/<module>/`; a new module brings its test directory in the same change.
 - A test obeys the same dependency law as its subject: it imports its module, that module's declared edges and its declared test support, nothing more — a Data test does not reach into Business for its fixtures.
 - A behavior spanning layers is tested **in the highest layer involved** (scanning a folder of fixture discs is a Business test).
 - Shared fixtures and fakes sink like shared code: `SupportSandbox` (infrastructure), `SupportDiscFixtures` (data), `SupportLibraryFakes` (business).

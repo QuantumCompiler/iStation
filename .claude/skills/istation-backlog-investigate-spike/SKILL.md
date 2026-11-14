@@ -7,7 +7,7 @@ description: Investigate a design question about iStation with evidence, not opi
 
 A spike answers a design question **with evidence**. Its deliverable is a report in chat. It never builds code, never creates backlog documents, never edits SPEC, ROADMAP or the backlog index, and never saves a write-up file unless asked. "Execute the spike" afterwards means `/istation-backlog-create-spike` — create the documents — never implement.
 
-The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the code is `src/istation/`.
+The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the code is `lib/src/darwin/`.
 
 ## 1. Ground
 
@@ -21,7 +21,7 @@ Read, before probing anything:
 
 ## 2. Probe the real thing
 
-- **Run the actual code**: build it (`cd src/istation && swift build`), drive the module the question touches from a scratch test or script, parse the actual sources (`Package.swift`'s module rows, the import lines), and **measure**.
+- **Run the actual code**: build it (`cd lib/src/darwin && swift build`), drive the module the question touches from a scratch test or script, parse the actual sources (`Package.swift`'s module rows, the import lines), and **measure**.
 - **Sandbox everything.** Probe scripts and files stay in the session's scratchpad. Never read or write the user's real `~/Library/Application Support/iStation/library.json`: build `Locations.sandbox(root:)` over a scratch folder, and to run the app itself, give it a scratch home (`CFFIXED_USER_HOME=<scratch>/home swift run iStation`).
 - **Play the naive outsider** when the question is "can X be driven by Y" (an emulator flag, a metadata service, a controller config file): try it the way a newcomer would and record every wall exactly as it is hit.
 - **Real runs are the user's.**\1 A GPL oracle (SwanStation, PCSX2) is only built unmodified and run: never open, read or disassemble its source, and a session that has read one writes no core code (ADR 0013).

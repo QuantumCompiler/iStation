@@ -8,45 +8,47 @@ The module-by-module reference: the tree, each module's files and interfaces, th
 CLAUDE.md                      root pointer → lib/documentation/CLAUDE.md
 README.md                      public overview
 LICENSE · LICENSES/            iStation's MIT licence; MIT.txt and BSD-2-Clause.txt for the SPDX headers
-iStation.xcodeproj/            the two apps over the package; four shared schemes (macOS/iOS × Personal/App Store); its navigator shows the whole repository
 .github/workflows/ci.yml       strict build, swift test, both apps' personal builds, docs validator
 lib/
   documentation/               by kind, then platform: CLAUDE.md (the router); assistant/ backlog/ adrs/ reference/,
                                each a README.md and darwin/ (this application), with macos/ and ios/ beneath
   scripts/validate_docs.py     the docs validator (each application's backlog index ↔ documents, every link)
-tools/
-  jit-probe/                   the JIT probe (3a): one sandboxed allow-jit app, build.sh, results in README.md
-  projectpsx-trace/            ProjectPSX at f4dc13aea42d with trace logging (3d): trace.patch, host/, build.sh, run.sh
-  swanstation-oracle/          SwanStation built unmodified, and frontend.c, its headless libretro frontend (3d)
-  istation-run/                the Swift console from the command line, the CPU-check program, trace diff (3d, 3g)
-  ps1-tests/                   fetch.sh: the open CPU tests' programs and their psx.log files, into .build/ (3d, 3g)
-  gate/                        run.sh: v0.0.1's gate with the user's BIOS — the boot and the CPU tests on all three, report.md and frames.tsv (3d, 3g)
-src/istation/
-  Package.swift                the module map (ADR 0002), the products PS1Core, EmuKit and TraceKit, PERSONAL_BUILD in debug
-  apps/
-    Acknowledgements.json      every notice the apps carry, bundled into both
-    Config/                    Version.xcconfig · AppStore.xcconfig (Release) · Personal.xcconfig (Debug)
-    macos/                     Sources/iStationApp.swift · AppStore.entitlements · Personal.entitlements
-    ios/                       Sources/iStationApp.swift · AppStore.entitlements · Personal.entitlements
-  scripts/
-    build-personal.sh          the personal routine: one app, Debug, into build/DerivedData
-    archive-appstore.sh        the App Store routine: one app, Release, archived into build/<platform>/
-  source/
-    infrastructure/            CLAUDE.md · bytes/
-    data/                      CLAUDE.md · iso9660/ systemcnf/ playlists/ tracing/
-    business/                  CLAUDE.md · r3000a/ ps1/
-    presentation/              CLAUDE.md · styles/ player/ acknowledgements/
-  tests/
-    infrastructure/ data/ business/ presentation/   CLAUDE.md each · one directory per module
-    support/                   sandbox/ (infrastructure) · discfixtures/ (data) · mips/ r3000atrace/ (business)
-    architecture/              the layering, layer-context and project-rule checks
+  src/darwin/                  the Apple apps, self-contained (Apogee's layout)
+    Package.swift              the module map (ADR 0002), the products PS1Core, EmuKit and TraceKit, PERSONAL_BUILD in debug
+    iStation.xcodeproj/        the two apps over the package; four app schemes (macOS/iOS × Personal/App Store) and one
+                               per Presentation module (ADR 0017); its navigator shows the whole repository
+    apps/
+      Acknowledgements.json    every notice the apps carry, bundled into both
+      Config/                  Version.xcconfig · AppStore.xcconfig (Release) · Personal.xcconfig (Debug) · Local.xcconfig (yours, git-ignored)
+      macos/                   Sources/iStationApp.swift · AppStore.entitlements · Personal.entitlements
+      ios/                     Sources/iStationApp.swift · AppStore.entitlements · Personal.entitlements
+    scripts/
+      build.sh                 the one entry point: build.sh personal|appstore macOS|iOS
+      build-personal.sh        the personal routine: one app, Debug, into build/DerivedData
+      archive-appstore.sh      the App Store routine: one app, Release, archived into build/<platform>/
+    source/
+      infrastructure/          CLAUDE.md · bytes/
+      data/                    CLAUDE.md · iso9660/ systemcnf/ playlists/ tracing/
+      business/                CLAUDE.md · r3000a/ ps1/
+      presentation/            CLAUDE.md · styles/ player/ acknowledgements/
+    tests/
+      infrastructure/ data/ business/ presentation/   CLAUDE.md each · one directory per module
+      support/                 sandbox/ (infrastructure) · discfixtures/ (data) · mips/ r3000atrace/ (business)
+      architecture/            the layering, layer-context and project-rule checks
+    tools/
+      jit-probe/               the JIT probe (3a): one sandboxed allow-jit app, build.sh, results in README.md
+      projectpsx-trace/        ProjectPSX at f4dc13aea42d with trace logging (3d): trace.patch, host/, build.sh, run.sh
+      swanstation-oracle/      SwanStation built unmodified, and frontend.c, its headless libretro frontend (3d)
+      istation-run/            the Swift console from the command line, the CPU-check program, trace diff (3d, 3g)
+      ps1-tests/               fetch.sh: the open CPU tests' programs and their psx.log files, into .build/ (3d, 3g)
+      gate/                    run.sh: v0.0.1's gate with the user's BIOS — the boot and the CPU tests on all three (3g)
 ```
 
-`src/istation/build/` (archives and DerivedData) and every `.build/` are git-ignored.
+`lib/src/darwin/build/` (archives and DerivedData) and every `.build/` are git-ignored.
 
 ## Build, test, run
 
-From `src/istation/` unless noted.
+From `lib/src/darwin/` unless noted.
 
 | Task | Command |
 |---|---|
@@ -56,15 +58,15 @@ From `src/istation/` unless noted.
 | One module's tests | `swift test --filter DataISO9660Tests` |
 | Only the architecture checks | `swift test --filter ArchitectureTests` |
 | Build one module alone | `swift build --target PresentationPlayer` |
-| Personal build of an app | `./scripts/build-personal.sh macOS` (or `iOS`, for the Simulator) |
-| App Store archive of an app | `./scripts/archive-appstore.sh macOS` (or `iOS`); `ISTATION_TEAM_ID=<team> …` also signs and exports — yours |
-| Xcode (repo root) | `open iStation.xcodeproj`; scheme `macOS Personal`: ⌘R runs, ⌘U runs every package test |
-| All tests through Xcode (repo root) | `xcodebuild test -project iStation.xcodeproj -scheme "macOS Personal" -destination 'platform=macOS'` |
+| Personal build of an app | `./scripts/build.sh personal macOS` (or `iOS`, for the Simulator) |
+| App Store archive of an app | `./scripts/build.sh appstore macOS` (or `iOS`); `ISTATION_TEAM_ID=<team> …` also signs and exports — yours |
+| Xcode (repo root) | `open lib/src/darwin/iStation.xcodeproj`; scheme `macOS Personal`: ⌘R runs, ⌘U runs every package test; a module's own scheme (`PresentationPlayer`) builds and tests it alone |
+| All tests through Xcode (repo root) | `xcodebuild test -project lib/src/darwin/iStation.xcodeproj -scheme "macOS Personal" -destination 'platform=macOS'` |
 | TraceKit's throughput (2.5 GB in a temporary folder) | `ISTATION_BENCHMARK=1 swift test -c release --filter ThroughputTests` |
 | The R3000A's instructions per second (the spike's loop, 300 M instructions) | `ISTATION_BENCHMARK=1 swift test -c release --filter BusinessR3000ATests.BenchmarkTests` |
 | The whole console's speed (the same loop, 600 frames) | `ISTATION_BENCHMARK=1 swift test -c release --filter BusinessPS1Tests.BenchmarkTests` |
-| The CPU check: one program on ProjectPSX and the Swift console, traces diffed (repo root) | `tools/projectpsx-trace/build.sh && tools/istation-run/cpu-check.sh` |
-| The gate, with your own BIOS (repo root; after both tools' `build.sh` and `tools/ps1-tests/fetch.sh`) | `tools/gate/run.sh <bios> [--scph1001] [--out <folder>]` |
+| The CPU check: one program on ProjectPSX and the Swift console, traces diffed (repo root) | `lib/src/darwin/tools/projectpsx-trace/build.sh && lib/src/darwin/tools/istation-run/cpu-check.sh` |
+| The gate, with your own BIOS (repo root; after both tools' `build.sh` and `lib/src/darwin/tools/ps1-tests/fetch.sh`) | `lib/src/darwin/tools/gate/run.sh <bios> [--scph1001] [--out <folder>]` |
 | Docs validator (repo root) | `python3 lib/scripts/validate_docs.py lib/documentation` |
 | Lint / format | _TODO:_ none chosen |
 
@@ -83,7 +85,7 @@ From `src/istation/` unless noted.
 
 `CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO` in the App Store routine keeps local signing from adding `get-task-allow`. The window or navigation title of a personal build reads "iStation — Personal build".
 
-**Signing with your team.** Your development team never enters the repository (the user's call, 2026-11-14). Both routines' xcconfigs end with `#include? "Local.xcconfig"`, and `src/istation/apps/Config/Local.xcconfig`, git-ignored, holds `DEVELOPMENT_TEAM = <your team ID>` on your Mac; without the file nothing changes, and `scripts/archive-appstore.sh`'s `ISTATION_TEAM_ID` still overrides it. Set the team there, not in Xcode's Signing & Capabilities pane: the pane writes `DEVELOPMENT_TEAM` into `project.pbxproj`, which is committed — if it does, move the value to `Local.xcconfig` and delete the line from the project.
+**Signing with your team.** Your development team never enters the repository (the user's call, 2026-11-14). Both routines' xcconfigs end with `#include? "Local.xcconfig"`, and `lib/src/darwin/apps/Config/Local.xcconfig`, git-ignored, holds `DEVELOPMENT_TEAM = <your team ID>` on your Mac; without the file nothing changes, and `scripts/archive-appstore.sh`'s `ISTATION_TEAM_ID` still overrides it. Set the team there, not in Xcode's Signing & Capabilities pane: the pane writes `DEVELOPMENT_TEAM` into `project.pbxproj`, which is committed — if it does, move the value to `Local.xcconfig` and delete the line from the project.
 
 ## The test table
 
@@ -144,9 +146,9 @@ source/presentation/
 ### Adding a module
 
 1. Decide its layer (the lowest one that can hold it) and its one-phrase concern.
-2. Create `src/istation/source/<layer>/<module>/` and `src/istation/tests/<layer>/<module>/`, each with at least one Swift file.
+2. Create `lib/src/darwin/source/<layer>/<module>/` and `lib/src/darwin/tests/<layer>/<module>/`, each with at least one Swift file.
 3. Add its row to `modules` in `Package.swift`: `Module(.<layer>, "<Name>", uses: [<targets>], testSupport: [<support targets>], derivedFrom: .projectPSX),` — on one line, `derivedFrom:` only for a ported module; its target is `<Layer><Name>`. If the apps use it, add the target to a product. Every file opens with its SPDX header (below).
-4. Add its name to its layer card's **Modules** line and a row to [ADR 0002](../../adrs/darwin/module-map.md)'s table (`| <layer> | \`<module>\` | <uses> |`), and a `<TestableReference>` for its `<Layer><Name>Tests` target to `iStation.xcodeproj/xcshareddata/xcschemes/macOS Personal.xcscheme` (copy a neighbour's block, change the three names).
+4. Add its name to its layer card's **Modules** line and a row to [ADR 0002](../../adrs/darwin/module-map.md)'s table (`| <layer> | \`<module>\` | <uses> |`), and a `<TestableReference>` for its `<Layer><Name>Tests` target to `lib/src/darwin/iStation.xcodeproj/xcshareddata/xcschemes/macOS Personal.xcscheme` (copy a neighbour's block, change the three names).
 5. Add it to the Codebase Map in CLAUDE.md and a section above.
 6. Run `swift test` — the layering and layer-context checks must pass.
 
@@ -156,7 +158,7 @@ source/presentation/
 2. Write the view-model first: `@MainActor @Observable`, named states, intents named for what the person does; test it headlessly.
 3. Write the views bound to it, every visual from `styles`, each with a named `#Preview` per visible state inside `#if DEBUG`, over fakes in `Previews/`.
 4. Build its view-model in each app's `iStationApp.swift` and mount its view.
-5. Add it to the Presentation card, ADR 0002's table, the `macOS Personal` scheme's tests and the Codebase Map. Run `swift test`.
+5. Add it to the Presentation card, ADR 0002's table, the `macOS Personal` scheme's tests and the Codebase Map, and give it its own shared scheme, `iStation.xcodeproj/xcshareddata/xcschemes/<Target>.xcscheme`, building it and testing its bundle (ADR 0017). Run `swift test`.
 
 ### Headers, provenance and the acknowledgements list
 
@@ -167,7 +169,7 @@ Every Swift file in the package and the apps opens with
 // SPDX-FileCopyrightText: 2026 iStation contributors
 ```
 
-A file ported from a reference sits in a module whose row says `derivedFrom: .projectPSX` (or `.play`), carries that reference's licence (`MIT` or `BSD-2-Clause`), keeps the reference's copyright line as a `SPDX-FileCopyrightText` line beside iStation's, and names its source: `// Ported from BluestormDNA/ProjectPSX/ProjectPSX/Core/CPU.cs — Copyright (c) 2019 Pedro Cortés`. A component whose notice an app carries gets an entry in `src/istation/apps/Acknowledgements.json` (its name, SPDX licence, source URL, the apps that carry it, its notice verbatim); a new licence also gets its text in `LICENSES/<id>.txt`. `ArchitectureTests` fails on any one missing.
+A file ported from a reference sits in a module whose row says `derivedFrom: .projectPSX` (or `.play`), carries that reference's licence (`MIT` or `BSD-2-Clause`), keeps the reference's copyright line as a `SPDX-FileCopyrightText` line beside iStation's, and names its source: `// Ported from BluestormDNA/ProjectPSX/ProjectPSX/Core/CPU.cs — Copyright (c) 2019 Pedro Cortés`. A component whose notice an app carries gets an entry in `lib/src/darwin/apps/Acknowledgements.json` (its name, SPDX licence, source URL, the apps that carry it, its notice verbatim); a new licence also gets its text in `LICENSES/<id>.txt`. `ArchitectureTests` fails on any one missing.
 
 ### Adding a view
 
@@ -179,7 +181,7 @@ A debug view goes in its module's `Debug/` and opens with `#if PERSONAL_BUILD`; 
 
 ### Adding a file Xcode's navigator should show
 
-`iStation.xcodeproj` shows the whole repository, not only the apps: the README and CLAUDE.md, `lib/documentation/`, the package, the apps' groups, `tools/`, `scripts/`, `.github/`, `.claude/`, the licences and `.gitignore`. Most folders are synchronized (blue in the navigator), so a new file in them appears by itself: `lib/documentation/`, `scripts/`, `.github/`, `.claude/`, `LICENSES/`, `tools/gate/`, and each tool's source folders (`Sources/`, `host/`). Each tool's top level is listed file by file instead, because every tool builds into a hidden `.build/` and a synchronized folder shows hidden folders too — SwanStation's clone and its GPL source among them, which no one opens. So a new file at a tool's top level is added to that tool's group under `tools` by hand (File ▸ Add Files to "iStation", no target), and a tool folder is never added whole; a new top-level folder in the repository gets its own synchronized group.
+`lib/src/darwin/iStation.xcodeproj` shows the whole repository, not only the apps: the README and CLAUDE.md, `lib/documentation/`, the package, the apps' groups, `lib/src/darwin/tools/`, `scripts/`, `.github/`, `.claude/`, the licences and `.gitignore`. Most folders are synchronized (blue in the navigator), so a new file in them appears by itself: `lib/documentation/`, `scripts/`, `.github/`, `.claude/`, `LICENSES/`, `lib/src/darwin/tools/gate/`, and each tool's source folders (`Sources/`, `host/`). Each tool's top level is listed file by file instead, because every tool builds into a hidden `.build/` and a synchronized folder shows hidden folders too — SwanStation's clone and its GPL source among them, which no one opens. So a new file at a tool's top level is added to that tool's group under `tools` by hand (File ▸ Add Files to "iStation", no target), and a tool folder is never added whole; a new top-level folder in the repository gets its own synchronized group.
 
 ### Adding or promoting a shared component
 

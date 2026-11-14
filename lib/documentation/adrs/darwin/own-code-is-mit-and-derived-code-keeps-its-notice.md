@@ -12,7 +12,7 @@
 2. **Every source file states its licence** in an SPDX header: `MIT` for iStation's own code and for code ported from ProjectPSX; `BSD-2-Clause` for code ported from Play! and its libraries.
 3. **A ported file names its source and keeps its notice**: the reference repository and file it comes from, and that file's copyright line (ProjectPSX's holder for PS1 code; "Jean-Philip Desjardins" for Play! code), beside iStation's own.
 4. **Every app shows every notice** it carries — ProjectPSX's MIT text, Play!'s and its libraries' BSD texts, and any audited dependency's — in its acknowledgements screen, generated from one list in the repository so source and screen can't drift.
-5. **Nothing GPL ships.** Tools that run GPL oracles live outside the shipped package (`tools/`) and are never distributed.
+5. **Nothing GPL ships.** Tools that run GPL oracles live outside the shipped package (`lib/src/darwin/tools/`) and are never distributed.
 
 ## Consequences
 
@@ -22,4 +22,4 @@
 
 ## Enforcement
 
-Enforced since Architecture item A2 (2026-11-07, [Milestone H](../../assistant/darwin/MILESTONES.md#milestone-h--provenance-headers-and-notices)): `ArchitectureTests/ProjectRulesTests.swift` — `everyFileHasItsHeader` fails on a Swift file in the package or the apps without its two SPDX lines, or naming a licence with no text in `LICENSES/`; `portedModulesNameTheirSources` fails on a file in a module the map marks `derivedFrom:` without its `// Ported from <repository>/<path> — <copyright>` line or with another licence than its reference's; `everyLicenceIsAcknowledged` fails on a licence or a reference missing from `src/istation/apps/Acknowledgements.json`, or an entry without a notice. Each verified against a planted violation, 2026-11-07. That a ported file's code really comes from the file it names is held by review.
+Enforced since Architecture item A2 (2026-11-07, [Milestone H](../../assistant/darwin/MILESTONES.md#milestone-h--provenance-headers-and-notices)): `ArchitectureTests/ProjectRulesTests.swift` — `everyFileHasItsHeader` fails on a Swift file in the package or the apps without its two SPDX lines, or naming a licence with no text in `LICENSES/`; `portedModulesNameTheirSources` fails on a file in a module the map marks `derivedFrom:` without its `// Ported from <repository>/<path> — <copyright>` line or with another licence than its reference's; `everyLicenceIsAcknowledged` fails on a licence or a reference missing from `lib/src/darwin/apps/Acknowledgements.json`, or an entry without a notice. Each verified against a planted violation, 2026-11-07. That a ported file's code really comes from the file it names is held by review.

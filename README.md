@@ -12,10 +12,10 @@ v0.0.1, re-envisioned on 2026-11-07. JIT is verified under the App Store routine
 
 Requires macOS 14 or later on Apple Silicon and Xcode 16 or later (Swift 6).
 
-In Xcode, open `iStation.xcodeproj` at the root of the repository and pick a scheme: `macOS Personal` or `iOS Personal` to run and debug (⌘R; ⌘U runs every test from `macOS Personal`), `macOS App Store` or `iOS App Store` to archive. From Terminal:
+In Xcode, open `lib/src/darwin/iStation.xcodeproj` and pick a scheme: `macOS Personal` or `iOS Personal` to run and debug (⌘R; ⌘U runs every test from `macOS Personal`), `macOS App Store` or `iOS App Store` to archive. From Terminal:
 
 ```bash
-cd src/istation
+cd lib/src/darwin
 swift test                              # every module's tests, plus the architecture checks
 ./scripts/build-personal.sh macOS       # the personal routine (or iOS, for the Simulator)
 ./scripts/archive-appstore.sh macOS     # an App Store archive; signing and uploading are yours
@@ -23,7 +23,7 @@ swift test                              # every module's tests, plus the archite
 
 ## Licence
 
-iStation's own code is MIT ([LICENSE](LICENSE)). Code ported from ProjectPSX keeps its MIT notice, and code from Play! keeps its BSD notices; every source file names its licence in an SPDX header, and each app lists the notices it carries in its acknowledgements ([src/istation/apps/Acknowledgements.json](src/istation/apps/Acknowledgements.json)).
+iStation's own code is MIT ([LICENSE](LICENSE)). Code ported from ProjectPSX keeps its MIT notice, and code from Play! keeps its BSD notices; every source file names its licence in an SPDX header, and each app lists the notices it carries in its acknowledgements ([lib/src/darwin/apps/Acknowledgements.json](lib/src/darwin/apps/Acknowledgements.json)).
 
 ## Contributing
 

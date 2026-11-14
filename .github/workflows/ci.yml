@@ -12,7 +12,7 @@ jobs:
     runs-on: macos-15
     defaults:
       run:
-        working-directory: src/istation
+        working-directory: lib/src/darwin
     steps:
       - uses: actions/checkout@v4
 
@@ -28,7 +28,6 @@ jobs:
         run: swift test
 
       - name: Both apps, personal routine, unsigned
-        working-directory: .
         run: |
           xcodebuild build -project iStation.xcodeproj -scheme "macOS Personal" -destination generic/platform=macOS CODE_SIGNING_ALLOWED=NO
           xcodebuild build -project iStation.xcodeproj -scheme "iOS Personal" -destination "generic/platform=iOS Simulator" CODE_SIGNING_ALLOWED=NO

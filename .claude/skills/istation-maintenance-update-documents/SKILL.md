@@ -7,7 +7,7 @@ description: The pre-merge documentation reconciliation for iStation — scope f
 
 The docs are the source of truth, so before a merge they must say what the code now does. Audit claims about **changed areas only** — no drive-by rewrites.
 
-The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the code is `src/istation/`; the base branch is `stable`.
+The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); the code is `lib/src/darwin/`; the base branch is `stable`.
 
 ## 1. Scope from the diff
 
@@ -20,7 +20,7 @@ The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); t
 - **[ROADMAP.md](../../../lib/documentation/assistant/darwin/ROADMAP.md)**: shipped lines ticked and linked to their milestone; "Decisions needed" current.
 - **[CLAUDE.md](../../../lib/documentation/assistant/darwin/CLAUDE.md)**: the Codebase Map (one concern per row — a row that can't be written that way is a split waiting, ADR 0003); Stack & environment; a newly enforced rule promoted to `⚠`; style rules; the checklist.
 - **[DEVELOPER.md](../../../lib/documentation/assistant/darwin/DEVELOPER.md)**: the tree, each changed module's section, the commands, the test table, the recipes.
-- **Layer cards** (`src/istation/source/<layer>/CLAUDE.md`, `src/istation/tests/<layer>/CLAUDE.md`), **ADR 0002's table** and the Xcode scheme's test list (`iStation.xcodeproj/xcshareddata/xcschemes/iStation.xcscheme`) against the `modules` rows in `Package.swift`.
+- **Layer cards** (`lib/src/darwin/source/<layer>/CLAUDE.md`, `lib/src/darwin/tests/<layer>/CLAUDE.md`), **ADR 0002's table** and the Xcode scheme's test list (`lib/src/darwin/iStation.xcodeproj/xcshareddata/xcschemes/iStation.xcscheme`) against the `modules` rows in `Package.swift`.
 - **[ADRs](../../../lib/documentation/adrs/darwin/README.md)**: a new standing rule gets a record; a changed one a superseding record (append-only — the old record's Status line is its only edit); each Enforcement section names the real check.
 - **[reference/](../../../lib/documentation/reference/darwin/README.md)** against the shipped contract: TraceKit's trace formats (`source/data/tracing/`, from item 3c), and any persisted format the apps write.
 - **[SPEC.md](../../../lib/documentation/assistant/darwin/SPEC.md)** only if scope moved, with a dated note.
@@ -29,8 +29,8 @@ The docs home is [`lib/documentation/`](../../../lib/documentation/CLAUDE.md); t
 ## 3. Validate mechanically
 
 - `python3 lib/scripts/validate_docs.py lib/documentation` (from the repository root).
-- `cd src/istation && swift build --explicit-target-dependency-import-check=error`
-- `cd src/istation && swift test` — the layering and layer-context checks run inside it.
+- `cd lib/src/darwin && swift build --explicit-target-dependency-import-check=error`
+- `cd lib/src/darwin && swift test` — the layering and layer-context checks run inside it.
 
 ## 4. Commit and push
 
