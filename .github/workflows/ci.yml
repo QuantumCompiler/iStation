@@ -1,0 +1,66 @@
+# The repository's pipeline (v0.0.1 item 4d, Apogee's shape): the documentation and the release. Each
+# application builds in its own pipeline beside this one — the Apple apps' is darwin.yml.
+#
+# Only for an open pull request (opened, new commits, reopened) and for a merge into stable; pushes to
+# release branches run nothing (the user's call, 2026-10-31). A merge into stable is the release (the
+# user's call, 2026-11-14): `version bump` checks on every pull request into stable that merging would
+# publish what changed, and once one merges, `tag and release` tags its merge commit v<lib/release/VERSION>
+# and publishes its source.
+#
+# WHEN YOU CHANGE A JOB — added, removed or renamed — the required checks follow: once the pull
+# request's run passes, lib/scripts/required-checks.py --pr <N> proposes them and --apply sets them,
+# which changes the repository's settings and is the user's to run. A required job never gets a
+# job-level `if:` (it would report skipped and never pass): its steps are skipped instead.
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+  push:
+    branches: [stable]
+
+permissions:
+  contents: read
+
+jobs:
+  docs:
+    name: docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        if: github.event.action != 'closed'
+      - name: The docs validator
+        if: github.event.action != 'closed'
+        run: lib/scripts/cicd.sh --docs
+
+  version-bump:
+    name: version bump
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        if: github.event_name == 'pull_request' && github.event.action != 'closed' && github.base_ref == 'stable'
+        with:
+          fetch-depth: 0
+      - name: What merging into stable publishes
+        if: github.event_name == 'pull_request' && github.event.action != 'closed' && github.base_ref == 'stable'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: lib/scripts/version-check.sh
+      - name: Not a pull request into stable
+        if: github.event_name != 'pull_request' || github.event.action == 'closed' || github.base_ref != 'stable'
+        run: echo "nothing to check — only a pull request into stable is a release"
+
+  tag-and-release:
+    name: tag and release
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.base_ref == 'stable'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Tag the merge commit and publish its release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: lib/scripts/release-from-pr.sh ${{ github.event.pull_request.number }} --publish

@@ -1,0 +1,5 @@
+// The apps' version follows the release, lib/release/VERSION, the only place it is edited: scripts/build.sh
+// writes MARKETING_VERSION from it, and ArchitectureTests fail if the two ever differ
+// (lib/documentation/assistant/darwin/CLAUDE.md → Versioning).
+MARKETING_VERSION = 0.0.1
+CURRENT_PROJECT_VERSION = 1

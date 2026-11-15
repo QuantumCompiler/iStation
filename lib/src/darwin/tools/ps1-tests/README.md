@@ -1,0 +1,3 @@
+# ps1-tests — the open CPU tests' programs
+
+[ps1-tests](https://github.com/JaCzekanski/ps1-tests) (MIT, Jakub Czekański): `fetch.sh` downloads release `build-158`'s `tests.zip` (6,613,816 bytes) into the git-ignored `.build/`, beside the suite's licence, and lists the CPU tests' EXEs. The programs are open test code, not Sony's; they run only on a BIOS, which is yours (v0.0.1 items 3d and 3g). Their `psx.log` files, recorded on a real PS1, are in the suite's repository (`cpu/*/psx.log`); `fetch.sh` fetches the four CPU tests' at the licence's commit, `f727802fead1`, into `.build/logs/` — all four or none. Fetching is a download, so it is the user's to start, with the gate (`../gate/`).
