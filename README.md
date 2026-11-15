@@ -6,7 +6,7 @@ iStation ships no BIOS files or games: you import your own.
 
 ## Status
 
-v0.0.1, re-envisioned on 2026-11-07. JIT is verified under the App Store routine, and the macOS and iOS apps build in two routines (App Store and personal) over one Swift package, whose library products are `PS1Core`, `EmuKit` and `TraceKit` (personal builds only). `PS1Core` holds the R3000A interpreter and the PS1 console around it, ported from ProjectPSX: run from the command line (`lib/src/darwin/tools/istation-run`), it boots the user's 23 BIOS images to the shell, passes ps1-tests' CPU tests up to known gaps and agrees with ProjectPSX instruction by instruction. Both apps still open to an empty player; the first picture comes with v0.1.0. See [the roadmap](lib/documentation/assistant/darwin/ROADMAP.md).
+v0.1.0, the first picture, is in progress; [v0.0.1](https://github.com/QuantumCompiler/iStation/releases/tag/v0.0.1) is released. JIT is verified under the App Store routine, and the macOS and iOS apps build in two routines (App Store and personal) over one Swift package, whose library products are `PS1Core`, `EmuKit` and `TraceKit` (personal builds only). `PS1Core` holds the R3000A interpreter and the PS1 console around it, ported from ProjectPSX: run from the command line (`lib/src/darwin/tools/istation-run`), it boots the user's 23 BIOS images to the shell, passes ps1-tests' CPU tests up to known gaps and agrees with ProjectPSX instruction by instruction. Both apps still open to an empty player. See [the roadmap](lib/documentation/assistant/darwin/ROADMAP.md).
 
 ## Build and run
 

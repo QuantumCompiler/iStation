@@ -1,6 +1,6 @@
 ---
 name: istation-backlog-swap-version
-description: Slide iStation's queued releases by one version — insert a new version ahead of the queue (bumping later versions, their backlog directories and every reference up) or collapse a vacated one — with an ordered, word-bounded scripted replace plus the judgment edits a script can't make; the skill resolves which application's queue is meant and asks when it cannot. Use when the user says "insert a v0.1.0 before the first picture", "bump everything after v0.2.0", "we're skipping v0.3.0", "renumber the releases", or "add a patch release ahead of the queue".
+description: Slide iStation's queued releases by one version — insert a new version ahead of the queue (bumping later versions, their backlog directories and every reference up) or collapse a vacated one — with an ordered, word-bounded scripted replace plus the judgment edits a script can't make; the skill resolves which application's queue is meant and asks when it cannot. Use when the user says "insert a v0.2.0 before PS1 games boot", "bump everything after v0.2.0", "we're skipping v0.3.0", "renumber the releases", or "add a patch release ahead of the queue".
 ---
 
 # Swap versions — iStation
@@ -11,7 +11,7 @@ The version scheme is one version per roadmap phase (the Version scheme line of 
 
 iStation's documentation is split by kind, then by platform ([the router](../../../lib/documentation/CLAUDE.md)): `lib/documentation/{assistant,backlog,adrs,reference}/<app>/`. Today there is one application, **`darwin`**: the Apple apps, one Swift package at `lib/src/darwin/` with the macOS app (PS1 and PS2) and the iOS app (PS1); what binds one OS alone sits in that kind's `darwin/macos/` or `darwin/ios/`. A second application gets its own folder in each kind and a row in the router. Resolve which application this invocation means, and for work that binds one OS which OS folder, before reading anything else, in order:
 
-1. **The arguments.** An id or table names its queue: `darwin`'s version tables (`v0.0.1`, `v0.1.0`, …) with their numeric tracks (`4e`), and its standing `M<n>` and `A<n>` tables. A named document resolves by the backlog that holds it, and by its folder (`macos/`, `ios/`) to one OS.
+1. **The arguments.** An id or table names its queue: `darwin`'s version tables (`v0.1.0`, `v0.2.0`, …) with their numeric tracks (`4e`), and its standing `M<n>` and `A<n>` tables. A named document resolves by the backlog that holds it, and by its folder (`macos/`, `ios/`) to one OS.
 2. **The conversation.** What the work touches: the package, its cores, the apps, their build routines and their tools (`lib/src/darwin/`) are `darwin`'s; a screen, entitlement or setting of one app alone is that OS's folder; what both apps share is `darwin` itself.
 3. **Still ambiguous? Ask.** One AskUserQuestion — which application, or whether the work binds macOS alone, iOS alone or both apps — before anything is treated as decided. Never guess between them. A request for an application that has no folder yet (a web or Windows app, say) is asked about too, never filed under `darwin`.
 
@@ -27,7 +27,7 @@ Everything below reads from the chosen application's folders, written `<app>` (t
 
 ## 2. Confirm the mapping
 
-With the user, one line per version ("v0.1.0 → v0.2.0, v0.2.0 → v0.3.0, …; new v0.1.0: <theme>"), before anything moves.
+With the user, one line per version ("v0.2.0 → v0.3.0, v0.3.0 → v0.4.0, …; new v0.2.0: <theme>"), before anything moves.
 
 ## 3. Move the directories — order prevents collisions
 
@@ -37,14 +37,14 @@ With the user, one line per version ("v0.1.0 → v0.2.0, v0.2.0 → v0.3.0, …;
 
 ## 4. The scripted replace — ordered, word-bounded, case-sensitive
 
-One script over the surveyed files, applying replacements in the same order as the moves (descending when bumping up, ascending when collapsing), so a bumped name is never bumped twice: `v0\.3\.0\b` → `v0.4.0` before `v0\.2\.0\b` → `v0.3.0`. Dots escaped and `\b` closing it, so `v0.1.0` never matches inside `v0.1.01`; it also rewrites every link path (`v0.1.0/<file>.md`), matching the directory moves.
+One script over the surveyed files, applying replacements in the same order as the moves (descending when bumping up, ascending when collapsing), so a bumped name is never bumped twice: `v0\.3\.0\b` → `v0.4.0` before `v0\.2\.0\b` → `v0.3.0`. Dots escaped and `\b` closing it, so `v0.2.0` never matches inside `v0.2.01`; it also rewrites every link path (`v0.2.0/<file>.md`), matching the directory moves.
 
 - **No pattern touches an id, a bare number or a date**: track numbers don't move with their version (ids are identities), so nothing risks the day in `2026-11-14`.
 - **Left out of the pass and read by hand after**: MILESTONES and every dated **Decisions made** entry. History keeps the version it was made under; only a forward-looking reference there (a pending item's earmark, a shipped spike's pending split) is bumped, as an exact string.
 
 ## 5. The judgment edits
 
-- Prose that names a version's theme ("the first picture"), and any narrative the renumber makes false — re-read after the pass and rewritten to stay true.
+- Prose that names a version's theme ("PS1 games boot"), and any narrative the renumber makes false — re-read after the pass and rewritten to stay true.
 - The repo-wide [Versioning](../../../lib/documentation/assistant/darwin/CLAUDE.md#versioning) section's list and ROADMAP's Version scheme line.
 - ROADMAP: the new release's section and theme paragraph under "Planned" (or the removed one deleted); the pass already bumped the surviving headings and links.
 - The index: the new version's table at its release-order position (nearest release first), with its preamble — or the vacated one removed. Every other table keeps its rows: a swap renumbers, it never reorders.

@@ -8,5 +8,5 @@ Repo-wide rules to know before anything else:
 
 - **Never commit a disc image, BIOS, PS3 system software or any game file** — users supply their own, and `swift test` fails on one anywhere in the repository.
 - **Never open, read or copy the source of a GPL emulator** (SwanStation, PCSX2, DuckStation, PCSX-Redux and its OpenBIOS, Beetle PSX/Mednafen, PCSX-ReARMed, Avocado, RPCS3): shipped code comes only from ProjectPSX (MIT), Play! (BSD), iStation's own MIT code and public documentation. GPL emulators are only built unmodified and run, as black-box oracles.
-- **Work happens on the release branch** (`v<x.y.z>`, today `v0.0.1`); `stable` only receives finished releases.
+- **Work happens on the release branch** (`v<x.y.z>`, today `v0.1.0`); `stable` only receives finished releases.
 - **Every task ends with one commit and a push** to that branch. The commit message is exactly one line — `v<x.y.z> : Title Case Summary`, e.g. `v0.0.1 : Documentation And Planning` — with no body and no trailers ([the rule](lib/documentation/assistant/darwin/CLAUDE.md#committing-and-pushing)).

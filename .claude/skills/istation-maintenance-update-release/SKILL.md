@@ -1,6 +1,6 @@
 ---
 name: istation-maintenance-update-release
-description: Advance or correct iStation's live version at a release boundary (the skill resolves which application's table and docs are meant, today darwin's, and asks when it cannot) — check the release is actually done (its backlog table empty), then sweep the version's carriers (lib/release/VERSION first, then the release branch, MARKETING_VERSION in lib/src/darwin/apps/Config/Version.xcconfig, ROADMAP, CLAUDE.md) so code, CI and docs agree, and prepare the pull request into stable whose merge is the release. Use when the user says "cut the release", "release v0.0.1", "bump to v0.1.0", "we're done with this version", "start the next version", or "the version number is wrong".
+description: Advance or correct iStation's live version at a release boundary (the skill resolves which application's table and docs are meant, today darwin's, and asks when it cannot) — check the release is actually done (its backlog table empty), then sweep the version's carriers (lib/release/VERSION first, then the release branch, MARKETING_VERSION in lib/src/darwin/apps/Config/Version.xcconfig, ROADMAP, CLAUDE.md) so code, CI and docs agree, and prepare the pull request into stable whose merge is the release. Use when the user says "cut the release", "release v0.1.0", "bump to v0.2.0", "we're done with this version", "start the next version", or "the version number is wrong".
 ---
 
 # Update the release — iStation
@@ -11,7 +11,7 @@ The release model: each version is built on its own branch `v<x.y.z>` (the user'
 
 iStation's documentation is split by kind, then by platform ([the router](../../../lib/documentation/CLAUDE.md)): `lib/documentation/{assistant,backlog,adrs,reference}/<app>/`. Today there is one application, **`darwin`**: the Apple apps, one Swift package at `lib/src/darwin/` with the macOS app (PS1 and PS2) and the iOS app (PS1); what binds one OS alone sits in that kind's `darwin/macos/` or `darwin/ios/`. A second application gets its own folder in each kind and a row in the router. Resolve which application this invocation means, and for work that binds one OS which OS folder, before reading anything else, in order:
 
-1. **The arguments.** An id or table names its queue: `darwin`'s version tables (`v0.0.1`, `v0.1.0`, …) with their numeric tracks (`4e`), and its standing `M<n>` and `A<n>` tables. A named document resolves by the backlog that holds it, and by its folder (`macos/`, `ios/`) to one OS.
+1. **The arguments.** An id or table names its queue: `darwin`'s version tables (`v0.1.0`, `v0.2.0`, …) with their numeric tracks (`4e`), and its standing `M<n>` and `A<n>` tables. A named document resolves by the backlog that holds it, and by its folder (`macos/`, `ios/`) to one OS.
 2. **The conversation.** What the work touches: the package, its cores, the apps, their build routines and their tools (`lib/src/darwin/`) are `darwin`'s; a screen, entitlement or setting of one app alone is that OS's folder; what both apps share is `darwin` itself.
 3. **Still ambiguous? Ask.** One AskUserQuestion — which application, or whether the work binds macOS alone, iOS alone or both apps — before anything is treated as decided. Never guess between them. A request for an application that has no folder yet (a web or Windows app, say) is asked about too, never filed under `darwin`.
 
@@ -25,10 +25,10 @@ Everything below reads from the chosen application's folders, written `<app>` (t
   - the branch name (`lib/scripts/version-check.sh` fails a release branch named for another version);
   - `MARKETING_VERSION` in `lib/src/darwin/apps/Config/Version.xcconfig`, written from `VERSION` by `lib/src/darwin/scripts/build.sh` (and `CURRENT_PROJECT_VERSION`, by hand);
   - `lib/documentation/assistant/<app>/ROADMAP.md`'s "In progress" heading and its Version scheme line;
-  - the repo-wide sections of the contributor guide: [Versioning](../../../lib/documentation/assistant/darwin/CLAUDE.md#versioning) ("`v0.0.1` today"), [Committing and pushing](../../../lib/documentation/assistant/darwin/CLAUDE.md#committing-and-pushing) ("today `v0.0.1`") and [Release and Install](../../../lib/documentation/assistant/darwin/CLAUDE.md#release-and-install) ("Today (v0.0.1):"); the root `CLAUDE.md` ("today `v0.0.1`"); and the root `README.md`'s Status ("v0.0.1, …");
+  - the repo-wide sections of the contributor guide: [Versioning](../../../lib/documentation/assistant/darwin/CLAUDE.md#versioning) ("`v0.1.0` today"), [Committing and pushing](../../../lib/documentation/assistant/darwin/CLAUDE.md#committing-and-pushing) ("today `v0.1.0`") and [Release and Install](../../../lib/documentation/assistant/darwin/CLAUDE.md#release-and-install) ("Today (v0.1.0):"); the root `CLAUDE.md` ("today `v0.1.0`"); and the root `README.md`'s Status ("v0.1.0, …");
   - `.github/workflows/ci.yml` if it names a branch.
 - `ArchitectureTests` (`theVersionFollowsTheRelease`) fails while `VERSION`, `MARKETING_VERSION` and ROADMAP's "In progress" heading disagree.
-- Search for any other occurrence: `grep -rIn "0\.0\.1" --exclude-dir=.build --exclude-dir=.git --exclude-dir=build --exclude-dir=DerivedData --exclude-dir=worktrees .` — a tool's own version (`tools/jit-probe/Info.plist`) and "v<x.y.z> item" notes are history, not carriers
+- Search for any other occurrence: `grep -rIn "0\.1\.0" --exclude-dir=.build --exclude-dir=.git --exclude-dir=build --exclude-dir=DerivedData --exclude-dir=worktrees .` — a tool's own version (`tools/jit-probe/Info.plist`) and "v<x.y.z> item" notes are history, not carriers
 
 ## 2. Gate: is the release actually done?
 

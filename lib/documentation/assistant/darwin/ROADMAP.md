@@ -10,6 +10,17 @@ How we work: features are discussed in chat, written up here (and in [SPEC.md](S
 
 ## In progress
 
+### v0.1.0 — The first picture
+
+- [ ] The GPU and its software rasterizer, ported from ProjectPSX
+- [ ] DMA and timers in full
+- [ ] The narrow core interface ([ADR 0015](../../adrs/darwin/a-core-is-a-cpu-module-and-a-console-module.md) §5) and EmuKit's Metal presentation of frames
+- [ ] Per-frame VRAM recorded from SwanStation and compared
+- [ ] The boot's guest RAM matching SwanStation's frame by frame, moved from v0.0.1's gate (the user's call, 2026-11-14): the shell waits on the GPU's VRAM transfers, and the boot's pace needs closer timing — the instruction cache, timer reads within a slice ([Milestone L](MILESTONES.md#milestone-l--the-bios-boots))
+- [ ] Gate: the BIOS's shell and a homebrew PS-EXE draw in the macOS app, VRAM matching SwanStation's frame by frame
+
+## Shipped
+
 ### v0.0.1 — JIT verified, both build routines, the R3000A boots the BIOS
 
 The brief's first three tasks: prove JIT works under the App Store routine, lay down the packages and both apps with both build routines, then the PS1 milestone — the R3000A interpreter, the memory map and the BIOS boot, reaching the shell, passing ps1-tests' CPU tests up to known gaps and agreeing with ProjectPSX instruction by instruction. The boot's guest RAM matching SwanStation's frame by frame moved to v0.1.0 (the user's call, 2026-11-14).
@@ -34,15 +45,6 @@ Then the repository takes the layout and procedure of the user's Apogee reposito
 - [x] **Development runs on the personal channel** — personal builds get their own identity, "iStation Personal" ([Milestone R](MILESTONES.md#milestone-r--development-on-the-personal-channel))
 
 ## Planned
-
-### v0.1.0 — The first picture
-
-- [ ] The GPU and its software rasterizer, ported from ProjectPSX
-- [ ] DMA and timers in full
-- [ ] The narrow core interface ([ADR 0015](../../adrs/darwin/a-core-is-a-cpu-module-and-a-console-module.md) §5) and EmuKit's Metal presentation of frames
-- [ ] Per-frame VRAM recorded from SwanStation and compared
-- [ ] The boot's guest RAM matching SwanStation's frame by frame, moved from v0.0.1's gate (the user's call, 2026-11-14): the shell waits on the GPU's VRAM transfers, and the boot's pace needs closer timing — the instruction cache, timer reads within a slice ([Milestone L](MILESTONES.md#milestone-l--the-bios-boots))
-- [ ] Gate: the BIOS's shell and a homebrew PS-EXE draw in the macOS app, VRAM matching SwanStation's frame by frame
 
 ### v0.2.0 — PS1 games boot
 

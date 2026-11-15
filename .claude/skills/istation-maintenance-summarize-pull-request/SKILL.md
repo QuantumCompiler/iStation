@@ -1,6 +1,6 @@
 ---
 name: istation-maintenance-summarize-pull-request
-description: Draft an iStation pull request description from evidence — the branch's diff, its MILESTONES entries, the backlog documents it deleted, and the decisions recorded on it — with Summary, items closed, decisions, docs updated, verification actually run, review notes, before-merging steps and open questions; the branch decides which application's docs are read, and the skill asks when it cannot tell. Use when the user says "write the PR description", "summarize this branch for a pull request", "draft the PR", or "what goes in the PR for v0.0.1?".
+description: Draft an iStation pull request description from evidence — the branch's diff, its MILESTONES entries, the backlog documents it deleted, and the decisions recorded on it — with Summary, items closed, decisions, docs updated, verification actually run, review notes, before-merging steps and open questions; the branch decides which application's docs are read, and the skill asks when it cannot tell. Use when the user says "write the PR description", "summarize this branch for a pull request", "draft the PR", or "what goes in the PR for v0.1.0?".
 ---
 
 # Summarize a pull request — iStation
@@ -11,7 +11,7 @@ A PR description written from evidence, delivered as text for the user to paste.
 
 iStation's documentation is split by kind, then by platform ([the router](../../../lib/documentation/CLAUDE.md)): `lib/documentation/{assistant,backlog,adrs,reference}/<app>/`. Today there is one application, **`darwin`**: the Apple apps, one Swift package at `lib/src/darwin/` with the macOS app (PS1 and PS2) and the iOS app (PS1); what binds one OS alone sits in that kind's `darwin/macos/` or `darwin/ios/`. A second application gets its own folder in each kind and a row in the router. Resolve which application this invocation means, and for work that binds one OS which OS folder, before reading anything else, in order:
 
-1. **The arguments.** An id or table names its queue: `darwin`'s version tables (`v0.0.1`, `v0.1.0`, …) with their numeric tracks (`4e`), and its standing `M<n>` and `A<n>` tables. A named document resolves by the backlog that holds it, and by its folder (`macos/`, `ios/`) to one OS.
+1. **The arguments.** An id or table names its queue: `darwin`'s version tables (`v0.1.0`, `v0.2.0`, …) with their numeric tracks (`4e`), and its standing `M<n>` and `A<n>` tables. A named document resolves by the backlog that holds it, and by its folder (`macos/`, `ios/`) to one OS.
 2. **The conversation.** What the work touches: the package, its cores, the apps, their build routines and their tools (`lib/src/darwin/`) are `darwin`'s; a screen, entitlement or setting of one app alone is that OS's folder; what both apps share is `darwin` itself.
 3. **Still ambiguous? Ask.** One AskUserQuestion — which application, or whether the work binds macOS alone, iOS alone or both apps — before anything is treated as decided. Never guess between them. A request for an application that has no folder yet (a web or Windows app, say) is asked about too, never filed under `darwin`.
 
