@@ -80,8 +80,8 @@ The shape:
 
 ```sh
 cd lib/src/darwin
-./scripts/build-personal.sh macOS      # the personal routine (or iOS, for the Simulator)
-./scripts/archive-appstore.sh macOS    # an App Store archive; signing and uploading are yours
+./scripts/build.sh personal macOS      # the personal routine (or iOS, for the Simulator)
+./scripts/build.sh appstore macOS      # an App Store archive; signing and uploading are yours
 ```
 
 <Bring your own BIOS; none is included. From v1.0.0: the App Stores.>

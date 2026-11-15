@@ -1,6 +1,6 @@
 # ADR 0005 — Presentation modules are MVVM, and share one styles module
 
-**Status:** Accepted · **Date:** 2026-10-31
+**Status:** Superseded by [ADR 0020](presentation-is-mvvm-with-one-styles-module.md) (2026-11-14): its modules and examples were the retired library app's; the rule carries to today's modules · **Date:** 2026-10-31
 
 ## Context
 

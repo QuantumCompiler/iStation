@@ -4,10 +4,10 @@
 import Foundation
 import Testing
 
-/// iStation's own laws: nothing in the package or the apps starts a process or loads code, external
-/// code joins only after a licence review, and the repository carries no Sony files (ADR 0013); the
-/// package never reaches the real home folder (ADR 0004); release builds carry no tools and no
-/// debugging entitlements (ADR 0016).
+/// iStation's own laws: nothing in the package or the apps starts a process or loads code
+/// (ADR 0022); external code joins only after a licence review, and the repository carries no Sony
+/// files (ADR 0013); the package never reaches the real home folder (ADR 0019); release builds
+/// carry no tools and no debugging entitlements (ADR 0016).
 @Suite("Project rules") struct ProjectRulesTests {
     /// The Swift files the apps are built from: the package's sources and the app targets' own.
     static var shippedFiles: [SourceFile] {

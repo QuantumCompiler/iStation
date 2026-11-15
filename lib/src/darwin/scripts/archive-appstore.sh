@@ -1,6 +1,7 @@
 #!/bin/bash
 # The App Store routine (ADR 0016): archives one app in its Release configuration into
-# lib/src/darwin/build/<platform>/iStation.xcarchive.
+# lib/src/darwin/build/<platform>/iStation.xcarchive. Its front is scripts/build.sh appstore, which
+# first writes MARKETING_VERSION from lib/release/VERSION.
 #
 #   ./scripts/archive-appstore.sh macOS
 #   ./scripts/archive-appstore.sh iOS

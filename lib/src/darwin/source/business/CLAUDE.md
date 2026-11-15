@@ -1,6 +1,6 @@
 # The Business layer
 
-**Position.** Third of the four ([ADR 0001](../../../../documentation/adrs/darwin/layer-enforcement.md)): the cores — what a console does. Today the R3000A interpreter and the PS1 console, both ported from ProjectPSX: the console's memory map, interrupts, timers, DMA and GPU timing, with the other devices stubbed until their versions.
+**Position.** Third of the four ([ADR 0018](../../../../documentation/adrs/darwin/four-layers-dependencies-point-down.md)): the cores — what a console does. Today the R3000A interpreter and the PS1 console, both ported from ProjectPSX: the console's memory map, interrupts, timers, DMA and GPU timing, with the other devices stubbed until their versions.
 
 **Modules:** `r3000a` (the R3000A interpreter: the PS1's CPU and the PS2's I/O processor), `ps1` (the PS1 console: memory map, devices, the run loop, PS-EXE loading)
 

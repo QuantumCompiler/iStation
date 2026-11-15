@@ -1,6 +1,6 @@
 ---
 name: istation-backlog-investigate-bug
-description: Turn an iStation symptom into a root cause with evidence and a Maintenance backlog item whose guardrail pins the reproduction — reproduced in a sandbox, the seam found, the blast radius measured, the fix specced and queued, never built here; the skill resolves which application is meant and asks when it cannot. Use when the user reports a bug or odd behavior — "this game shows up as PS1 but it's PS2", "the emulator doesn't launch", "play time isn't counted", "iStation didn't come back after the game", "my library disappeared", "the scan misses .m3u sets", "the BIOS never reaches the shell", "the trace diverges", "investigate this crash" — or pastes a log, a trace or a screenshot.
+description: Turn an iStation symptom into a root cause with evidence and a Maintenance backlog item whose guardrail pins the reproduction — reproduced in a sandbox, the seam found, the blast radius measured, the fix specced and queued, never built here; the skill resolves which application is meant and asks when it cannot. Use when the user reports a bug or odd behavior — "a ps1-tests CPU test fails", "the picture is wrong", "the disc won't read", "the pad doesn't respond", "JIT fails under the App Sandbox", "the iOS app crashes on launch", "the App Store archive won't build", "the BIOS never reaches the shell", "the trace diverges", "investigate this crash" — or pastes a log, a trace or a screenshot.
 ---
 
 # Investigate a bug — iStation

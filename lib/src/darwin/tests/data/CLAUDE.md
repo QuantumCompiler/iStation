@@ -1,6 +1,6 @@
 # The Data tests
 
-**Mirror.** `tests/data/<module>/` tests `source/data/<module>/` ([ADR 0004](../../../../documentation/adrs/darwin/tests-mirror-architecture.md)); a new module brings its test directory in the same change.
+**Mirror.** `tests/data/<module>/` tests `source/data/<module>/` ([ADR 0019](../../../../documentation/adrs/darwin/tests-live-in-the-layer-of-what-they-test.md)); a new module brings its test directory in the same change.
 
 **Builds as:** one Swift Testing target per module, `Data<Name>Tests`, depending on its module and its declared support; it may import its module's own edges (Data and Infrastructure) and nothing above: a Data test that imports Business fails `ArchitectureTests`.
 
@@ -8,4 +8,4 @@
 
 **Conventions:** hermetic — no network, files only inside a `Sandbox`, never the real home folder. A persisted format gets a recorded fixture of each released shape, never edited ([ADR 0016](../../../../documentation/adrs/darwin/two-build-routines-and-a-fresh-start.md) §5).
 
-**Depth:** [ADR 0004](../../../../documentation/adrs/darwin/tests-mirror-architecture.md) · [ADR 0001](../../../../documentation/adrs/darwin/layer-enforcement.md) · [DEVELOPER.md](../../../../documentation/assistant/darwin/DEVELOPER.md) (the test table).
+**Depth:** [ADR 0019](../../../../documentation/adrs/darwin/tests-live-in-the-layer-of-what-they-test.md) · [ADR 0018](../../../../documentation/adrs/darwin/four-layers-dependencies-point-down.md) · [DEVELOPER.md](../../../../documentation/assistant/darwin/DEVELOPER.md) (the test table).

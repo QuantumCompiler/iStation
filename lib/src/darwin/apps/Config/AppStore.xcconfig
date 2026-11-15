@@ -1,6 +1,6 @@
 // The App Store routine (ADR 0016) — the Release configuration of both apps: App Sandbox,
 // user-selected files and, on macOS, JIT; no tools (PERSONAL_BUILD undefined) and no debugging
-// entitlements. Archive with scripts/archive-appstore.sh.
+// entitlements. Archive with scripts/build.sh appstore macOS|iOS.
 #include "Version.xcconfig"
 
 // The App Store identity: placeholders until the user's App Store Connect identifiers exist (v1.0.0).

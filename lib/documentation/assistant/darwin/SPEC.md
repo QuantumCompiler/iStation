@@ -53,7 +53,7 @@ And at construction (2026-10-31), still standing: the four-layer architecture wi
 ### Porting
 
 - **Order:** the CPU interpreter, the memory map and the BIOS boot first; then the devices a picture needs; the software rasterizer before Metal; the interpreter before any code generator.
-- **Two kinds of trace.** The permissive reference may be changed: ProjectPSX gains trace logging in its own source (MIT allows it) for instruction-by-instruction comparison. The GPL oracle may only be run: SwanStation and PCSX2 run unmodified, preferring their built-in debugger, trace and logging features, else recorded from outside (LLDB, Frida via Revula) — guest state only. TraceKit diffs the Swift port's trace against either and reports the first divergence.
+- **Two kinds of trace.** The permissive reference may be changed: ProjectPSX gains trace logging in its own source (MIT allows it) for instruction-by-instruction comparison. The GPL oracle may only be run: SwanStation and PCSX2 run unmodified, preferring their built-in debugger, trace and logging features, else recorded from outside — through their public API by iStation's own frontend (SwanStation's libretro core, `lib/src/darwin/tools/swanstation-oracle/`, v0.0.1 item 3d), or with LLDB or Frida via Revula — guest state only. TraceKit diffs the Swift port's trace against either and reports the first divergence.
 - **Revula** maps, profiles and traces the permissive references freely (Play!'s symbols, hot paths and AArch64 code-generator output), and only records guest state from the GPL oracles — never disassembling or decompiling them.
 - **Documentation** that is public, such as psx-spx (PS1) and ps2tek (PS2), may be read freely.
 - **Hot paths** use concrete types, never protocol-typed values, ARC traffic or redundant bounds checks ([ADR 0015](../../adrs/darwin/a-core-is-a-cpu-module-and-a-console-module.md)).
@@ -61,7 +61,7 @@ And at construction (2026-10-31), still standing: the four-layer architecture wi
 ### Test content
 
 - **Hermetic tests** (`swift test`, CI) use only content built in code or committed beside an open licence.
-- **Personal builds** also run the user's own BIOS dump, homebrew, and open suites such as [ps1-tests](https://github.com/JaCzekanski/ps1-tests) (MIT) and [ps2autotests](https://github.com/unknownbrackets/ps2autotests) (ISC). A run with the user's BIOS is the user's to start.
+- **The tools under `lib/src/darwin/tools/`**, and later the personal builds, also run the user's own BIOS dump, homebrew, and open suites such as [ps1-tests](https://github.com/JaCzekanski/ps1-tests) (MIT) and [ps2autotests](https://github.com/unknownbrackets/ps2autotests) (ISC), fetched by their tools. A run with the user's BIOS is the user's to start: the user runs it, or tells the agent to and gives the files' paths. *Revised 2026-11-14: the agent may make the run with files the user names by path (the user's call); until the apps import a BIOS (v0.2.0), the runs go through the command-line tools.*
 
 ### Build routines
 
@@ -75,7 +75,7 @@ And at construction (2026-10-31), still standing: the four-layer architecture wi
 | Tools | TraceKit and debug UI compiled out | TraceKit, CPU and VRAM viewers, trace recording |
 | Distributed | to the App Stores | never |
 
-One Swift compilation condition (`PERSONAL_BUILD`), separate xcconfig and entitlements files per routine, and one scheme or script per routine (`xcodebuild archive` with export options).
+One Swift compilation condition (`PERSONAL_BUILD`), separate xcconfig and entitlements files per routine, one shared scheme per app per routine (`macOS Personal`, `macOS App Store`, `iOS Personal`, `iOS App Store`), and one entry point over both routines, `lib/src/darwin/scripts/build.sh personal|appstore macOS|iOS` (`xcodebuild archive` with export options for the App Store routine).
 
 ### Apple constraints
 
@@ -105,16 +105,16 @@ On the Mac App Store and the iOS App Store, eligible under App Review Guidelines
 
 ## Principles
 
-- **Layered, and the law is mechanical.** Four layers, dependencies pointing down, enforced by a check — see [ADR 0001](../../adrs/darwin/layer-enforcement.md).
+- **Layered, and the law is mechanical.** Four layers, dependencies pointing down, enforced by a check — see [ADR 0018](../../adrs/darwin/four-layers-dependencies-point-down.md).
 - **The oracle decides.** A ported subsystem is right when its guest-visible behaviour matches the oracle's; the first divergence is the bug.
 - **Provenance stays clean and visible.** Every ported file names the permissive file it comes from and keeps its notice; nothing is learned from a GPL emulator's code, and a session that has read one writes no core code ([ADR 0013](../../adrs/darwin/shipped-code-derives-only-from-permissive-references.md)).
 - **Release builds carry no tools.** Anything for debugging or tracing compiles only into personal builds.
 - **The user's data is theirs.** Settings and memory cards written by an older version keep loading ([ADR 0016](../../adrs/darwin/two-build-routines-and-a-fresh-start.md), carrying ADR 0007's rule).
-- **The first milestone matters most.** Until the Swift R3000A boots the BIOS and passes ps1-tests' CPU tests with a trace that matches SwanStation's, nothing else in a core is worth building.
+- **The first milestone matters most.** Until the Swift R3000A boots the BIOS, passes ps1-tests' CPU tests against their hardware logs up to known gaps and agrees with ProjectPSX instruction by instruction, nothing else in a core is worth building. *Revised 2026-11-14 (the user's call): the boot's frame-by-frame match with SwanStation's guest RAM moved to v0.1.0, which builds the GPU it waits on.*
 
 ## Success criteria
 
-- **v0.0.1:** JIT runs in an App Store-routine macOS app; both build routines produce the macOS and iOS apps; the R3000A interpreter, the memory map and the BIOS boot pass ps1-tests' CPU tests with a guest-state trace that matches SwanStation's.
+- **v0.0.1:** JIT runs in an App Store-routine macOS app; both build routines produce the macOS and iOS apps; the R3000A interpreter and the memory map boot the BIOS to its shell on the user's 23 BIOS images, pass ps1-tests' CPU tests up to known gaps, and agree with ProjectPSX instruction by instruction. *Revised 2026-11-14 (the user's call): the boot's guest RAM matching SwanStation's frame by frame moved to v0.1.0, after the GPU's VRAM transfers the shell waits on ([Milestone L](MILESTONES.md#milestone-l--the-bios-boots)).*
 - PS1 games boot and play in both apps.
 - Each app passes App Review under section 4.7.
 - PS2: the EE and IOP interpreters run a homebrew ELF through the HLE BIOS, with output and post-boot guest trace matching PCSX2.

@@ -72,7 +72,7 @@ When the acceptance criteria pass, each checked by running it:
 1. **MILESTONES.md** (`lib/documentation/assistant/<app>/MILESTONES.md`) extended — folded into the matching milestone, or a new lettered one: goal, what was built (modules and files), trade-offs, how it was verified (the commands and their results), decisions consumed.
 2. **The backlog document and its index row deleted**; any item gated on it updated (🔒 → 🟢 when its gate empties). A version table that empties is retired at the pre-merge docs pass.
 3. **ROADMAP.md** line ticked, linking the milestone.
-4. **Codebase Map, DEVELOPER.md, layer cards, ADR 0002's table** updated for any module change; `lib/documentation/reference/<app>/` for a changed contract (a trace format, an emulator's flags).
+4. **Codebase Map, DEVELOPER.md, layer cards, ADR 0002's table** updated for any module change; `lib/documentation/reference/<app>/` for a changed contract (a trace format, a persisted format the apps write).
 5. **SPEC.md** only on a scope change, with a dated note.
 6. A new standing rule → an ADR in `lib/documentation/adrs/<app>/`; promoted to a `⚠` section once enforced.
 7. The validator clean again.

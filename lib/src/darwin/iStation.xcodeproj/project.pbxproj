@@ -16,7 +16,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		8625B66556D2368A0FF1F457 /* settings.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = settings.json; sourceTree = "<group>"; };
 		0B4F69351F4B941255C33F1E /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		209DB850E2B5BB905DF90F3F /* fetch.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = fetch.sh; sourceTree = "<group>"; };
 		25E2934C2EA1AE5BD0ABAF06 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -30,6 +29,7 @@
 		793F257C7B9F24D70B6489A5 /* Personal.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Personal.xcconfig; sourceTree = "<group>"; };
 		810518D886B08192A47FF3ED /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>"; };
 		83A31A17D85787D8F147F070 /* trace.patch */ = {isa = PBXFileReference; lastKnownFileType = text; path = trace.patch; sourceTree = "<group>"; };
+		8625B66556D2368A0FF1F457 /* settings.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = settings.json; sourceTree = "<group>"; };
 		864FEB15C2523DE68F3690AB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		875AFCAB9A090DA68F00CACA /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		88BD3A181616833AB9BEF9E5 /* Personal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Personal.entitlements; sourceTree = "<group>"; };
@@ -40,9 +40,9 @@
 		A30E39450C380D2CDC6CD682 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A40ED5F030BA3FCD8229A0E3 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		C93B50687CCA325E43FBE332 /* istation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = istation; path = .; sourceTree = "<group>"; };
-		CA40BD3FDD20857ACBA75FC5 /* iStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iStation.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA40BD3FDD20857ACBA75FC5 /* iStation Personal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iStation Personal.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CCDA0073D61BBB7F3097E139 /* run.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = run.sh; sourceTree = "<group>"; };
-		D1BF349F3CDBE7800DB129C8 /* iStation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iStation.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1BF349F3CDBE7800DB129C8 /* iStation Personal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iStation Personal.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D3C406288A12754B3E7173EC /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		E425F813682F096029F53E1B /* cpu-check.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "cpu-check.sh"; sourceTree = "<group>"; };
 		EC4566141DD56FB973C6B6EC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -70,6 +70,11 @@
 		726D2D4BF0A24C2DA0523ADA /* skills */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = skills;
+			sourceTree = "<group>";
+		};
+		75D3C4C4C134FC76BFCBE804 /* release */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = release;
 			sourceTree = "<group>";
 		};
 		887F19413DF108751B11C9C5 /* LICENSES */ = {
@@ -107,11 +112,6 @@
 			path = gate;
 			sourceTree = "<group>";
 		};
-		75D3C4C4C134FC76BFCBE804 /* release */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = release;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,15 +136,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		26DA62B705DBE966229E5E3E /* .claude */ = {
-			isa = PBXGroup;
-			children = (
-				8625B66556D2368A0FF1F457 /* settings.json */,
-				726D2D4BF0A24C2DA0523ADA /* skills */,
-			);
-			path = .claude;
-			sourceTree = "<group>";
-		};
 		0C28B4358E618CCC863CBA2E /* ps1-tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -161,6 +152,15 @@
 			);
 			name = Shared;
 			path = apps;
+			sourceTree = "<group>";
+		};
+		26DA62B705DBE966229E5E3E /* .claude */ = {
+			isa = PBXGroup;
+			children = (
+				8625B66556D2368A0FF1F457 /* settings.json */,
+				726D2D4BF0A24C2DA0523ADA /* skills */,
+			);
+			path = .claude;
 			sourceTree = "<group>";
 		};
 		47C9A9AB5FE8344A3E6B47AE /* iOS */ = {
@@ -279,15 +279,6 @@
 			path = apps/macos;
 			sourceTree = "<group>";
 		};
-		CC0F68FE2D81F9614883F277 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				CA40BD3FDD20857ACBA75FC5 /* iStation.app */,
-				D1BF349F3CDBE7800DB129C8 /* iStation.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		C02F602F235BEE96322611AB /* iStation repository */ = {
 			isa = PBXGroup;
 			children = (
@@ -302,6 +293,15 @@
 			);
 			name = "iStation repository";
 			path = ../../..;
+			sourceTree = "<group>";
+		};
+		CC0F68FE2D81F9614883F277 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CA40BD3FDD20857ACBA75FC5 /* iStation Personal.app */,
+				D1BF349F3CDBE7800DB129C8 /* iStation Personal.app */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -328,7 +328,7 @@
 				F180DB32BBD1E476C7EB86A7 /* EmuKit */,
 			);
 			productName = iStation;
-			productReference = D1BF349F3CDBE7800DB129C8 /* iStation.app */;
+			productReference = D1BF349F3CDBE7800DB129C8 /* iStation Personal.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B806710A481F978F97249349 /* iStation macOS */ = {
@@ -352,7 +352,7 @@
 				937A56F8C555619C691D8B69 /* EmuKit */,
 			);
 			productName = iStation;
-			productReference = CA40BD3FDD20857ACBA75FC5 /* iStation.app */;
+			productReference = CA40BD3FDD20857ACBA75FC5 /* iStation Personal.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

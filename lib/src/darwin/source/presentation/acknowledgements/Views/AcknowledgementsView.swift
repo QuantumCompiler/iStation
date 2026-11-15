@@ -34,6 +34,10 @@ public struct AcknowledgementsView: View {
 
 #if DEBUG
 #Preview("Empty") {
-    AcknowledgementsView(viewModel: AcknowledgementsViewModel())
+    AcknowledgementsView(viewModel: PreviewAcknowledgements.empty())
+}
+
+#Preview("Listed") {
+    AcknowledgementsView(viewModel: PreviewAcknowledgements.listed())
 }
 #endif

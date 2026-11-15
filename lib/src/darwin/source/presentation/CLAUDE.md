@@ -1,12 +1,12 @@
 # The Presentation layer
 
-**Position.** Fourth of the four ([ADR 0001](../../../../documentation/adrs/darwin/layer-enforcement.md)): EmuKit, the SwiftUI views the macOS and iOS apps share — the player and the acknowledgements screen, and the tokens they draw with. The apps themselves are targets in `lib/src/darwin/iStation.xcodeproj` (`lib/src/darwin/apps/`), the composition roots.
+**Position.** Fourth of the four ([ADR 0018](../../../../documentation/adrs/darwin/four-layers-dependencies-point-down.md)): EmuKit, the SwiftUI views the macOS and iOS apps share — the player and the acknowledgements screen, and the tokens they draw with. The apps themselves are targets in `lib/src/darwin/iStation.xcodeproj` (`lib/src/darwin/apps/`), the composition roots.
 
 **Modules:** `styles` (tokens: palette, symbols, metrics, typography), `player` (the player's screen), `acknowledgements` (every notice the app carries)
 
-**Shape** ([ADR 0005](../../../../documentation/adrs/darwin/presentation-mvvm.md)): every module but `styles` is `Views/` + `ViewModels/`, with `Components/`, `Models/`, `Previews/` or `Debug/` only as real files need them. A view binds to its view-model, the view-model consumes Business, and no file under `ViewModels/` or `Models/` imports SwiftUI, AppKit, UIKit or Cocoa. `styles` leans on no sibling; every other module may use it, and every color, font and size comes from it. Debug views live in `Debug/`, inside `#if PERSONAL_BUILD` ([ADR 0016](../../../../documentation/adrs/darwin/two-build-routines-and-a-fresh-start.md)).
+**Shape** ([ADR 0020](../../../../documentation/adrs/darwin/presentation-is-mvvm-with-one-styles-module.md)): every module but `styles` is `Views/` + `ViewModels/`, with `Components/`, `Models/`, `Previews/` or `Debug/` only as real files need them. A view binds to its view-model, the view-model consumes Business, and no file under `ViewModels/` or `Models/` imports SwiftUI, AppKit, UIKit or Cocoa. `styles` leans on no sibling; every other module may use it, and every color, font and size comes from it. Debug views live in `Debug/`, inside `#if PERSONAL_BUILD` ([ADR 0016](../../../../documentation/adrs/darwin/two-build-routines-and-a-fresh-start.md)).
 
-**Seen on its own** ([ADR 0006](../../../../documentation/adrs/darwin/presentation-previews.md)): every module is its own SwiftPM target with its own test target; every view has named `#Preview`s per visible state, over the module's own fakes in `Previews/`, inside `#if DEBUG`.
+**Seen on its own** ([ADR 0021](../../../../documentation/adrs/darwin/presentation-modules-stand-alone-and-preview-sample-data.md)): every module is its own SwiftPM target with its own test target; every view has named `#Preview`s per visible state, over the module's own fakes in `Previews/`, inside `#if DEBUG`.
 
 **May depend on:** all four layers. Views and components import no Business module.
 

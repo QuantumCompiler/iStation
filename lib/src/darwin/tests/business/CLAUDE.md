@@ -1,6 +1,6 @@
 # The Business tests
 
-**Mirror.** `tests/business/<module>/` tests `source/business/<module>/` ([ADR 0004](../../../../documentation/adrs/darwin/tests-mirror-architecture.md)); a new module brings its test directory in the same change.
+**Mirror.** `tests/business/<module>/` tests `source/business/<module>/` ([ADR 0019](../../../../documentation/adrs/darwin/tests-live-in-the-layer-of-what-they-test.md)); a new module brings its test directory in the same change.
 
 **Builds as:** one Swift Testing target per module, `Business<Name>Tests`, depending on its module and its declared support; it may import its module's own edges and nothing in Presentation.
 
@@ -8,4 +8,4 @@
 
 **Conventions:** hermetic — no network, files only inside a `Sandbox`, never the real home folder, never a real BIOS or game. Expected results come from psx-spx or a permissive reference's recorded trace, never a GPL emulator's source. A behavior spanning layers is tested here, in the highest layer it touches.
 
-**Depth:** [ADR 0004](../../../../documentation/adrs/darwin/tests-mirror-architecture.md) · [ADR 0001](../../../../documentation/adrs/darwin/layer-enforcement.md) · [DEVELOPER.md](../../../../documentation/assistant/darwin/DEVELOPER.md) (the test table).
+**Depth:** [ADR 0019](../../../../documentation/adrs/darwin/tests-live-in-the-layer-of-what-they-test.md) · [ADR 0018](../../../../documentation/adrs/darwin/four-layers-dependencies-point-down.md) · [DEVELOPER.md](../../../../documentation/assistant/darwin/DEVELOPER.md) (the test table).

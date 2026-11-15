@@ -7,7 +7,7 @@
 #   lib/src/darwin/scripts/build.sh personal macOS|iOS [--unsigned]   the personal routine (build-personal.sh)
 #   lib/src/darwin/scripts/build.sh appstore macOS|iOS    the App Store routine (archive-appstore.sh)
 #
-# The two routines' scripts stay its helpers until lib/scripts/cicd.sh becomes the one path (4d).
+# The two routines' scripts are its helpers; lib/scripts/cicd.sh, the one build path (4d), calls it.
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 

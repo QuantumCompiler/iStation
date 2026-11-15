@@ -23,12 +23,12 @@ Everything below reads from the chosen application's folders, written `<app>` (t
 - The carriers of the live number:
   - **`lib/release/VERSION`** — the release; sweep it first, everything else follows it;
   - the branch name (`lib/scripts/version-check.sh` fails a release branch named for another version);
-  - `MARKETING_VERSION` in `lib/src/darwin/apps/Config/Version.xcconfig`, written from `VERSION` by `scripts/build.sh` (and `CURRENT_PROJECT_VERSION`, by hand);
+  - `MARKETING_VERSION` in `lib/src/darwin/apps/Config/Version.xcconfig`, written from `VERSION` by `lib/src/darwin/scripts/build.sh` (and `CURRENT_PROJECT_VERSION`, by hand);
   - `lib/documentation/assistant/<app>/ROADMAP.md`'s "In progress" heading and its Version scheme line;
-  - the repo-wide [Versioning](../../../lib/documentation/assistant/darwin/CLAUDE.md#versioning) section ("`v0.0.1` today") and the root `CLAUDE.md` ("today `v0.0.1`");
+  - the repo-wide sections of the contributor guide: [Versioning](../../../lib/documentation/assistant/darwin/CLAUDE.md#versioning) ("`v0.0.1` today"), [Committing and pushing](../../../lib/documentation/assistant/darwin/CLAUDE.md#committing-and-pushing) ("today `v0.0.1`") and [Release and Install](../../../lib/documentation/assistant/darwin/CLAUDE.md#release-and-install) ("Today (v0.0.1):"); the root `CLAUDE.md` ("today `v0.0.1`"); and the root `README.md`'s Status ("v0.0.1, …");
   - `.github/workflows/ci.yml` if it names a branch.
 - `ArchitectureTests` (`theVersionFollowsTheRelease`) fails while `VERSION`, `MARKETING_VERSION` and ROADMAP's "In progress" heading disagree.
-- Search for any other occurrence: `grep -rn "0\.0\.1" --exclude-dir=.build --exclude-dir=.git .`
+- Search for any other occurrence: `grep -rIn "0\.0\.1" --exclude-dir=.build --exclude-dir=.git --exclude-dir=build --exclude-dir=DerivedData --exclude-dir=worktrees .` — a tool's own version (`tools/jit-probe/Info.plist`) and "v<x.y.z> item" notes are history, not carriers
 
 ## 2. Gate: is the release actually done?
 
@@ -36,7 +36,7 @@ The version's table in the backlog index (`lib/documentation/backlog/<app>/READM
 
 ## 3. Sweep the carriers
 
-For a release: the version's table retired from the index, if the pre-merge docs pass (`/istation-maintenance-update-documents`) hasn't already; ROADMAP's section stays under "In progress", every line ticked and linked to its milestones — `theVersionFollowsTheRelease` holds its heading to `lib/release/VERSION` until the next version starts; MILESTONES' entries reference the version. For the next version, in its branch's first commit: `lib/release/VERSION` bumped first; ROADMAP's shipped section moved out of "In progress" into a `## Shipped` section between it and "Planned" (created with the first release), and the next version's section moved up from "Planned"; then `MARKETING_VERSION` in `Version.xcconfig` follows it (`scripts/build.sh` writes it, or set it by hand to the same number) and `CURRENT_PROJECT_VERSION` is incremented; CLAUDE.md's and the root CLAUDE.md's "today" updated. For a correction: every carrier made to agree.
+For a release: the version's table retired from the index, if the pre-merge docs pass (`/istation-maintenance-update-documents`) hasn't already; ROADMAP's section stays under "In progress", every line ticked and linked to its milestones — `theVersionFollowsTheRelease` holds its heading to `lib/release/VERSION` until the next version starts; MILESTONES' entries reference the version. For the next version, in its branch's first commit: `lib/release/VERSION` bumped first; ROADMAP's shipped section moved out of "In progress" into a `## Shipped` section between it and "Planned" (created with the first release), and the next version's section moved up from "Planned"; then `MARKETING_VERSION` in `Version.xcconfig` follows it (`lib/src/darwin/scripts/build.sh` writes it, or set it by hand to the same number) and `CURRENT_PROJECT_VERSION` is incremented; every "today" in CLAUDE.md and the root CLAUDE.md, and the root `README.md`'s Status, updated. For a correction: every carrier made to agree.
 
 ## 4. Validate
 
@@ -44,7 +44,7 @@ For a release: the version's table retired from the index, if the pre-merge docs
 - `cd lib/src/darwin && swift build --explicit-target-dependency-import-check=error && swift test`
 - `lib/scripts/version-check.sh` (from the repository root): it says what merging into `stable` would publish, and fails if the release is already out or the branch disagrees.
 - `lib/scripts/pr-ci.sh --uncommitted` (from the repository root) passes: CI's pull-request jobs on the test merge into `stable`, the sweep included, before the pull request is opened.
-- `cd lib/src/darwin && ./scripts/archive-appstore.sh macOS` archives, and `defaults read "$PWD/build/macOS/iStation.xcarchive/Products/Applications/iStation.app/Contents/Info.plist" CFBundleShortVersionString` prints the new number.
+- `cd lib/src/darwin && ./scripts/build.sh appstore macOS && defaults read "$PWD/build/macOS/iStation.xcarchive/Products/Applications/iStation.app/Contents/Info.plist" CFBundleShortVersionString` prints the new number: `build.sh` writes `MARKETING_VERSION` from `lib/release/VERSION`, then archives into `build/macOS/iStation.xcarchive`. Run it with `ISTATION_TEAM_ID` unset, so the archive is not signed for distribution (macOS: ad-hoc, as `archive-appstore.sh` says); signing with the user's team is the user's.
 
 ## 5. Prepare, then hand over
 

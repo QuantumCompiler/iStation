@@ -1,6 +1,7 @@
 #!/bin/bash
 # The personal routine (ADR 0016): builds one app in its Debug configuration — PERSONAL_BUILD,
-# get-task-allow, JIT on — into lib/src/darwin/build/DerivedData. Never distributed.
+# get-task-allow, JIT on macOS — into lib/src/darwin/build/DerivedData. Never distributed. Its front is
+# scripts/build.sh personal, which first writes MARKETING_VERSION from lib/release/VERSION.
 #
 #   ./scripts/build-personal.sh macOS     signed to run locally; open the printed .app
 #   ./scripts/build-personal.sh iOS       for the iOS Simulator
@@ -14,7 +15,7 @@ signing=()
 case "$platform" in
     macOS) destination="platform=macOS"; products="Debug" ;;
     iOS) destination="generic/platform=iOS Simulator"; products="Debug-iphonesimulator" ;;
-    *) echo "usage: $0 macOS|iOS" >&2; exit 2 ;;
+    *) echo "usage: $0 macOS|iOS [--unsigned]" >&2; exit 2 ;;
 esac
 
 derived="build/DerivedData"

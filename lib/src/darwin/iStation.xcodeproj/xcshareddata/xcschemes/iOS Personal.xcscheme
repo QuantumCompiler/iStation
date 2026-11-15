@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "5D1D20C540B3325DB95D55A4"
-               BuildableName = "iStation Personal.app"
+               BuildableName = "iStation.app"
                BlueprintName = "iStation iOS"
                ReferencedContainer = "container:iStation.xcodeproj">
             </BuildableReference>
@@ -28,8 +28,6 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
-      <Testables>
-      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -46,7 +44,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5D1D20C540B3325DB95D55A4"
-            BuildableName = "iStation Personal.app"
+            BuildableName = "iStation.app"
             BlueprintName = "iStation iOS"
             ReferencedContainer = "container:iStation.xcodeproj">
          </BuildableReference>
@@ -63,7 +61,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5D1D20C540B3325DB95D55A4"
-            BuildableName = "iStation Personal.app"
+            BuildableName = "iStation.app"
             BlueprintName = "iStation iOS"
             ReferencedContainer = "container:iStation.xcodeproj">
          </BuildableReference>

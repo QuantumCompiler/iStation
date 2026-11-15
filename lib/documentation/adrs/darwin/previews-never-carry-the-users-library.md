@@ -1,6 +1,6 @@
 # ADR 0009 — Previews show the sample games, never the user's own library
 
-**Status:** Accepted · **Date:** 2026-11-02 · Supersedes the preview-data plan in [ADR 0006](presentation-previews.md) §3
+**Status:** Superseded by [ADR 0021](presentation-modules-stand-alone-and-preview-sample-data.md) (2026-11-14): the sample games and the recorded `library.json` retired with the library app; the rule carries to the user's BIOS images and games · **Date:** 2026-11-02 · Supersedes the preview-data plan in [ADR 0006](presentation-previews.md) §3
 
 ## Context
 

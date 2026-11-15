@@ -1,6 +1,6 @@
 # The Data layer
 
-**Position.** Second of the four ([ADR 0001](../../../../documentation/adrs/darwin/layer-enforcement.md)): the shapes of the outside world. The disc-image readers kept for v0.2.0's discs, and TraceKit's trace formats ([reference/trace-formats.md](../../../../documentation/reference/darwin/trace-formats.md)). It knows the shapes, not the rules.
+**Position.** Second of the four ([ADR 0018](../../../../documentation/adrs/darwin/four-layers-dependencies-point-down.md)): the shapes of the outside world. The disc-image readers kept for v0.2.0's discs, and TraceKit's trace formats ([reference/trace-formats.md](../../../../documentation/reference/darwin/trace-formats.md)). It knows the shapes, not the rules.
 
 **Modules:** `iso9660` (2048/2352-byte sectors and the ISO 9660 directory tree), `systemcnf` (SYSTEM.CNF: boot key to console and serial), `playlists` (.cue tracks and .m3u discs), `tracing` (TraceKit: trace records, files, diff and checkpoints — personal builds only)
 

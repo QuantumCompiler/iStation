@@ -1,6 +1,6 @@
 ---
 name: istation-backlog-swap-version
-description: Slide iStation's queued releases by one version — insert a new version ahead of the queue (bumping later versions, their backlog directories and every reference up) or collapse a vacated one — with an ordered, word-bounded scripted replace plus the judgment edits a script can't make; the skill resolves which application's queue is meant and asks when it cannot. Use when the user says "insert a v0.1.0 before covers", "bump everything after v0.2.0", "we're skipping v0.3.0", "renumber the releases", or "add a patch release ahead of the queue".
+description: Slide iStation's queued releases by one version — insert a new version ahead of the queue (bumping later versions, their backlog directories and every reference up) or collapse a vacated one — with an ordered, word-bounded scripted replace plus the judgment edits a script can't make; the skill resolves which application's queue is meant and asks when it cannot. Use when the user says "insert a v0.1.0 before the first picture", "bump everything after v0.2.0", "we're skipping v0.3.0", "renumber the releases", or "add a patch release ahead of the queue".
 ---
 
 # Swap versions — iStation

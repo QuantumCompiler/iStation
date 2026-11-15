@@ -1,6 +1,6 @@
 // The personal routine (ADR 0016) — the Debug configuration of both apps: development signing,
-// get-task-allow so LLDB and Frida can attach, JIT on, and PERSONAL_BUILD for TraceKit and the debug
-// views. Never distributed. Build with scripts/build-personal.sh.
+// get-task-allow so LLDB and Frida can attach, JIT on macOS, and PERSONAL_BUILD for TraceKit and the
+// debug views. Never distributed. Build with scripts/build.sh personal macOS|iOS.
 #include "Version.xcconfig"
 
 // The personal channel (CLAUDE.md → Development runs on the personal channel): its own identity, so a

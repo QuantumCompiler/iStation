@@ -12,7 +12,7 @@ How we work: features are discussed in chat, written up here (and in [SPEC.md](S
 
 ### v0.0.1 — JIT verified, both build routines, the R3000A boots the BIOS
 
-The brief's first three tasks: prove JIT works under the App Store routine, lay down the packages and both apps with both build routines, then the PS1 milestone — the R3000A interpreter, the memory map and the BIOS boot, passing ps1-tests' CPU tests with a guest-state trace that matches SwanStation's.
+The brief's first three tasks: prove JIT works under the App Store routine, lay down the packages and both apps with both build routines, then the PS1 milestone — the R3000A interpreter, the memory map and the BIOS boot, reaching the shell, passing ps1-tests' CPU tests up to known gaps and agreeing with ProjectPSX instruction by instruction. The boot's guest RAM matching SwanStation's frame by frame moved to v0.1.0 (the user's call, 2026-11-14).
 
 - [x] **The scaffold compiles** and **the tests are green** ([Milestone A](MILESTONES.md#milestone-a--the-construction))
 - [x] **Provenance headers and notices** — SPDX headers, provenance lines, the acknowledgements list and the root licence, with a check ([Milestone H](MILESTONES.md#milestone-h--provenance-headers-and-notices))

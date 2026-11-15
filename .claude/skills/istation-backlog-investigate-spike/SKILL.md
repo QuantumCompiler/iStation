@@ -1,6 +1,6 @@
 ---
 name: istation-backlog-investigate-spike
-description: Investigate a design question about iStation with evidence, not opinion, and deliver a findings report in chat — walls, measurements, what already works, the backlog documents that would need creating, and the user-owned questions. Never builds and never writes backlog documents; the skill resolves which application the question belongs to and asks when it cannot. Use when the user says "spike this", "investigate whether…", "can iStation do X", "what would it take to…", "how would we add cover art / CHD / controllers / PCSX-Redux", "probe the emulators' flags", or asks a feasibility or design question before anything is specced.
+description: Investigate a design question about iStation with evidence, not opinion, and deliver a findings report in chat — walls, measurements, what already works, the backlog documents that would need creating, and the user-owned questions. Never builds and never writes backlog documents; the skill resolves which application the question belongs to and asks when it cannot. Use when the user says "spike this", "investigate whether…", "can iStation do X", "what would it take to…", "how would we add the GPU / CHD / controllers / a Metal renderer", "probe JIT under the App Sandbox", or asks a feasibility or design question before anything is specced.
 ---
 
 # Investigate a spike — iStation

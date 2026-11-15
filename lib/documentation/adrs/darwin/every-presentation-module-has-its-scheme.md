@@ -10,7 +10,7 @@ The Xcode project had four shared schemes, one per app per routine (ADR 0016); t
 
 - **Every Presentation module in the module map has a shared scheme**, `lib/src/darwin/iStation.xcodeproj/xcshareddata/xcschemes/<Target>.xcscheme`, named exactly as its target (`PresentationPlayer.xcscheme`): committed under `xcshareddata`, never left to Xcode's automatic schemes.
 - **Its Build action builds the module's target**, its dependencies with it; **its Test action runs the module's own bundle**, `<Target>Tests`, in Debug, so ⌘U there tests that module alone. A library has no Run action executable.
-- **The app schemes stay the whole**: `macOS Personal` still tests every bundle (ADR 0002's scheme check), and the build scripts and CI build only the app schemes. A module's scheme is for working on that module — its previews, its tests — never a second way to build or ship.
+- **The app schemes stay the whole**: `macOS Personal` still tests every bundle (ADR 0019's scheme check), and the build scripts and CI build only the app schemes. A module's scheme is for working on that module — its previews, its tests — never a second way to build or ship.
 - Lower layers take no scheme by this record: they draw nothing.
 
 ## Consequences

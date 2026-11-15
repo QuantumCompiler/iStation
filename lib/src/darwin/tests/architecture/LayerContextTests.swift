@@ -4,7 +4,7 @@
 import Foundation
 import Testing
 
-/// The docs and the tests tree may not drift from the module map (ADRs 0002, 0004).
+/// The docs and the tests tree may not drift from the module map (ADRs 0002, 0019).
 @Suite("Layer context") struct LayerContextTests {
     let map: ModuleMap
 
@@ -140,9 +140,9 @@ import Testing
         #expect(violations.isEmpty, "\(violations.report)")
     }
 
-    @Test("ADR 0001 lists the layers in the map's order")
-    func adr0001ListsTheLayersInOrder() {
-        let path = "lib/documentation/adrs/darwin/layer-enforcement.md"
+    @Test("ADR 0018 lists the layers in the map's order")
+    func adrListsTheLayersInOrder() {
+        let path = "lib/documentation/adrs/darwin/four-layers-dependencies-point-down.md"
         let adr = Repository.text(Repository.root.appendingPathComponent(path)) ?? ""
         let listed = Pattern.captures(#"^\d\. \*\*([A-Za-z]+)\*\*"#, in: adr, options: [.anchorsMatchLines])
             .compactMap { $0.first ?? nil }.map { $0.lowercased() }

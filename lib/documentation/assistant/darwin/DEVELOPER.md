@@ -10,6 +10,8 @@ README.md                      public overview
 LICENSE · LICENSES/            iStation's MIT licence; MIT.txt and BSD-2-Clause.txt for the SPDX headers
 .github/workflows/ci.yml       the repository's pipeline: docs, version bump, tag and release
 .github/workflows/darwin.yml   the Apple apps' pipeline: what changed, then build darwin (cicd.sh --app darwin --test)
+.claude/                       settings.json (Superpowers; worktree.baseRef: head) · skills/: the 13 istation-* lifecycle skills
+.gitignore                     build output and .build/, Local.xcconfig, .superpowers/, .claude/worktrees/, .claude/settings.local.json
 lib/
   documentation/               by kind, then platform: CLAUDE.md (the router); assistant/ backlog/ adrs/ reference/,
                                each a README.md and darwin/ (this application), with macos/ and ios/ beneath
@@ -33,7 +35,7 @@ lib/
       macos/                   Sources/iStationApp.swift · AppStore.entitlements · Personal.entitlements
       ios/                     Sources/iStationApp.swift · AppStore.entitlements · Personal.entitlements
     scripts/
-      build.sh                 the one entry point: build.sh personal|appstore macOS|iOS
+      build.sh                 the one entry point: build.sh personal macOS|iOS [--unsigned] · appstore macOS|iOS
       build-personal.sh        the personal routine: one app, Debug, as "iStation Personal.app" into build/DerivedData
       archive-appstore.sh      the App Store routine: one app, Release, archived into build/<platform>/
     source/
@@ -117,8 +119,8 @@ Every test target is Swift Testing, named `<Layer><Module>Tests`, at `tests/<lay
 | `BusinessPS1Tests` | Business | over BIOS images and PS-EXEs built in code (`Harness.swift`): the memory map's mirrors, segments, read-only BIOS, empty expansions and bus errors; the I/O ports' widths against ps1-tests' io-access-bitwidth log; I_STAT and I_MASK, and the CPU taking the vertical blank; the timers' clocks, targets and flags; DMA's OTC, DPCR and DICR; the NTSC frame and GPUSTAT; PS-EXE parsing and loading; the TTY through expansion 2, the BIOS's putchar and the boot hook, what an EXE printed apart from the BIOS, and an EXE waiting while the BIOS never reaches its shell; an empty controller port; the load times of RAM, the BIOS, the scratchpad and an I/O port, and psx-spx's formula for the rest; the console powering on; the review's regressions (`BusRegressionTests`, `DeviceRegressionTests`): RAM_SIZE's window, the expansions' sizes, the locked gaps, the port widths, DMA's bounds and endings, DICR's interrupt, the GPU's clock, fields and GP1(08h); the benchmark (off by default) |
 | `PresentationStylesTests` | Presentation | the screen's 4:3 shape; distinct symbols |
 | `PresentationPlayerTests` | Presentation | a new player has nothing loaded |
-| `PresentationAcknowledgementsTests` | Presentation | the empty state; entries listed in order |
-| `ArchitectureTests` | — | `LayeringTests`, `LayerContextTests`, `ProjectRulesTests` (ADRs 0001–0006, 0013, 0016) |
+| `PresentationAcknowledgementsTests` | Presentation | the empty state; entries listed in order; each app gets only the entries it carries; the committed `apps/Acknowledgements.json` decodes for both apps (Play! macOS-only); a missing bundled list is no entries |
+| `ArchitectureTests` | — | `LayeringTests`, `LayerContextTests`, `ProjectRulesTests` (ADRs 0002, 0013, 0014, 0016–0022) |
 
 ## Modules
 
@@ -144,12 +146,12 @@ Every test target is Swift Testing, named `<Layer><Module>Tests`, at `tests/<lay
 source/presentation/
   styles/            Palette.swift  Symbols.swift  Metrics.swift  Typography.swift
   player/            Views/ (PlayerView)  ViewModels/ (PlayerViewModel)  Previews/ (PreviewPlayer)
-  acknowledgements/  Views/ (AcknowledgementsView)  ViewModels/ (AcknowledgementsViewModel)  Models/ (Acknowledgement)
+  acknowledgements/  Views/ (AcknowledgementsView)  ViewModels/ (AcknowledgementsViewModel)  Models/ (Acknowledgement)  Previews/ (PreviewAcknowledgements)
 ```
 
 - **`styles`** (`PresentationStyles`) — `Palette` (screen, on-screen text, secondary text), `Symbols`, `Metrics` (the 4:3 screen, the player's minimum size, padding, spacing), `Typography`.
 - **`player`** (`PresentationPlayer`) — `PlayerViewModel(console:)` (`state: .nothingLoaded`, `consoleName`, `message`); `PlayerView` (the screen, preview "Nothing loaded").
-- **`acknowledgements`** (`PresentationAcknowledgements`) — `Acknowledgement` (name, SPDX licence, notice, source URL); `AcknowledgementsViewModel(entries:)` (`state: .empty | .listed`); `AcknowledgementsView` (preview "Empty"). Its entries come from `apps/Acknowledgements.json` through `Acknowledgement.bundled(for:)`.
+- **`acknowledgements`** (`PresentationAcknowledgements`) — `Acknowledgement` (name, SPDX licence, notice, source URL); `AcknowledgementsViewModel(entries:)` (`state: .empty | .listed`); `AcknowledgementsView` (previews "Empty" and "Listed", over `PreviewAcknowledgements`' in-memory entries). Its entries come from `apps/Acknowledgements.json` through `Acknowledgement.bundled(for:)`.
 
 ### The apps
 
@@ -177,7 +179,7 @@ source/presentation/
 
 ### Headers, provenance and the acknowledgements list
 
-Every Swift file in the package and the apps opens with
+Every Swift file under `source/`, `tests/` and `apps/` (`Package.swift` excepted: its first line is the tools version) opens with
 
 ```swift
 // SPDX-License-Identifier: MIT
@@ -196,7 +198,7 @@ A debug view goes in its module's `Debug/` and opens with `#if PERSONAL_BUILD`; 
 
 ### Adding a file Xcode's navigator should show
 
-`lib/src/darwin/iStation.xcodeproj` shows the whole repository, not only the apps: the README and CLAUDE.md, `lib/documentation/`, the package, the apps' groups, `lib/src/darwin/tools/`, `scripts/`, `.github/`, `.claude/`, the licences and `.gitignore`. Most folders are synchronized (blue in the navigator), so a new file in them appears by itself: `lib/documentation/`, `scripts/`, `.github/`, `.claude/skills/`, `LICENSES/`, `lib/src/darwin/tools/gate/`, and each tool's source folders (`Sources/`, `host/`). `.claude/` itself lists `settings.json` by hand around its synchronized `skills/`, because Superpowers' worktrees under `.claude/worktrees/` are whole checkouts. Each tool's top level is listed file by file instead, because every tool builds into a hidden `.build/` and a synchronized folder shows hidden folders too — SwanStation's clone and its GPL source among them, which no one opens. So a new file at a tool's top level is added to that tool's group under `tools` by hand (File ▸ Add Files to "iStation", no target), and a tool folder is never added whole; a new top-level folder in the repository gets its own synchronized group.
+`lib/src/darwin/iStation.xcodeproj` shows the whole repository, not only the apps: the README and CLAUDE.md, `lib/documentation/`, the package, the apps' groups, `lib/src/darwin/tools/`, `lib/scripts/`, `lib/release/`, `.github/`, `.claude/`, the licences and `.gitignore`. Most folders are synchronized (blue in the navigator), so a new file in them appears by itself: `lib/documentation/`, `lib/scripts/`, `lib/release/`, `.github/`, `.claude/skills/`, `LICENSES/`, `lib/src/darwin/tools/gate/`, and the apps' and each tool's source folders (`Sources/`, `host/`). `.claude/` itself lists `settings.json` by hand around its synchronized `skills/`, because Superpowers' worktrees under `.claude/worktrees/` are whole checkouts. Each tool's top level is listed file by file instead, because every tool that builds does so into a hidden `.build/` and a synchronized folder shows hidden folders too — SwanStation's clone and its GPL source among them, which no one opens. So a new file at a tool's top level is added to that tool's group under `tools` by hand (File ▸ Add Files to "iStation", no target), and a tool folder is never added whole; a new top-level folder in the repository gets its own synchronized group.
 
 ### Adding or promoting a shared component
 

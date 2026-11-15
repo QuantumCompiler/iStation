@@ -39,7 +39,7 @@ In the table's build order, and within a document top to bottom. **Record each a
 
 For every answer, in the document, in the same pass:
 
-- A dated **Decisions made** entry: what was decided and whose call it was ("2026-11-02: Covers come from <source> (the user's call)"; "(the default, confirmed by the user)").
+- A dated **Decisions made** entry: what was decided and whose call it was ("2026-11-14: VRAM is compared with SwanStation's frame by frame (the user's call)"; "(the default, confirmed by the user)").
 - The call removed from **Open calls**.
 - **Consequences propagated** to every Core constraint, Seam + files line, Guardrail and Acceptance criterion that branched on it — a decision recorded but not propagated is drift wearing a date.
 - Flags elsewhere brought down: track preambles ("answered the same day" is the house phrasing), ROADMAP's "Decisions needed" ("answered 2026-11-02"). An answered call changes no Status cell: 🔒 names pending ids only.

@@ -3,7 +3,7 @@
 
 import Testing
 
-/// The layer law (ADR 0001) over the module map (ADR 0002), and the Presentation shape (ADRs 0005, 0006).
+/// The layer law (ADR 0018) over the module map (ADR 0002), and the Presentation shape (ADRs 0020, 0021).
 /// Each test names its rule and every offending file.
 @Suite("Layering") struct LayeringTests {
     let map: ModuleMap

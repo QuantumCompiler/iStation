@@ -35,7 +35,7 @@ let modules: [Module] = [
     Module(.presentation, "Acknowledgements", uses: ["PresentationStyles"]),
 ]
 
-/// Shared test fixtures and fakes, each at the lowest layer whose tests use it (ADR 0004).
+/// Shared test fixtures and fakes, each at the lowest layer whose tests use it (ADR 0019).
 /// A row becomes a library target `Support<Name>` built from tests/support/<name in lowercase>/.
 let testSupport: [Support] = [
     Support(.infrastructure, "Sandbox"),
@@ -115,7 +115,7 @@ let package = Package(
     } + testSupport.map { support in
         .target(name: support.target, dependencies: dependencies(support.uses), path: support.path, swiftSettings: settings)
     } + [
-        // The layering, layer-context and project-rule checks (ADRs 0001, 0002, 0004, 0005, 0013, 0016). Reads files only.
+        // The layering, layer-context and project-rule checks (ADRs 0002, 0013, 0014, 0016–0022). Reads files only.
         .testTarget(name: "ArchitectureTests", path: "tests/architecture"),
     ]
 )

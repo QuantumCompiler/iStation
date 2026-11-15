@@ -1,6 +1,6 @@
 # ADR 0004 — Tests live in the layer of what they test
 
-**Status:** Accepted · **Date:** 2026-10-31
+**Status:** Superseded by [ADR 0019](tests-live-in-the-layer-of-what-they-test.md) (2026-11-14): the library app's retirement left it naming modules and checks that no longer exist · **Date:** 2026-10-31
 
 ## Context
 

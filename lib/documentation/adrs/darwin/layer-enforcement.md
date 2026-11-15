@@ -1,6 +1,6 @@
 # ADR 0001 — Four layers, dependencies point down, regardless of language and framework
 
-**Status:** Accepted · **Date:** 2026-10-31
+**Status:** Superseded by [ADR 0018](four-layers-dependencies-point-down.md) (2026-11-14): restated for today's modules, apps and checks after the library app's retirement · **Date:** 2026-10-31
 
 ## Context
 
