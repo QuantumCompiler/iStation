@@ -10,7 +10,7 @@
 Today the iOS app is one screen: the player with an Acknowledgements button (`apps/ios/Sources/iStationApp.swift`). The view-models are the Mac app's (5c, 5d, 5h, 5e); this item is the iPhone's views and composition. Measured, not guessed, 2026-11-21 (probe): the iOS app carries two acknowledgements, iStation and ProjectPSX.
 
 **Core constraint(s).**
-- View-models are shared and import no UI toolkit; only views differ by platform ([ADR 0020](../../../../adrs/darwin/presentation-is-mvvm-with-one-styles-module.md)).
+- View-models are shared and import no UI toolkit; only views differ by platform ([ADR 0023](../../../../adrs/darwin/presentation-is-mvvm-and-styles-carries-the-design.md)).
 - The iOS App Store app generates no code at run time: interpreter only (SPEC, Apple constraints).
 - Touch targets at least 44 points; text follows Dynamic Type (the iOS type ramp in `tokens.json`).
 - Files chosen through the Files picker are read only, through security-scoped bookmarks.

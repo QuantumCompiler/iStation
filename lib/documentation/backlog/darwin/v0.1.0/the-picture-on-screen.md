@@ -12,7 +12,7 @@
 - Under the App Sandbox the App Store build reads only files the user chose (`apps/macos/AppStore.entitlements:6`), so screenshots stay in its container, and its entitlements gain nothing for them. The app target resolves the Screenshots folder in its own container and hands the player the URL: nothing in the package reaches the home folder (`noRealHome`).
 
 **Seam + files.**
-- Presentation, `player`: `FrameView` (6b) placed and scaled per the Video settings; Save Screenshot from the latest picture, its raw 15- or 24-bit rows converted to RGBA in Presentation, off the hot path and never in the core, by one shared converter in `styles`, which `player`, `tools`' VRAM tab and 5l's save-state thumbnails all use (ADR 0020's bar for sharing; 6b's shader converts only what is drawn on screen).
+- Presentation, `player`: `FrameView` (6b) placed and scaled per the Video settings; Save Screenshot from the latest picture, its raw 15- or 24-bit rows converted to RGBA in Presentation, off the hot path and never in the core, by one shared converter in `styles`, which `player`, `tools`' VRAM tab and 5l's save-state thumbnails all use (ADR 0023's bar for sharing; 6b's shader converts only what is drawn on screen).
 - The design, in the same change (its CLAUDE.md): the screenshot toast in `html/main.html` gains its Show in Finder button, and `Processes.dc.html`'s Screenshots row says it is shown in the Finder from the toast, with no Pictures entitlement.
 - Presentation, `settings`: the Video tab.
 - Presentation, `tools`: the VRAM tab, from 6b's snapshot.

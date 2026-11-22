@@ -117,10 +117,10 @@ Every test target is Swift Testing, named `<Layer><Module>Tests`, at `tests/<lay
 | `DataTracingTests` | Data | the trace formats byte for byte; round trips across the buffer; truncated, foreign, newer and unknown input; FNV-1a vectors and the register checksum; the first divergence by field; checkpoints; throughput (off by default) |
 | `BusinessR3000ATests` | Business | every instruction family against psx-spx over an in-memory bus (`Harness.swift`) and `SupportMIPS`'s assembler: ALU and the overflow trap, shifts, MULT/DIV and their edge cases, loads with the load-delay slot, LWL/LWR/SWL/SWR at every offset, branches and jumps with the delay slot, SYSCALL, BREAK, reserved instructions, address and bus errors, interrupts, RFE and COP0's other commands, the COP0 moves and which registers they reach, COP1, COP3 and LWCn/SWCn as ps1-tests' `cop` shows them on hardware, user mode, cache isolation, COP2 routing and Coprocessor Unusable; the tracer through TraceKit's records; the benchmark (off by default) |
 | `BusinessPS1Tests` | Business | over BIOS images and PS-EXEs built in code (`Harness.swift`): the memory map's mirrors, segments, read-only BIOS, empty expansions and bus errors; the I/O ports' widths against ps1-tests' io-access-bitwidth log; I_STAT and I_MASK, and the CPU taking the vertical blank; the timers' clocks, targets and flags; DMA's OTC, DPCR and DICR; the NTSC frame and GPUSTAT; PS-EXE parsing and loading; the TTY through expansion 2, the BIOS's putchar and the boot hook, what an EXE printed apart from the BIOS, and an EXE waiting while the BIOS never reaches its shell; an empty controller port; the load times of RAM, the BIOS, the scratchpad and an I/O port, and psx-spx's formula for the rest; the console powering on; the review's regressions (`BusRegressionTests`, `DeviceRegressionTests`): RAM_SIZE's window, the expansions' sizes, the locked gaps, the port widths, DMA's bounds and endings, DICR's interrupt, the GPU's clock, fields and GP1(08h); the benchmark (off by default) |
-| `PresentationStylesTests` | Presentation | the screen's 4:3 shape; distinct symbols |
+| `PresentationStylesTests` | Presentation | every color role, text style, space, radius, duration and layout size in the design's `json/tokens.json` (read by its repository path) against its `styles` member, and every `contrastPairs` entry recomputed from the Swift values; the theme's resolution under the light, dark and high-contrast appearances; each symbol an SF Symbol that exists, there by macOS 14 and iOS 17; a job's status, current step, progress and which button Return, Escape and ⌘. press; each tone a `contrastPairs` entry with its symbol; a shortcut's keycap glyphs; the screen's 4:3 shape; distinct symbols |
 | `PresentationPlayerTests` | Presentation | a new player has nothing loaded |
 | `PresentationAcknowledgementsTests` | Presentation | the empty state; entries listed in order; each app gets only the entries it carries; the committed `apps/Acknowledgements.json` decodes for both apps (Play! macOS-only); a missing bundled list is no entries |
-| `ArchitectureTests` | — | `LayeringTests`, `LayerContextTests`, `ProjectRulesTests` (ADRs 0002, 0013, 0014, 0016–0022) |
+| `ArchitectureTests` | — | `LayeringTests`, `LayerContextTests`, `ProjectRulesTests` (ADRs 0002, 0013, 0014, 0016–0019, 0021–0023) |
 
 ## Modules
 
@@ -144,12 +144,13 @@ Every test target is Swift Testing, named `<Layer><Module>Tests`, at `tests/<lay
 
 ```
 source/presentation/
-  styles/            Palette.swift  Symbols.swift  Metrics.swift  Typography.swift
+  styles/            Palette.swift  Theme.swift  Typography.swift  Metrics.swift  Motion.swift  Symbols.swift
+                     Components/ (JobSheet  DetailsAlert  Chip  Banner  Keycap)  Models/ (JobPresentation  Tone)  Previews/ (PreviewJobs)
   player/            Views/ (PlayerView)  ViewModels/ (PlayerViewModel)  Previews/ (PreviewPlayer)
   acknowledgements/  Views/ (AcknowledgementsView)  ViewModels/ (AcknowledgementsViewModel)  Models/ (Acknowledgement)  Previews/ (PreviewAcknowledgements)
 ```
 
-- **`styles`** (`PresentationStyles`) — `Palette` (screen, on-screen text, secondary text), `Symbols`, `Metrics` (the 4:3 screen, the player's minimum size, padding, spacing), `Typography`.
+- **`styles`** (`PresentationStyles`) — the design's [`json/tokens.json`](../../design/darwin/json/tokens.json) in Swift, each member named for its role as the file's `swiftui` map says ([ADR 0023](../../adrs/darwin/presentation-is-mvvm-and-styles-carries-the-design.md)). `Palette`: a static member per color role, each a dynamic `NSColor`/`UIColor` provider of its dark, light and high-contrast values, resolved at draw time (`screen`, `onScreen` and `secondaryText` kept; the focus ring and the sheet and alert dimming stay the system's). `Theme`: the theme setting — Match the system (the default: dark or light as the system is, High contrast while Increase Contrast is on), Dark, Light, High contrast — and the resolution the providers read, through `Theme.applied`, which Settings (5e) sets with the scheme each choice asks for (dark whenever it resolves to high contrast). `Typography`: the macOS and iOS text styles (`largeTitle` to `caption`), their weights and the monospaced face, scaled on macOS by the text-size setting's multiplier and on iOS by Dynamic Type. `Metrics`: `space1` to `space10`, the radii, the macOS and iOS layout sizes (`Metrics.layout`, a sheet's and an alert's width among them), and the player's own (the 4:3 screen, its minimum size, padding, spacing). `Motion`: fast, base and slow and the design's curve, none under Reduce Motion. `Symbols`: an SF Symbol per icon the design draws. `Components/`, the shared components, each with a named preview per state: `JobSheet` over `Models/`' `JobPresentation` (steps, progress, summary, buttons), `DetailsAlert` (an alert whose Details disclosure shows the exact call), `Chip`, `Banner`, `Keycap`.
 - **`player`** (`PresentationPlayer`) — `PlayerViewModel(console:)` (`state: .nothingLoaded`, `consoleName`, `message`); `PlayerView` (the screen, preview "Nothing loaded").
 - **`acknowledgements`** (`PresentationAcknowledgements`) — `Acknowledgement` (name, SPDX licence, notice, source URL); `AcknowledgementsViewModel(entries:)` (`state: .empty | .listed`); `AcknowledgementsView` (previews "Empty" and "Listed", over `PreviewAcknowledgements`' in-memory entries). Its entries come from `apps/Acknowledgements.json` through `Acknowledgement.bundled(for:)`.
 
@@ -202,11 +203,18 @@ A debug view goes in its module's `Debug/` and opens with `#if PERSONAL_BUILD`; 
 
 ### Adding or promoting a shared component
 
-A component a second module wants moves to `source/presentation/styles/Components/` (never copied): make its inputs plain values and callbacks (no feature view-model), move its previews with it, update both users, delete the original.
+A component a second module wants moves to `source/presentation/styles/Components/` (never copied): make its inputs plain values and callbacks (no feature view-model), move its previews with it, update both users, delete the original. A component the design already draws in two or more places starts there; a plain value it shows sits in `styles/Models/`, importing no UI framework.
 
 ### Adding a token
 
-Add it to `Palette`, `Symbols`, `Metrics` or `Typography`, named for its role, and replace the literal that prompted it. `ArchitectureTests` rejects literal colors, sizes and paddings in feature views.
+A color, size, font, space, radius or duration starts in [the design](../../design/darwin/README.md), never in `styles`:
+
+1. Add it to the design's `json/tokens.json`, named for its role — a color with its dark, light and contrast values, and a `contrastPairs` entry for each new text pair — with its line in the `swiftui` map naming its `styles` member.
+2. From `lib/documentation/design/darwin/`, run `node tools/sync.mjs`, then the design's checks (`node tools/check.mjs`, and `--render` after a markup change), and publish the changed files to the canvas by [the design's sync rule](../../design/darwin/CLAUDE.md#the-sync-rule).
+3. Add its member to `Palette`, `Symbols`, `Metrics`, `Typography` or `Motion`, named for its role, with the value `tokens.json` gives it (a color as a dynamic provider of its three values), and replace the literal that prompted it.
+4. Run `swift test`: the tokens test in `tests/presentation/styles/` fails while `styles` and `tokens.json` differ, and `ArchitectureTests` rejects literal colors, sizes and paddings in feature views.
+
+An icon takes the same path through the design's `html/main.html` (its `ICON` set) instead of `tokens.json`, then its SF Symbol in `Symbols`.
 
 ### Changing an entitlement
 

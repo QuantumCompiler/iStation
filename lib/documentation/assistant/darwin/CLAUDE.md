@@ -55,7 +55,7 @@ A core lives in Business and imports no UI or Apple framework: one module per CP
 
 ### The UI: MVVM, one styles module
 
-Presentation is EmuKit: one module per user-facing place, each **`Views/` + `ViewModels/`** ([ADR 0020](../../adrs/darwin/presentation-is-mvvm-with-one-styles-module.md)): views lay out and bind; view-models (`@MainActor @Observable` classes) hold state and intents, read the core they are given, and never import SwiftUI, AppKit, UIKit or Cocoa. **`styles`** is the only source of colors, symbols, sizes and fonts and of shared components. The apps' targets are the composition roots: each builds the console and the view-models and holds no logic. Every view has named previews per visible state over in-module fakes, and every module builds and tests alone ([ADR 0021](../../adrs/darwin/presentation-modules-stand-alone-and-preview-sample-data.md)). Debug views live in a module's `Debug/`, inside `#if PERSONAL_BUILD`. The Presentation layer card has the module list and the recipe.
+Presentation is EmuKit: one module per user-facing place, each **`Views/` + `ViewModels/`** ([ADR 0023](../../adrs/darwin/presentation-is-mvvm-and-styles-carries-the-design.md)): views lay out and bind; view-models (`@MainActor @Observable` classes) hold state and intents, read the core they are given, and never import SwiftUI, AppKit, UIKit or Cocoa. **`styles`** is the only source of colors, symbols, sizes and fonts and of shared components, and it carries [the design](../../design/darwin/README.md)'s `json/tokens.json`: every color a dynamic provider of its dark, light and high-contrast values, and the theme setting (Match the system by default) beside them; a token changes in `tokens.json` first. The apps' targets are the composition roots: each builds the console and the view-models and holds no logic. Every view has named previews per visible state over in-module fakes, and every module builds and tests alone ([ADR 0021](../../adrs/darwin/presentation-modules-stand-alone-and-preview-sample-data.md)). Debug views live in a module's `Debug/`, inside `#if PERSONAL_BUILD`. The Presentation layer card has the module list and the recipe.
 
 ---
 
@@ -150,7 +150,7 @@ Presentation is EmuKit: one module per user-facing place, each **`Views/` + `Vie
 | Data | `tracing` | TraceKit: trace records, files, the first divergence and checkpoints (personal builds only) |
 | Business | `r3000a` | the R3000A interpreter, generic over its bus, coprocessor 2 and tracer (ported from ProjectPSX) |
 | Business | `ps1` | the PS1 console: its memory map and wait states, interrupt controller, timers, DMA, the GPU's timing, stubs for the other devices, PS-EXE loading and the TTY (ported from ProjectPSX) |
-| Presentation | `styles` | the visual tokens: palette, symbols, metrics, typography |
+| Presentation | `styles` | the visual tokens from the design's `tokens.json` — palette (dynamic, three themes), theme, typography, metrics, motion, symbols — and the shared components |
 | Presentation | `player` | the player's screen |
 | Presentation | `acknowledgements` | every notice the app carries |
 
@@ -240,7 +240,7 @@ Every change satisfies this before merge:
 - [ ] **No game, BIOS or firmware file** is added anywhere, fixtures included — open test suites are fetched by their tools, or committed only beside their licence through an allow-list; never OpenBIOS.
 - [ ] **The user's data stays readable**: a new persisted field (settings, memory cards) decodes with a default; a save state carries its version ([ADR 0016](../../adrs/darwin/two-build-routines-and-a-fresh-start.md) §5).
 - [ ] **A view has its view-model and its previews**: new UI logic lives in a view-model (tested over fakes, every named state), not the view; every new or changed view has a named `#Preview` per visible state, debug-only, over the module's own fakes and sample data — never anything derived from the user's own files ([ADR 0021](../../adrs/darwin/presentation-modules-stand-alone-and-preview-sample-data.md)).
-- [ ] **Visuals come from `styles`**: no literal color, font or size in a feature view — a new need is a token; a component a second module wants is promoted to `styles`, never copied ([ADR 0020](../../adrs/darwin/presentation-is-mvvm-with-one-styles-module.md)).
+- [ ] **Visuals come from `styles`**: no literal color, font or size in a feature view — a new need is a token, in the design's `tokens.json` first ([DEVELOPER.md](DEVELOPER.md#adding-a-token)); a component a second module wants, or the design draws in two places, lives in `styles`, promoted, never copied ([ADR 0023](../../adrs/darwin/presentation-is-mvvm-and-styles-carries-the-design.md)).
 - [ ] **A new place is a module**: `Views/` + `ViewModels/`, its `Module` row, its test directory, its place in the `EmuKit` product, its view-model built by the apps, its name on the Presentation card and in ADR 0002's table, and its own shared Xcode scheme (ADR 0017) — in the same change.
 - [ ] The docs validator is clean: `python3 lib/scripts/validate_docs.py lib/documentation` (from the repository root).
 - [ ] The affected docs are updated in the same change (see **Documentation and Status**) — run `/istation-maintenance-update-documents` before opening a pull request.
@@ -251,7 +251,7 @@ Every change satisfies this before merge:
 - Every public type and function carries a `///` comment saying what it is for, in plain words; comments explain why, not what (the scaffold's convention).
 - Messages a person sees say what happened and what to do, in plain words with typographic apostrophes: "The BIOS couldn’t be read. Choose another file."
 - Readers tolerate bad input: a truncated, foreign or corrupt file is `nil` or a thrown error, never a trap — check lengths before indexing.
-- No singletons or global lookups: dependencies arrive through initializers; only the apps' targets construct the console and the view-models.
+- No singletons or global lookups: dependencies arrive through initializers; only the apps' targets construct the console and the view-models. The one process-wide value is the theme setting's `Theme.applied`, which the palette's dynamic colors read at draw time because nothing else can reach them ([ADR 0023](../../adrs/darwin/presentation-is-mvvm-and-styles-carries-the-design.md)).
 - Value types are `Sendable`; every view-model is `@MainActor`; work that must leave the main actor runs in a `Task.detached` inside the service that owns it.
 - Match the surrounding code's conventions; when in doubt, find the closest existing analogue and follow it.
 

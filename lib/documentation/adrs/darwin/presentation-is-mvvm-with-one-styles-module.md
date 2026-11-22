@@ -1,6 +1,6 @@
 # ADR 0020 — Presentation modules are MVVM and share one styles module; the apps are the composition roots
 
-**Status:** Accepted · **Date:** 2026-11-14 · Supersedes [ADR 0005](presentation-mvvm.md)
+**Status:** Superseded by [ADR 0023](presentation-is-mvvm-and-styles-carries-the-design.md) (2026-11-22): `Palette` carries the design's own colors from its `tokens.json` in three themes and `Theme` the theme setting, where it named SwiftUI's own; the rule otherwise carries · **Date:** 2026-11-14 · Supersedes [ADR 0005](presentation-mvvm.md)
 
 ## Context
 

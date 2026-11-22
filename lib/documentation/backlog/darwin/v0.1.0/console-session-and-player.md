@@ -4,7 +4,7 @@
 
 **Core constraint(s).**
 - The layer law ([ADR 0018](../../../adrs/darwin/four-layers-dependencies-point-down.md)): the session sits below Presentation and imports no UI or Apple framework, only the standard library and Swift concurrency; a new module is a row, a directory, a test directory, a card line and an ADR 0002 row in the same change.
-- View-models import no UI toolkit; the view maps their states to `styles` (5a) ([ADR 0020](../../../adrs/darwin/presentation-is-mvvm-with-one-styles-module.md)).
+- View-models import no UI toolkit; the view maps their states to `styles` (5a) ([ADR 0023](../../../adrs/darwin/presentation-is-mvvm-and-styles-carries-the-design.md)).
 - A core is driven from one thread ([ADR 0015](../../../adrs/darwin/a-core-is-a-cpu-module-and-a-console-module.md) §4); work leaving the main actor runs in a `Task.detached` inside the service that owns it.
 - Tests and previews never touch the real home or a real BIOS: build images in code.
 

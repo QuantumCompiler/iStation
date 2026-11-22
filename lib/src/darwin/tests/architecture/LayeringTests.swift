@@ -3,7 +3,7 @@
 
 import Testing
 
-/// The layer law (ADR 0018) over the module map (ADR 0002), and the Presentation shape (ADRs 0020, 0021).
+/// The layer law (ADR 0018) over the module map (ADR 0002), and the Presentation shape (ADRs 0021, 0023).
 /// Each test names its rule and every offending file.
 @Suite("Layering") struct LayeringTests {
     let map: ModuleMap
@@ -148,7 +148,7 @@ import Testing
         for module in map.modules(in: "presentation") {
             let root = Repository.package.appendingPathComponent(module.sourcePath)
             let isStyles = module.name == "Styles"
-            let admitted: Set<String> = isStyles ? ["Components", "Previews"] : ["Views", "ViewModels", "Components", "Models", "Previews", "Debug"]
+            let admitted: Set<String> = isStyles ? ["Components", "Models", "Previews"] : ["Views", "ViewModels", "Components", "Models", "Previews", "Debug"]
             let directories = Repository.subdirectories(of: root)
             for directory in directories where !admitted.contains(directory) {
                 violations.add("MVVM shape", "\(module.sourcePath)/\(directory)", "is not an admitted directory (\(admitted.sorted().joined(separator: ", ")))")

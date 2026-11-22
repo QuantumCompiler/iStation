@@ -85,14 +85,15 @@ Split, the user's calls of 2026-11-21:
 
 Four interface items are **split first** (6b here; 6d, 6g in v0.2.0; 6i in v0.3.0), because the device behind each, the GPU, the CD-ROM drive, every device's state and the SPU, is ROADMAP work with no document yet: each names its sub-documents. Each document carries the design's decisions as `[default: …]` calls and the user's open ones as `[user]`; v0.1.0's were all answered 2026-11-22, its table's documents left with nothing to ask. G13, the PS2 core, waits for v2.x's spike; until then 5h refuses PS2 discs with the reason. v0.1.0's other ROADMAP lines have no documents yet: the GPU's and the VRAM comparison's are 6b's split, the GPU's taking its own row ahead of 6b before anyone builds it (the default, confirmed 2026-11-22); DMA and timers in full and the boot's RAM recorded from SwanStation weren't written at the 2026-11-22 grooming, and each is written with `/istation-backlog-create-item` before v0.1.0's gate is built.
 
+5a shipped on 2026-11-22: the design's tokens, the theme setting and the shared components are in `styles` ([Milestone S](../../assistant/darwin/MILESTONES.md#milestone-s--the-designs-tokens-in-styles)), which opened 5b and 5e.
+
 | # | Item | Version | File | Status |
 |---|---|---|---|---|
-| 5a | **The design's tokens in the styles module** — every color, type style, space, radius and duration from `tokens.json`, and the shared components | v0.1.0 | [design-tokens-in-styles.md](v0.1.0/design-tokens-in-styles.md) | 🟢 |
 | 6a | **The narrow interface: boot a PS-EXE, the BIOS's shell, debug values** — gaps G5, G6 and G10, forwarding to what `PS1Machine` has | v0.1.0 | [interface-boot-shell-and-debug.md](v0.1.0/interface-boot-shell-and-debug.md) | 🟢 |
-| 5b | **The console session and the player** — the runner off the main actor, and the player with its HUD, pause, reset and stop | v0.1.0 | [console-session-and-player.md](v0.1.0/console-session-and-player.md) | 🔒 5a |
+| 5b | **The console session and the player** — the runner off the main actor, and the player with its HUD, pause, reset and stop | v0.1.0 | [console-session-and-player.md](v0.1.0/console-session-and-player.md) | 🟢 |
 | 5c | **First run and the BIOS** — welcome, the BIOS check job, the wrong-size refusal and the BIOS pane, kept by bookmark | v0.1.0 | [first-run-and-the-bios.md](v0.1.0/first-run-and-the-bios.md) | 🔒 5b, 6a |
 | 5d | **The library, before discs can be read** — files, folders, search, Game info and PS-EXEs that play | v0.1.0 | [library-of-files.md](v0.1.0/library-of-files.md) | 🔒 5c, 6a |
-| 5e | **Settings, Acknowledgements, About, menus and shortcuts** — the other windows and every key | v0.1.0 | [windows-settings-and-shortcuts.md](v0.1.0/windows-settings-and-shortcuts.md) | 🔒 5a |
+| 5e | **Settings, Acknowledgements, About, menus and shortcuts** — the other windows and every key | v0.1.0 | [windows-settings-and-shortcuts.md](v0.1.0/windows-settings-and-shortcuts.md) | 🟢 |
 | 5f | **The personal build's Tools and debug drawer** — console, TTY, trace recording and comparison, personal builds only | v0.1.0 | [personal-tools.md](v0.1.0/personal-tools.md) | 🔒 5b, 6a |
 | 6b | **The narrow interface: the picture and VRAM** — gap G1, split first: the GPU, the frame member and its Metal presentation | v0.1.0 | [interface-picture.md](v0.1.0/interface-picture.md) | 🟢 |
 | 5g | **The picture on screen** — frames in the player, Settings › Video, screenshots and the VRAM tab | v0.1.0 | [the-picture-on-screen.md](v0.1.0/the-picture-on-screen.md) | 🔒 6b, 5e, 5f |

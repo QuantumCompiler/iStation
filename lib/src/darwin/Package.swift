@@ -115,7 +115,7 @@ let package = Package(
     } + testSupport.map { support in
         .target(name: support.target, dependencies: dependencies(support.uses), path: support.path, swiftSettings: settings)
     } + [
-        // The layering, layer-context and project-rule checks (ADRs 0002, 0013, 0014, 0016–0022). Reads files only.
+        // The layering, layer-context and project-rule checks (ADRs 0002, 0013, 0014, 0016–0019, 0021–0023). Reads files only.
         .testTarget(name: "ArchitectureTests", path: "tests/architecture"),
     ]
 )

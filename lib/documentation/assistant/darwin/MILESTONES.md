@@ -605,3 +605,52 @@ Decided by the hardware (2026-11-14, ps1-tests' `cop` and its `psx.log`, recorde
 
 - 2026-11-14: mimic Apogee's agentic procedure, adapted for iStation (the user's call).
 - 2026-11-14: the personal identities are `local.istation.macos.personal` and `local.istation.ios.personal`, displayed as "iStation Personal"; the App Store identifiers stay `local.istation.macos` and `local.istation.ios` until the user's App Store Connect identifiers exist (v1.0.0) (the defaults, confirmed by the user).
+
+## Milestone S — The design's tokens in `styles`
+
+**Goal.** v0.1.0 item 5a, first of track 5: bring the `styles` module up to the app design's `json/tokens.json` ([`design/darwin/`](../../design/darwin/README.md)), so every screen in track 5 can be built to the design, and add the components the design draws in two or more places. Until now `styles` had three colors, two symbols, five metrics and three fonts, and ADR 0020 said "There is no custom theme: `Palette` names SwiftUI's own colors."
+
+**Built** (5a, 2026-11-22), in `lib/src/darwin/source/presentation/styles/`:
+
+- **`Palette.swift`**: the 42 color roles, one static member each, every member built from its row in `Palette.roles` (token, member, and the dark, light and high-contrast values written as `tokens.json` writes them, `.rgb(0x1E1E21)`, `.rgba(0x00000099)`), as a dynamic `NSColor`/`UIColor` provider resolved at draw time. No asset catalog, and no system color or material in a role the app draws. `screen`, `onScreen` and `secondaryText` keep their names.
+- **`Theme.swift`** (new): the theme setting (`system`, `dark`, `light`, `highContrast`; Match the system is the default) and its resolution to `ResolvedTheme` (dark, light, contrast); `Theme.applied`, the choice the providers read; the scheme each choice asks of the system (`colorScheme`, `appearanceName` on macOS, `userInterfaceStyle` and `accessibilityContrast` on iOS); `TextSize` (Small, Medium, Large, Extra large). Unknown stored values read as the default.
+- **`Typography.swift`**: `Typography.Style`, the eight text styles in the macOS and iOS ramps with their weights, applied with `.textStyle(_:weight:monospaced:)`; the text-size multiplier on macOS (`\.textSize`), Dynamic Type on iOS. The player's and acknowledgements' fonts are unchanged.
+- **`Metrics.swift`**: `space1` to `space10`, the six radii, and `LayoutSizes` for each platform (`Metrics.mac`, `Metrics.iOS`, `Metrics.layout` for the current one), the job sheet's and alert's widths and the results list's height among them, added to `tokens.json` first. The player's names stay as aliases.
+- **`Motion.swift`** (new): fast, base and slow (0.12, 0.2, 0.32 s), the design's curve, and no animation under Reduce Motion.
+- **`Symbols.swift`**: 55 entries, an SF Symbol for each key of the design's `ICON` set, each there by macOS 14 and iOS 17.
+- **`Models/`** (no imports): `JobPresentation` (title, steps with their states, progress, summary, per-file results, output, buttons, and which key presses which) and `Tone` (neutral, muted, ok, warning, danger, info, verify: each a pair of the design's roles and its symbol).
+- **`Components/`**: `JobSheet`, `DetailsAlert`, `Chip`, `Banner`, `Keycap`, each with a named `#Preview` per state inside `#if DEBUG`, over `Previews/PreviewJobs`.
+- **Tests**, in `tests/presentation/styles/`: `TokensTests`, `ThemeTests`, `PaletteProviderTests`, `ToneTests`, `SymbolsTests`, `JobPresentationTests`, `KeycapTests` (with `Design.swift`, which reads `tokens.json` and `html/main.html` by repository path); 50 tests in 8 suites, from 2.
+- **`LayeringTests`**: `presentationModulesHaveTheMVVMShape` admits `Models/` in `styles`.
+- **The design**: `tokens.json`'s `swiftui` map names each role's `Palette` member (42 roles, 54 notes; `focus` and the sheet dimming of `bg-overlay` stay system-drawn, and say why), and gains the three sizes above; `node tools/sync.mjs` copied it into `html/main.html` and the seven pages that embed it. `Layout` and `Processes` name the shared components in `styles` where they named a Jobs module; the `Contract` page's Branding call drops the accent and the look. Published to [the canvas](https://claude.ai/artifact/LA2jv631Ar184Dviuju8hu) as this item landed.
+- **The docs**: [ADR 0023](../../adrs/darwin/presentation-is-mvvm-and-styles-carries-the-design.md) supersedes ADR 0020; CLAUDE.md (the UI section, the Codebase Map, the checklist, and the one exception to "no singletons"), DEVELOPER ("Adding a token" first in `tokens.json`, the module's section, the test table), both Presentation cards and the live ADR 0020 citations follow.
+
+**Trade-offs.**
+
+- **`Theme.applied` is process-wide.** AppKit and UIKit hand a dynamic color only the appearance or traits it is drawn in, and SwiftUI hands each color an appearance built from its color scheme, so an explicit choice can reach the providers no other way. The routes tried and refused: `NSAppearance(named: .accessibilityHighContrastDarkAqua)` returns plain Dark Aqua on this macOS (pinned by `highContrastCannotBeNamed`); neither an `NSAppearance` subclass nor `_colorSchemeContrast` reached a provider in an `NSHostingView`; a custom `ShapeStyle` reading the environment worked, but would have made members something other than `Color`. CLAUDE.md's Code Style names it as the one exception to "no singletons", and ADR 0023 records why.
+- **macOS has no high contrast an app can turn on.** An explicit High contrast draws the palette's contrast values, and asks for Dark Aqua; AppKit's own controls draw high contrast only while the system's Increase Contrast is on.
+- **Hand-written values, checked twice.** The colors are Swift literals, not generated, so `TokensTests` compares each with `tokens.json` and recomputes every contrast pair from the Swift side.
+- **The user's own accent color is not used**: the design's amber is the accent. The focus ring stays the system's, in the user's accent.
+
+**Verified** (2026-11-22):
+
+- `lib/scripts/cicd.sh --app darwin --test` in the item's worktree: the strict build, `swift test` (280 tests in 11 runs, from 232; the three benchmarks skipped as before) and both apps' personal routine built unsigned, `iStation Personal.app` for macOS and for the iOS Simulator; exit 0. `xcodebuild build-for-testing -scheme PresentationStyles` for the iOS Simulator also passed, so the iOS-only branches compile.
+- Planted violations, then restored: `fg-muted`'s dark value darkened in `Palette` failed `everyColorRoleHasItsPaletteRow`, `everyContrastPairMeetsItsMinimum` and `eachToneIsAContrastPair`; Light resolved to the dark theme failed `anExplicitChoiceWins`, `anExplicitChoiceIsWhatIsDrawn` and `explicitChoicesApplyThroughTheAppearance`.
+- `node tools/check.mjs` and `--render`: 138 color pairs at their minimum, 2015 renders, 8 flows, 29 shortcuts, 72 boards, 137 pages rendered in headless Chrome. The canvas's files matched the base commit's before the publish, so nothing on it was overwritten.
+- Each component's previews were rendered to images in Dark, Light and High contrast through an `NSHostingView` (a throwaway test, deleted) and compared with the `Foundations-Components` board in the browser: steps and their states, the alert with Details open and closed, chips, banners and keycaps draw as the board does, and High contrast draws on its black window.
+- Not verified: the system's Increase Contrast turned on (a system setting) with a preview open, which is the one way to see SwiftUI's own route to the contrast values; and whether the progress bar's accent tint shows in an active window (the offscreen render, an inactive window, drew it grey, as macOS draws inactive windows' controls).
+
+**Decisions consumed.**
+
+- 2026-11-22: the look is the design's graphite and amber, amber the accent (the user's call); colors are dynamic `NSColor`/`UIColor` providers, not an asset catalog (the default, confirmed by the user); the theme's default is Match the system, with High contrast under Increase Contrast (the default, confirmed by the user); the shared components start in `styles` (the default, confirmed by the user); the design is published as the item lands, and screens are checked by rendered previews (the user's calls, before the group run).
+- 2026-11-22, rulings made building it:
+  - High contrast: `Theme.applied`, as above, accepted at landing for the user's veto; it supersedes the build's first ruling, which set Dark Aqua alone and left an explicit High contrast drawing the dark values.
+  - Settings' stored values: `system`, `dark`, `light`, `highContrast`; `small`, `medium`, `large`, `extraLarge` (tokens `s`, `m`, `l`, `xl`).
+  - Text styles are `Typography.Style` cases, since `Typography.title` and `.body` were taken; their default weights come from the `Foundations-Type` board (largeTitle and title bold; title2, title3 and headline semibold; the rest regular). iOS ignores the text-size setting and follows Dynamic Type.
+  - Symbols: `finder` is `folder.circle` (the real `finder` symbol is from 2025 and reserved for Apple's Finder), `spinner` is `circle.dashed` (`progress.indicator` is from 2024), `save` and `load` are `tray.and.arrow.down` and `tray.and.arrow.up`; where the design draws one shape twice the symbol is shared.
+  - Spacing the design writes off the scale takes the nearest step (14 → `space4`, 10 → `space3`, 6 → `space2`); the keycap's 4 pt corner is `radiusControl` (6); icons size by text style.
+  - The job sheet's buttons: Stop on ⌘., Close on Escape, Finish and Retry the accent default on Return; Escape with no Close stops a running job and otherwise finishes; a running sheet can't be dismissed. In `DetailsAlert` Cancel takes Escape and a destructive button is never the default.
+  - One `Tone` for every component; a "skipped" step state, which the prototype draws; a pending step shows no word, as `main.html` has it, and VoiceOver says "Waiting".
+  - The button style and the code block stay internal to `JobSheet` and `DetailsAlert` until a place needs them; the progress bar and spinner are the system's, the spinner a still `circle.dashed` under Reduce Motion; the sheet's and alert's chrome is the system's, their content on `Palette.raised`.
+  - Additions the design doesn't draw: a banner's optional action, and `Keycap(_ shortcut:)`, so the shortcuts sheet can't disagree with the menus.
+  - The iOS sheet width is 390, the iPhone width the design draws at; no iOS code reads it yet.
