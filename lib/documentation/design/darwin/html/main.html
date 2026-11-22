@@ -1,0 +1,1898 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>iStation: the app</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.ist,.ist *{box-sizing:border-box}
+.ist{line-height:1.35;-webkit-font-smoothing:antialiased;outline:none}
+.ist button,.ist input,.ist select{font:inherit;color:inherit}
+.ist p{margin:0}
+.ist .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:var(--size-control);padding:0 12px;border-radius:var(--radius-control);border:1px solid var(--line-strong);background:var(--bg-control);color:var(--fg);cursor:pointer;white-space:nowrap;transition:background var(--motion-fast) var(--ease)}
+.ist .btn:hover{background:var(--bg-control-hover)}
+.ist .btn:active{background:var(--bg-control-pressed)}
+.ist .btn:disabled{color:var(--fg-faint);background:var(--bg-control);border-color:var(--line);cursor:default}
+.ist .btn-primary{background:var(--accent);border-color:var(--accent);color:var(--fg-on-accent);font-weight:600}
+.ist .btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.ist .btn-primary:active{background:var(--accent-pressed);border-color:var(--accent-pressed)}
+.ist .btn-primary:disabled{background:var(--bg-control);border-color:var(--line);color:var(--fg-faint)}
+.ist .btn-danger{background:var(--danger-solid);border-color:var(--danger-solid);color:var(--fg-on-danger);font-weight:600}
+.ist .btn-danger:hover{background:var(--danger-solid)}
+.ist .btn-plain{background:transparent;border-color:transparent;color:var(--accent-text)}
+.ist .btn-plain:hover{background:var(--bg-control)}
+.ist .btn-wide{width:100%}
+.ist .tb{width:32px;height:28px;padding:0;border-radius:var(--radius-control);border:0;background:transparent;color:var(--fg-muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.ist .tb:hover{background:var(--bg-control);color:var(--fg)}
+.ist .tb[aria-pressed="true"]{background:var(--bg-control-pressed);color:var(--fg)}
+.ist .tb:disabled{color:var(--fg-faint);background:transparent;cursor:default}
+.ist .sbrow,.ist .grow,.ist .pick{display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;color:var(--fg);cursor:pointer;text-align:left}
+.ist .sbrow{height:28px;padding:0 8px;border-radius:var(--radius-control)}
+.ist .sbrow:hover,.ist .grow:hover,.ist .pick:hover{background:var(--bg-hover-row)}
+.ist .grow{display:grid;align-items:center;height:var(--size-row);padding:0 12px;border-radius:var(--radius-control)}
+.ist .pick{height:30px;padding:0 10px;border-radius:var(--radius-control)}
+.ist .tile{display:flex;flex-direction:column;gap:6px;width:var(--size-tile);padding:0;border:0;background:transparent;color:var(--fg);cursor:pointer;text-align:left}
+.ist .slot{display:flex;flex-direction:column;gap:4px;padding:8px;border-radius:var(--radius-card);border:1px solid var(--line);background:var(--bg-content);color:var(--fg);cursor:pointer;text-align:left}
+.ist .slot:hover{background:var(--bg-hover-row)}
+.ist .seg{display:inline-flex;padding:2px;border-radius:var(--radius-control);background:var(--bg-control);gap:2px}
+.ist .seg button{border:0;border-radius:4px;padding:3px 10px;background:transparent;color:var(--fg);cursor:pointer}
+.ist .seg button[aria-pressed="true"]{background:var(--bg-raised);font-weight:600;box-shadow:0 1px 2px var(--shadow)}
+.ist .tab{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:72px;padding:6px 8px;border:0;border-radius:var(--radius-control);background:transparent;color:var(--fg-muted);cursor:pointer}
+.ist .tab:hover{background:var(--bg-control);color:var(--fg)}
+.ist .tab[aria-pressed="true"]{background:var(--bg-control-pressed);color:var(--fg)}
+.ist .field{height:var(--size-control);border-radius:var(--radius-control);border:1px solid var(--line-strong);background:var(--bg-content);color:var(--fg);padding:0 8px;min-width:0}
+.ist .field::placeholder{color:var(--fg-muted)}
+.ist :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.ist:focus-visible{outline:none}
+.ist .ic{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ist .icf{fill:currentColor;stroke:none}
+.ist .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.ist .kbd{display:inline-block;font-size:var(--text-caption);line-height:1.4;padding:0 6px;border:1px solid var(--line-strong);border-radius:4px;color:var(--fg-muted);background:var(--bg-control);white-space:nowrap}
+.ist .chip{display:inline-flex;align-items:center;gap:4px;font-size:var(--text-caption);font-weight:600;line-height:1.5;padding:0 6px;border-radius:var(--radius-pill);white-space:nowrap}
+.ist .muted{color:var(--fg-muted)}
+.ist .cap{font-size:var(--text-caption)}
+.ist .ellip{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ist details summary{cursor:pointer;color:var(--accent-text);font-size:var(--text-callout)}
+.ist a{color:var(--accent-text)}
+.ist a:hover{color:var(--accent-text);text-decoration:underline}
+.ist progress{width:100%;height:6px;accent-color:var(--accent)}
+.ist input[type=range]{accent-color:var(--accent);width:220px}
+.ist input[type=checkbox],.ist input[type=radio]{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.ist .spin{animation:ist-spin 0.9s linear infinite;transform-origin:50% 50%}
+@keyframes ist-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.ist *{transition:none!important;animation:none!important}}
+</style>
+</helmet>
+<div class="ist" style="{{ rootStyle }}" tabIndex="0" onKeyDown="{{ onKey }}" ref="{{ rootRef }}" data-start="{{ startName }}">
+
+<sc-if value="{{ mac.on }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;inset:0;display:flex;overflow:hidden;border-radius:var(--radius-window);border:1px solid var(--line);background:var(--bg-window)">
+
+  <sc-if value="{{ mac.sidebarOn }}" hint-placeholder-val="{{ true }}">
+  <nav aria-label="Sidebar" data-contract="C13" style="width:var(--size-sidebar);flex:none;display:flex;flex-direction:column;background:var(--bg-sidebar);border-right:1px solid var(--line)">
+    <div style="height:var(--size-toolbar);flex:none;display:flex;align-items:center;gap:8px;padding:0 18px">
+      <span aria-hidden="true" style="width:12px;height:12px;border-radius:50%;background:var(--traffic-close)"></span>
+      <span aria-hidden="true" style="width:12px;height:12px;border-radius:50%;background:var(--traffic-minimize)"></span>
+      <span aria-hidden="true" style="width:12px;height:12px;border-radius:50%;background:var(--traffic-zoom)"></span>
+    </div>
+    <div style="flex:1;overflow:auto;padding:0 10px 12px">
+      <sc-for list="{{ mac.sections }}" as="sec" hint-placeholder-count="2">
+        <div class="cap muted" style="font-weight:600;padding:12px 8px 4px">{{ sec.title }}</div>
+        <sc-for list="{{ sec.items }}" as="it" hint-placeholder-count="3">
+          <button class="sbrow" style="{{ it.bg }}" onClick="{{ it.go }}" aria-current="{{ it.current }}" title="{{ it.tip }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="flex:none;color:var(--accent-text)"><path class="ic" d="{{ it.icon }}"></path></svg>
+            <span class="ellip" style="flex:1">{{ it.label }}</span>
+            <span class="cap muted">{{ it.count }}</span>
+          </button>
+        </sc-for>
+      </sc-for>
+    </div>
+    <sc-if value="{{ mac.routineChip }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:10px 18px;border-top:1px solid var(--line)"><span class="chip" style="background:var(--verify-bg);color:var(--verify)">Personal build</span></div>
+    </sc-if>
+  </nav>
+  </sc-if>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg-content)">
+    <sc-if value="{{ mac.toolbarOn }}" hint-placeholder-val="{{ true }}">
+    <header style="height:var(--size-toolbar);flex:none;display:flex;align-items:center;gap:4px;padding:0 10px;border-bottom:1px solid var(--line);background:var(--bg-toolbar)">
+      <sc-if value="{{ mac.lightsInToolbar }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:8px;padding:0 10px 0 8px">
+          <span aria-hidden="true" style="width:12px;height:12px;border-radius:50%;background:var(--traffic-close)"></span>
+          <span aria-hidden="true" style="width:12px;height:12px;border-radius:50%;background:var(--traffic-minimize)"></span>
+          <span aria-hidden="true" style="width:12px;height:12px;border-radius:50%;background:var(--traffic-zoom)"></span>
+        </div>
+      </sc-if>
+      <sc-for list="{{ mac.toolsLeft }}" as="b" hint-placeholder-count="1">
+        <sc-if value="{{ b.sep }}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="width:1px;height:18px;background:var(--line);margin:0 4px"></span></sc-if>
+        <sc-if value="{{ b.button }}" hint-placeholder-val="{{ true }}">
+          <button class="tb" aria-label="{{ b.label }}" title="{{ b.tip }}" aria-pressed="{{ b.pressed }}" disabled="{{ b.disabled }}" onClick="{{ b.go }}" data-contract="{{ b.contract }}"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="{{ b.icon }}"></path></svg></button>
+        </sc-if>
+      </sc-for>
+      <div style="display:flex;flex-direction:column;min-width:0;padding:0 8px">
+        <div class="ellip" style="font-weight:600;font-size:var(--text-headline)">{{ mac.title }}</div>
+        <div class="ellip cap muted">{{ mac.subtitle }}</div>
+      </div>
+      <div style="flex:1"></div>
+      <sc-for list="{{ mac.toolsRight }}" as="b" hint-placeholder-count="3">
+        <sc-if value="{{ b.sep }}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="width:1px;height:18px;background:var(--line);margin:0 4px"></span></sc-if>
+        <sc-if value="{{ b.button }}" hint-placeholder-val="{{ true }}">
+          <button class="tb" aria-label="{{ b.label }}" title="{{ b.tip }}" aria-pressed="{{ b.pressed }}" disabled="{{ b.disabled }}" onClick="{{ b.go }}" data-contract="{{ b.contract }}"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="{{ b.icon }}"></path></svg></button>
+        </sc-if>
+      </sc-for>
+      <sc-if value="{{ mac.searchOn }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative;margin-left:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" style="position:absolute;left:8px;top:7px;color:var(--fg-muted)"><path class="ic" d="{{ icon.search }}"></path></svg>
+          <input class="field" type="search" placeholder="Search" aria-label="Search games" data-contract="C53" value="{{ query }}" onChange="{{ onQuery }}" ref="{{ searchRef }}" style="width:200px;padding-left:28px">
+        </div>
+      </sc-if>
+    </header>
+    </sc-if>
+
+    <div style="flex:1;min-height:0;display:flex">
+      <main style="flex:1;min-width:0;overflow:auto;position:relative">
+
+        <sc-if value="{{ screen.welcome }}" hint-placeholder-val="{{ false }}">
+          <div data-contract="C01 C11" style="height:100%;display:flex;align-items:center;justify-content:center;padding:40px">
+            <div style="max-width:460px;display:flex;flex-direction:column;gap:16px;align-items:flex-start">
+              <svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent-text)"><path class="ic" d="{{ icon.disc }}"></path></svg>
+              <h1 style="margin:0;font-size:var(--text-largetitle);font-weight:700;font-family:var(--font-display)">Welcome to iStation</h1>
+              <p>iStation plays PS1 games on your Mac. First it needs the BIOS from your own console: a 512 KB file you copy from a console you own.</p>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-primary" onClick="{{ act.pickBios }}" title="Choose BIOS File (⌘O)">Choose BIOS File…</button>
+                <button class="btn" onClick="{{ act.openAcks }}">Acknowledgements</button>
+              </div>
+              <p class="cap muted" data-contract="C47">iStation never downloads a BIOS or games, and never sends anything off your Mac.</p>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ screen.games }}" hint-placeholder-val="{{ true }}">
+          <sc-if value="{{ lib.todayBanner }}" hint-placeholder-val="{{ false }}">
+            <div role="note" data-contract="C14 C30" style="margin:12px 16px 0;padding:8px 12px;border-radius:var(--radius-control);background:var(--info-bg);color:var(--info);display:flex;gap:8px;align-items:center">
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="flex:none"><path class="ic" d="{{ icon.info }}"></path></svg>
+              <span>This version lists your disc images but can’t read or play them yet. Discs play from v0.2.0.</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ lib.list }}" hint-placeholder-val="{{ true }}">
+            <div role="table" aria-label="Games" data-contract="C13 C14 C16 C17" style="padding:8px 4px">
+              <div role="row" class="cap muted" style="{{ lib.headStyle }}">
+                <sc-for list="{{ lib.cols }}" as="c" hint-placeholder-count="5"><span role="columnheader" class="ellip" style="font-weight:600">{{ c.label }}</span></sc-for>
+              </div>
+              <sc-for list="{{ lib.rows }}" as="r" hint-placeholder-count="6">
+                <button class="grow" style="{{ r.style }}" onClick="{{ r.select }}" onDoubleClick="{{ r.play }}" aria-current="{{ r.current }}" aria-label="{{ r.aria }}">
+                  <span style="display:flex;align-items:center;gap:8px;min-width:0">
+                    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="flex:none;color:var(--fg-muted)"><path class="ic" d="{{ r.icon }}"></path></svg>
+                    <span class="ellip">{{ r.name }}</span>
+                    <sc-if value="{{ r.flag }}" hint-placeholder-val="{{ false }}"><span class="chip" style="{{ r.flagStyle }}">{{ r.flag }}</span></sc-if>
+                  </span>
+                  <sc-for list="{{ r.cells }}" as="cell" hint-placeholder-count="4"><span class="ellip" style="{{ cell.style }}">{{ cell.text }}</span></sc-for>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ lib.grid }}" hint-placeholder-val="{{ false }}">
+            <div aria-label="Games" data-contract="C13 C14" style="display:flex;flex-wrap:wrap;gap:20px;padding:20px">
+              <sc-for list="{{ lib.rows }}" as="r" hint-placeholder-count="6">
+                <button class="tile" onClick="{{ r.select }}" onDoubleClick="{{ r.play }}" aria-current="{{ r.current }}" aria-label="{{ r.aria }}">
+                  <span style="{{ r.art }}">
+                    <span style="font-size:40px;font-weight:700;color:var(--fg-muted);font-family:var(--font-display)">{{ r.initials }}</span>
+                    <span class="chip" style="position:absolute;top:8px;right:8px;background:var(--bg-control);color:var(--fg)">{{ r.consoleShort }}</span>
+                    <span class="mono cap muted" style="position:absolute;left:10px;bottom:8px">{{ r.serialShort }}</span>
+                  </span>
+                  <span class="ellip" style="font-weight:600;width:100%">{{ r.name }}</span>
+                  <span class="cap muted ellip" style="width:100%">{{ r.tileMeta }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ lib.empty }}" hint-placeholder-val="{{ false }}">
+            <div style="height:100%;display:flex;align-items:center;justify-content:center;padding:40px">
+              <div style="max-width:440px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center">
+                <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--fg-muted)"><path class="ic" d="{{ icon.disc }}"></path></svg>
+                <h2 style="margin:0;font-size:var(--text-title2)">Add your games</h2>
+                <p class="muted">Add disc images you made from your own discs: a .cue with its .bin tracks, an .iso, an .m3u for a game on several discs, or a PS-EXE.</p>
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-primary" onClick="{{ act.pickGames }}" title="Add Games (⌘O)">Add Games…</button>
+                  <button class="btn" onClick="{{ act.pickFolder }}" title="Add Folder (⇧⌘O)">Add Folder…</button>
+                </div>
+                <p class="cap muted" data-contract="C47">iStation reads your files where they are. It never copies, uploads or downloads games.</p>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ lib.noResults }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:60px 20px;display:flex;flex-direction:column;align-items:center;gap:12px">
+              <p class="muted">{{ lib.noResultsText }}</p>
+              <button class="btn" onClick="{{ act.clearQuery }}">Clear Search</button>
+            </div>
+          </sc-if>
+        </sc-if>
+
+        <sc-if value="{{ screen.bios }}" hint-placeholder-val="{{ false }}">
+          <div data-contract="C01 C09 C10 C11" style="padding:24px;max-width:720px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;gap:16px;padding:16px;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--bg-raised)">
+              <svg width="36" height="36" viewBox="0 0 24 24" aria-hidden="true" style="flex:none;color:var(--accent-text)"><path class="ic" d="{{ icon.chip }}"></path></svg>
+              <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+                <div class="mono" style="font-weight:600">{{ biosPane.file }}</div>
+                <div class="muted">{{ biosPane.size }}</div>
+                <div class="mono cap muted">{{ biosPane.sha }}</div>
+                <div class="cap muted">{{ biosPane.folder }}</div>
+                <div style="display:flex;gap:6px;align-items:center;color:var(--ok)"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="{{ icon.checkCircle }}"></path></svg><span>{{ biosPane.checked }}</span></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-primary" onClick="{{ act.runBios }}">Run the BIOS</button>
+              <button class="btn" onClick="{{ act.pickBios }}">Choose Another BIOS…</button>
+              <button class="btn" onClick="{{ act.finder }}">Show in Finder</button>
+            </div>
+            <p class="muted">iStation keeps a bookmark to this file and reads it each time the console starts. It never copies the file.</p>
+            <p class="muted">The BIOS is your console’s own startup software. iStation needs it to play PS1 games, and you copy it from a console you own. When PS2 games arrive, they won’t need a BIOS file.</p>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ screen.cards }}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{ cards.none }}" hint-placeholder-val="{{ false }}">
+            <div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px;text-align:center">
+              <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--fg-muted)"><path class="ic" d="{{ icon.card }}"></path></svg>
+              <h2 style="margin:0;font-size:var(--text-title2)">No memory cards yet</h2>
+              <p class="muted" style="max-width:420px">{{ cards.policy }}</p>
+            </div>
+          </sc-if>
+          <sc-if value="{{ cards.some }}" hint-placeholder-val="{{ true }}">
+          <div data-contract="C33 C34" style="display:flex;height:100%">
+            <div role="list" aria-label="Memory cards" style="width:320px;flex:none;border-right:1px solid var(--line);padding:8px">
+              <sc-for list="{{ cards.rows }}" as="c" hint-placeholder-count="4">
+                <button class="sbrow" role="listitem" style="{{ c.bg }}" onClick="{{ c.select }}" aria-current="{{ c.current }}">
+                  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="flex:none;color:var(--fg-muted)"><path class="ic" d="{{ icon.card }}"></path></svg>
+                  <span class="ellip" style="flex:1">{{ c.name }}</span>
+                  <span class="cap muted">{{ c.blocks }}</span>
+                </button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ cards.sel }}" hint-placeholder-val="{{ true }}">
+              <div style="flex:1;padding:24px;display:flex;flex-direction:column;gap:12px;min-width:0">
+                <h2 style="margin:0;font-size:var(--text-title3)">{{ cards.sel.name }}</h2>
+                <dl style="margin:0;display:grid;grid-template-columns:140px 1fr;gap:6px 12px">
+                  <sc-for list="{{ cards.sel.facts }}" as="f" hint-placeholder-count="5"><dt class="muted">{{ f.k }}</dt><dd class="ellip" style="margin:0;{{ f.style }}">{{ f.v }}</dd></sc-for>
+                </dl>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <button class="btn" onClick="{{ act.finder }}">Show in Finder</button>
+                  <button class="btn" onClick="{{ act.cardDuplicate }}">Duplicate</button>
+                  <button class="btn" onClick="{{ act.cardDelete }}" title="Move to Trash (⌘⌫)">Move to Trash…</button>
+                </div>
+                <p class="cap muted">{{ cards.policy }}</p>
+              </div>
+            </sc-if>
+          </div>
+          </sc-if>
+        </sc-if>
+
+        <sc-if value="{{ screen.tools }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+            <div class="seg" role="group" aria-label="Tool">
+              <sc-for list="{{ tools.tabs }}" as="tab" hint-placeholder-count="4"><button aria-pressed="{{ tab.pressed }}" onClick="{{ tab.go }}">{{ tab.label }}</button></sc-for>
+            </div>
+            <sc-if value="{{ tools.today }}" hint-placeholder-val="{{ false }}">
+              <div data-contract="C46" style="display:flex;flex-direction:column;gap:12px;max-width:820px">
+                <div role="note" style="padding:10px 12px;border-radius:var(--radius-control);background:var(--info-bg);color:var(--info)">The console doesn’t offer its registers, output or tracer to the app yet. Run these from Terminal in lib/src/darwin/tools/istation-run. iStation never starts them itself.</div>
+                <sc-for list="{{ tools.commands }}" as="cmd" hint-placeholder-count="2">
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <div style="font-weight:600">{{ cmd.title }}</div>
+                    <div style="display:flex;gap:8px;align-items:flex-start">
+                      <pre class="mono cap" style="flex:1;margin:0;padding:10px 12px;border-radius:var(--radius-control);background:var(--bg-raised);border:1px solid var(--line);white-space:pre-wrap;word-break:break-all">{{ cmd.text }}</pre>
+                      <button class="btn" onClick="{{ cmd.copy }}">Copy</button>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ tools.console }}" hint-placeholder-val="{{ false }}">
+              <div data-contract="C40" style="display:flex;flex-direction:column;gap:12px">
+                <div class="muted">{{ tools.consoleNote }}</div>
+                <div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:4px 16px;max-width:900px">
+                  <sc-for list="{{ tools.special }}" as="rg" hint-placeholder-count="8"><div style="display:flex;justify-content:space-between;gap:8px;padding:3px 8px;border-radius:4px;background:var(--bg-raised)"><span class="mono muted">{{ rg.name }}</span><span class="mono">{{ rg.value }}</span></div></sc-for>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:4px 16px;max-width:900px">
+                  <sc-for list="{{ tools.regs }}" as="rg" hint-placeholder-count="32"><div style="display:flex;justify-content:space-between;gap:8px;padding:3px 8px"><span class="mono muted">{{ rg.name }}</span><span class="mono" style="{{ rg.style }}">{{ rg.value }}</span></div></sc-for>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ tools.tty }}" hint-placeholder-val="{{ false }}">
+              <div data-contract="C41" style="display:flex;flex-direction:column;gap:8px;max-width:820px">
+                <pre class="mono" style="margin:0;min-height:220px;padding:12px;border-radius:var(--radius-control);background:var(--bg-screen);color:var(--fg-on-screen-muted)">Nothing printed yet.</pre>
+                <p class="cap muted">What the console prints through expansion 2, and through the BIOS’s putchar when Settings › Personal keeps it.</p>
+              </div>
+            </sc-if>
+            <sc-if value="{{ tools.trace }}" hint-placeholder-val="{{ false }}">
+              <div data-contract="C42" style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+                <form aria-label="Record a trace" onSubmit="{{ tools.submit }}" style="display:grid;grid-template-columns:180px 1fr;gap:10px 12px;align-items:center;min-width:420px">
+                  <label for="tr-frames">Frames</label><input id="tr-frames" class="field mono" type="number" min="0" value="{{ tools.form.frames }}" onChange="{{ tools.setFrames }}" style="width:100px">
+                  <label for="tr-ins">Instruction trace</label><span style="display:flex;gap:8px;align-items:center"><input id="tr-ins" type="checkbox" checked="{{ tools.form.instructions }}" onChange="{{ tools.toggleIns }}"><span class="mono cap muted">cpu.trace</span></span>
+                  <label for="tr-int">Full state every</label><span style="display:flex;gap:8px;align-items:center"><input id="tr-int" class="field mono" type="number" min="0" value="{{ tools.form.interval }}" onChange="{{ tools.setInterval }}" style="width:100px"><span class="muted">instructions</span></span>
+                  <label for="tr-fr">Frame trace</label><span style="display:flex;gap:8px;align-items:center"><input id="tr-fr" type="checkbox" checked="{{ tools.form.frameTrace }}" onChange="{{ tools.toggleFrames }}"><span class="mono cap muted">frames.trace</span></span>
+                  <label for="tr-from">Start at frame</label><input id="tr-from" class="field mono" type="number" min="0" value="{{ tools.form.from }}" onChange="{{ tools.setFrom }}" style="width:100px">
+                  <span class="muted">Saves to</span><span class="mono cap">{{ tools.folder }}</span>
+                  <span></span><span style="display:flex;gap:8px"><button type="button" class="btn btn-primary" onClick="{{ act.traceStart }}" disabled="{{ tools.busy }}" title="Record (⇧⌘R)">Record</button></span>
+                </form>
+                <div style="flex:1;min-width:360px;display:flex;flex-direction:column;gap:8px">
+                  <div class="cap muted" style="font-weight:600">The same run from Terminal</div>
+                  <pre class="mono cap" style="margin:0;padding:10px 12px;border-radius:var(--radius-control);background:var(--bg-raised);border:1px solid var(--line);white-space:pre-wrap;word-break:break-all">{{ tools.command }}</pre>
+                  <sc-if value="{{ tools.result }}" hint-placeholder-val="{{ false }}">
+                    <div class="cap muted" style="font-weight:600">Last recording</div>
+                    <pre class="mono cap" style="margin:0;padding:10px 12px;border-radius:var(--radius-control);background:var(--ok-bg);color:var(--ok);white-space:pre-wrap">{{ tools.result }}</pre>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ tools.compare }}" hint-placeholder-val="{{ false }}">
+              <div data-contract="C43 C44" style="display:flex;flex-direction:column;gap:12px;max-width:980px">
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                  <span class="muted">Left</span><button class="btn mono" onClick="{{ act.pickTraceLeft }}">{{ tools.left }}</button>
+                  <span class="muted">Right</span><button class="btn mono" onClick="{{ act.pickTraceRight }}">{{ tools.right }}</button>
+                  <button class="btn btn-primary" onClick="{{ act.compare }}">Compare</button>
+                </div>
+                <sc-if value="{{ tools.diff }}" hint-placeholder-val="{{ false }}">
+                  <div style="{{ tools.diff.box }}">
+                    <div style="display:flex;gap:8px;align-items:center;font-weight:600"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="{{ tools.diff.icon }}"></path></svg><span>{{ tools.diff.headline }}</span></div>
+                    <pre class="mono cap" style="margin:0;white-space:pre-wrap;word-break:break-all;color:var(--fg)">{{ tools.diff.text }}</pre>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{ tools.vram }}" hint-placeholder-val="{{ false }}">
+              <div data-contract="C45" style="display:flex;flex-direction:column;gap:8px">
+                <div style="width:768px;height:384px;max-width:100%;border:1px solid var(--line);background:var(--bg-picture);display:flex;align-items:center;justify-content:center" role="img" aria-label="VRAM, 1024 by 512 pixels, 16-bit">
+                  <span class="mono cap" style="color:var(--fg-on-screen-muted)">VRAM · 1024 × 512 · 16-bit</span>
+                </div>
+                <p class="cap muted">Shown at three quarters size. Drawn from the console’s VRAM after each frame.</p>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ screen.player }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;display:flex;background:var(--bg-screen);color:var(--fg-on-screen)">
+            <div style="flex:1;min-width:0;position:relative;display:flex;align-items:center;justify-content:center">
+              <sc-if value="{{ player.picture }}" hint-placeholder-val="{{ true }}">
+                <div data-contract="C21 C23" role="img" aria-label="{{ player.pictureLabel }}" style="{{ player.pictureStyle }}">
+                  <span class="mono cap" style="color:var(--fg-on-screen-muted)">{{ player.pictureText }}</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ player.noPicture }}" hint-placeholder-val="{{ false }}">
+                <div data-contract="C03 C04" style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;max-width:440px">
+                  <div style="font-size:var(--text-title2);font-weight:600">No picture yet</div>
+                  <p style="color:var(--fg-on-screen-muted)">This build runs the console but can’t show its picture yet.</p>
+                  <div class="mono" style="font-size:var(--text-largetitle)">{{ player.frameText }}</div>
+                  <div class="cap" style="color:var(--fg-on-screen-muted)">frames run · {{ player.fpsText }}</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ player.paused }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;inset:0;background:var(--bg-overlay);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">
+                  <div style="font-size:var(--text-title2);font-weight:600">Paused</div>
+                  <button class="btn btn-primary" onClick="{{ act.togglePause }}" title="Resume (⌘P)">Resume</button>
+                </div>
+              </sc-if>
+              <div data-contract="C04 C07 C08 C27" style="position:absolute;left:16px;right:16px;bottom:12px;display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:var(--radius-card);background:var(--bg-raised);color:var(--fg);box-shadow:0 4px 16px var(--shadow)">
+                <span class="chip" data-contract="C05 C07" style="{{ player.statusStyle }}">{{ player.statusText }}</span>
+                <span class="ellip" style="font-weight:600;max-width:280px">{{ player.name }}</span>
+                <span class="mono cap muted">{{ player.hudFrame }}</span>
+                <span class="mono cap muted" data-contract="C08 C25">{{ player.fpsText }}</span>
+                <span style="flex:1"></span>
+                <span class="cap muted ellip">{{ player.ports }}</span>
+                <sc-if value="{{ player.fullscreen }}" hint-placeholder-val="{{ false }}">
+                  <sc-for list="{{ player.hudButtons }}" as="b" hint-placeholder-count="3">
+                    <button class="tb" aria-label="{{ b.label }}" title="{{ b.tip }}" onClick="{{ b.go }}"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="{{ b.icon }}"></path></svg></button>
+                  </sc-for>
+                </sc-if>
+              </div>
+            </div>
+            <sc-if value="{{ player.debug }}" hint-placeholder-val="{{ false }}">
+              <aside aria-label="Debug" data-contract="C40 C41" style="width:300px;flex:none;background:var(--bg-raised);color:var(--fg);border-left:1px solid var(--line);padding:14px;overflow:auto;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600">Debug</span><span class="chip" style="background:var(--verify-bg);color:var(--verify)">Personal build</span></div>
+                <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:4px 10px">
+                  <sc-for list="{{ tools.special }}" as="rg" hint-placeholder-count="8"><div style="display:flex;justify-content:space-between;gap:6px"><span class="mono cap muted">{{ rg.name }}</span><span class="mono cap">{{ rg.value }}</span></div></sc-for>
+                </div>
+                <div class="cap muted" style="font-weight:600">TTY</div>
+                <pre class="mono cap" style="margin:0;padding:8px;border-radius:var(--radius-control);background:var(--bg-screen);color:var(--fg-on-screen-muted);min-height:80px">Nothing printed yet.</pre>
+                <button class="btn" onClick="{{ act.openTools }}">Open Tools</button>
+              </aside>
+            </sc-if>
+          </div>
+        </sc-if>
+
+      </main>
+
+      <sc-if value="{{ insp.on }}" hint-placeholder-val="{{ false }}">
+        <aside aria-label="Game info" data-contract="C12 C13 C14 C51 C52" style="width:var(--size-inspector);flex:none;border-left:1px solid var(--line);background:var(--bg-window);padding:16px;overflow:auto;display:flex;flex-direction:column;gap:14px">
+          <div style="{{ insp.art }}"><span style="font-size:32px;font-weight:700;color:var(--fg-muted)">{{ insp.initials }}</span></div>
+          <div style="display:flex;gap:6px;align-items:flex-start">
+            <h2 style="margin:0;flex:1;font-size:var(--text-title3);min-width:0;overflow-wrap:anywhere">{{ insp.name }}</h2>
+            <button class="tb" aria-label="Rename" title="Rename" onClick="{{ act.rename }}"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="{{ icon.pencil }}"></path></svg></button>
+          </div>
+          <sc-if value="{{ insp.banner }}" hint-placeholder-val="{{ false }}">
+            <div role="note" style="{{ insp.bannerStyle }}">{{ insp.banner }}</div>
+          </sc-if>
+          <dl style="margin:0;display:grid;grid-template-columns:96px 1fr;gap:6px 10px">
+            <sc-for list="{{ insp.facts }}" as="f" hint-placeholder-count="7"><dt class="muted">{{ f.k }}</dt><dd style="margin:0;overflow-wrap:anywhere;{{ f.style }}">{{ f.v }}</dd></sc-for>
+          </dl>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+            <button class="btn btn-primary btn-wide" data-contract="{{ insp.primary.contract }}" onClick="{{ insp.primary.go }}" disabled="{{ insp.primary.disabled }}" title="{{ insp.primary.tip }}">{{ insp.primary.label }}</button>
+            <sc-if value="{{ insp.reason }}" hint-placeholder-val="{{ false }}"><p class="cap muted">{{ insp.reason }}</p></sc-if>
+            <button class="btn btn-wide" onClick="{{ act.finder }}" disabled="{{ insp.missing }}">Show in Finder</button>
+            <button class="btn btn-wide" onClick="{{ act.removeAsk }}" title="Remove from Library (⌘⌫)">Remove from Library…</button>
+          </div>
+        </aside>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ ios.on }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;overflow:hidden;border-radius:var(--radius-device);border:1px solid var(--line);background:var(--bg-window);display:flex;flex-direction:column">
+
+  <sc-if value="{{ ios.welcome }}" hint-placeholder-val="{{ false }}">
+    <div data-contract="C01 C11" style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;padding:60px 28px 48px">
+      <svg width="56" height="56" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent-text)"><path class="ic" d="{{ icon.disc }}"></path></svg>
+      <h1 style="margin:0;font-size:var(--text-largetitle);font-weight:700">Welcome to iStation</h1>
+      <p>iStation plays PS1 games on your iPhone. First it needs the BIOS from your own console: a 512 KB file you copy from a console you own.</p>
+      <div style="flex:1"></div>
+      <button class="btn btn-primary btn-wide" style="min-height:50px;border-radius:14px" onClick="{{ act.pickBios }}">Choose BIOS File</button>
+      <p class="cap muted" style="text-align:center" data-contract="C47">iStation never downloads a BIOS or games, and never sends anything off your iPhone.</p>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ios.library }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column;padding-top:50px">
+      <div style="display:flex;justify-content:flex-end;gap:4px;padding:0 12px">
+        <button class="tb" style="width:44px;height:44px;color:var(--accent-text)" aria-label="Add games" onClick="{{ act.pickGames }}"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="{{ icon.plus }}"></path></svg></button>
+        <button class="tb" style="width:44px;height:44px;color:var(--accent-text)" aria-label="Settings" onClick="{{ act.openSettings }}"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="{{ icon.gear }}"></path></svg></button>
+      </div>
+      <h1 style="margin:0 20px 8px;font-size:var(--text-largetitle);font-weight:700">Library</h1>
+      <div style="position:relative;margin:0 16px 8px">
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="position:absolute;left:10px;top:10px;color:var(--fg-muted)"><path class="ic" d="{{ icon.search }}"></path></svg>
+        <input class="field" type="search" placeholder="Search" aria-label="Search games" value="{{ query }}" onChange="{{ onQuery }}" style="width:100%;height:36px;border-radius:10px;padding-left:32px;background:var(--bg-control);border-color:var(--bg-control)">
+      </div>
+      <div role="list" aria-label="Games" data-contract="C13 C14" style="flex:1;overflow:auto;padding:0 16px 34px">
+        <sc-for list="{{ lib.rows }}" as="r" hint-placeholder-count="6">
+          <button class="pick" role="listitem" style="height:var(--size-row);border-bottom:1px solid var(--line);border-radius:0;padding:0 4px" onClick="{{ r.play }}" aria-label="{{ r.aria }}">
+            <span style="width:44px;height:44px;flex:none;border-radius:10px;background:var(--bg-raised);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--fg-muted)">{{ r.initials }}</span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column">
+              <span class="ellip">{{ r.name }}</span>
+              <span class="ellip" style="font-size:var(--text-callout);{{ r.subStyle }}">{{ r.iosSub }}</span>
+            </span>
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="flex:none;color:var(--fg-muted)"><path class="ic" d="{{ icon.chevronRight }}"></path></svg>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ios.player }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;background:var(--bg-screen);color:var(--fg-on-screen)">
+      <div data-contract="C21" role="img" aria-label="{{ player.pictureLabel }}" style="{{ player.pictureStyle }}"><span class="mono cap" style="color:var(--fg-on-screen-muted)">{{ player.pictureText }}</span></div>
+      <div data-contract="C28" style="{{ ios.controlsStyle }}">
+        <button class="tb" aria-label="Pause" onClick="{{ act.iosPause }}" style="position:absolute;top:14px;left:50%;margin-left:-22px;width:44px;height:44px;border-radius:22px;background:var(--bg-overlay);color:var(--fg-on-screen)"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="{{ icon.pause }}"></path></svg></button>
+        <sc-for list="{{ ios.pad }}" as="k" hint-placeholder-count="14">
+          <button aria-label="{{ k.label }}" style="{{ k.style }}"><sc-if value="{{ k.text }}" hint-placeholder-val="{{ false }}"><span>{{ k.text }}</span></sc-if><sc-if value="{{ k.path }}" hint-placeholder-val="{{ false }}"><svg width="{{ k.glyph }}" height="{{ k.glyph }}" viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="{{ k.path }}"></path></svg></sc-if></button>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ios.settings }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column;padding-top:50px;background:var(--bg-window)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 20px;height:44px">
+        <span style="font-weight:600;font-size:var(--text-headline)">Settings</span>
+        <button class="btn btn-plain" onClick="{{ act.closeWin }}">Done</button>
+      </div>
+      <div style="flex:1;overflow:auto;padding:8px 16px 34px;display:flex;flex-direction:column;gap:22px">
+        <sc-for list="{{ ios.groups }}" as="g" hint-placeholder-count="4">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div class="cap muted" style="padding:0 16px;text-transform:uppercase;letter-spacing:0.02em">{{ g.title }}</div>
+            <div style="border-radius:12px;background:var(--bg-raised);overflow:hidden">
+              <sc-for list="{{ g.rows }}" as="row" hint-placeholder-count="2">
+                <button class="pick" style="height:48px;padding:0 16px;border-radius:0;border-bottom:1px solid var(--line)" onClick="{{ row.go }}">
+                  <span style="flex:1">{{ row.k }}</span><span class="muted ellip" style="max-width:55%">{{ row.v }}</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" style="flex:none;color:var(--fg-muted)"><path class="ic" d="{{ icon.chevronRight }}"></path></svg>
+                </button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ g.foot }}" hint-placeholder-val="{{ false }}"><div class="cap muted" style="padding:0 16px">{{ g.foot }}</div></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ win.settings }}" hint-placeholder-val="{{ false }}">
+  <div role="dialog" aria-label="Settings" style="position:absolute;left:50%;top:70px;width:680px;margin-left:-340px;max-height:calc(100% - 100px);display:flex;flex-direction:column;border-radius:var(--radius-window);border:1px solid var(--line);background:var(--bg-window);box-shadow:0 20px 60px var(--shadow);overflow:hidden">
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 14px 0">
+      <button class="tb" aria-label="Close Settings" title="Close (⌘W)" onClick="{{ act.closeWin }}" style="width:14px;height:14px;border-radius:50%;background:var(--traffic-close)"></button>
+      <span aria-hidden="true" style="width:12px;height:12px;border-radius:50%;background:var(--line-strong)"></span>
+      <span aria-hidden="true" style="width:12px;height:12px;border-radius:50%;background:var(--line-strong)"></span>
+      <span style="flex:1;text-align:center;font-weight:600;margin-right:50px">{{ settings.title }}</span>
+    </div>
+    <div role="group" aria-label="Settings sections" style="display:flex;justify-content:center;gap:2px;padding:8px;border-bottom:1px solid var(--line);background:var(--bg-toolbar)">
+      <sc-for list="{{ settings.tabs }}" as="tab" hint-placeholder-count="5">
+        <button class="tab" aria-pressed="{{ tab.pressed }}" onClick="{{ tab.go }}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="{{ tab.icon }}"></path></svg><span class="cap">{{ tab.label }}</span></button>
+      </sc-for>
+    </div>
+    <div style="flex:1;overflow:auto;padding:20px 28px;display:flex;flex-direction:column;gap:16px">
+
+      <sc-if value="{{ settings.controllers }}" hint-placeholder-val="{{ false }}">
+        <div data-contract="C27 C28 C29 C54" style="display:flex;flex-direction:column;gap:14px">
+          <div style="font-weight:600">Connected</div>
+          <sc-for list="{{ settings.pads }}" as="p" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-card);background:var(--bg-raised);border:1px solid var(--line)">
+              <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent-text)"><path class="ic" d="{{ p.icon }}"></path></svg>
+              <div style="flex:1;min-width:0"><div style="font-weight:600">{{ p.name }}</div><div class="cap muted">{{ p.detail }}</div></div>
+              <label class="cap muted" for="{{ p.portId }}">Port</label>
+              <select class="field" id="{{ p.portId }}" style="width:120px"><option>{{ p.port }}</option></select>
+            </div>
+          </sc-for>
+          <sc-if value="{{ settings.noPads }}" hint-placeholder-val="{{ false }}"><p class="muted">No controllers connected. Connect one over Bluetooth or USB in System Settings. Until then, the keyboard plays on port 1.</p></sc-if>
+          <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-weight:600">Port 1 buttons</div><span class="cap muted">Digital pad</span></div>
+          <div role="table" aria-label="Button mapping" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid var(--line);border-radius:var(--radius-card);overflow:hidden">
+            <span role="columnheader" class="cap muted" style="padding:6px 10px;font-weight:600;background:var(--bg-raised)">Console button</span><span role="columnheader" class="cap muted" style="padding:6px 10px;font-weight:600;background:var(--bg-raised)">Controller</span><span role="columnheader" class="cap muted" style="padding:6px 10px;font-weight:600;background:var(--bg-raised)">Keyboard</span>
+            <sc-for list="{{ settings.mapping }}" as="m" hint-placeholder-count="14"><span role="cell" style="padding:4px 10px;border-top:1px solid var(--line)">{{ m.button }}</span><span role="cell" style="padding:4px 10px;border-top:1px solid var(--line)">{{ m.pad }}</span><span role="cell" style="padding:4px 10px;border-top:1px solid var(--line)"><span class="kbd">{{ m.key }}</span></span></sc-for>
+          </div>
+          <div><button class="btn" onClick="{{ act.toastDefaults }}">Restore Defaults</button></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ settings.video }}" hint-placeholder-val="{{ false }}">
+        <div data-contract="C23 C21" style="display:grid;grid-template-columns:200px 1fr;gap:14px 16px;align-items:center">
+          <span>Scale</span><div class="seg" role="group" aria-label="Scale"><sc-for list="{{ settings.scaleOpts }}" as="o" hint-placeholder-count="2"><button aria-pressed="{{ o.pressed }}" onClick="{{ o.go }}">{{ o.label }}</button></sc-for></div>
+          <span>Shape</span><div class="seg" role="group" aria-label="Shape"><sc-for list="{{ settings.aspectOpts }}" as="o" hint-placeholder-count="2"><button aria-pressed="{{ o.pressed }}" onClick="{{ o.go }}">{{ o.label }}</button></sc-for></div>
+          <label for="v-smooth">Smooth the picture</label><input id="v-smooth" type="checkbox" checked="{{ prefs.smoothing }}" onChange="{{ act.toggleSmoothing }}">
+          <label for="v-hud">Show the frame counter while playing</label><input id="v-hud" type="checkbox" checked="{{ prefs.hudFrames }}" onChange="{{ act.toggleHudFrames }}">
+          <span>Renderer</span><span class="muted" data-contract="C24">Software</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ settings.audio }}" hint-placeholder-val="{{ false }}">
+        <div data-contract="C26" style="display:grid;grid-template-columns:200px 1fr;gap:14px 16px;align-items:center">
+          <label for="a-vol">Volume</label><span style="display:flex;gap:10px;align-items:center"><input id="a-vol" type="range" min="0" max="100" value="{{ prefs.volume }}" onChange="{{ act.setVolume }}"><span class="mono cap muted">{{ settings.volumeText }}</span></span>
+          <label for="a-bg">Mute when iStation isn’t the active app</label><input id="a-bg" type="checkbox" checked="{{ prefs.muteBackground }}" onChange="{{ act.toggleMute }}">
+          <span>Output</span><span class="muted">Your Mac’s sound output</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ settings.cards }}" hint-placeholder-val="{{ false }}">
+        <div data-contract="C33 C34" style="display:flex;flex-direction:column;gap:10px">
+          <div style="font-weight:600">When a game starts</div>
+          <sc-for list="{{ settings.policyOpts }}" as="o" hint-placeholder-count="2">
+            <label style="display:flex;gap:8px;align-items:flex-start"><input type="radio" name="card-policy" checked="{{ o.checked }}" onChange="{{ o.go }}"><span><span>{{ o.label }}</span><br><span class="cap muted">{{ o.detail }}</span></span></label>
+          </sc-for>
+          <div style="font-weight:600;margin-top:6px">Folder</div>
+          <div style="display:flex;gap:8px;align-items:center"><span class="mono cap ellip" style="flex:1">~/Library/Containers/local.istation.macos/Data/Memory Cards</span><button class="btn" onClick="{{ act.finder }}">Show in Finder</button></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ settings.appearance }}" hint-placeholder-val="{{ false }}">
+        <div data-contract="C39" style="display:grid;grid-template-columns:200px 1fr;gap:14px 16px;align-items:center">
+          <span>Theme</span><div class="seg" role="group" aria-label="Theme"><sc-for list="{{ settings.themeOpts }}" as="o" hint-placeholder-count="4"><button aria-pressed="{{ o.pressed }}" onClick="{{ o.go }}">{{ o.label }}</button></sc-for></div>
+          <span>Text size</span><div class="seg" role="group" aria-label="Text size"><sc-for list="{{ settings.sizeOpts }}" as="o" hint-placeholder-count="4"><button aria-pressed="{{ o.pressed }}" onClick="{{ o.go }}">{{ o.label }}</button></sc-for></div>
+          <span>Motion</span><span class="muted">Follows Reduce Motion in System Settings › Accessibility.</span>
+          <span>Preview</span>
+          <div style="display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:var(--radius-card);background:var(--bg-content);border:1px solid var(--line)">
+            <span class="chip" style="background:var(--ok-bg);color:var(--ok)">Running</span><span style="font-weight:600">Harbor Lights (USA)</span><span class="mono cap muted">SLUS-01042</span><span style="flex:1"></span><button class="btn btn-primary">Play</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ settings.personal }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:240px 1fr;gap:14px 16px;align-items:center">
+          <span>Trace folder</span><span style="display:flex;gap:8px;align-items:center"><span class="mono cap">~/Traces</span><button class="btn" onClick="{{ act.toastChooseFolder }}">Choose…</button></span>
+          <label for="p-drawer">Show the debug drawer while playing</label><input id="p-drawer" type="checkbox" checked="{{ prefs.debugDrawer }}" onChange="{{ act.toggleDrawer }}">
+          <label for="p-tty">Keep the BIOS’s putchar output</label><input id="p-tty" type="checkbox" checked="{{ prefs.keepTTY }}" onChange="{{ act.toggleTTY }}">
+          <span></span><span class="cap muted">This tab, the Tools pane and the debug drawer exist only in personal builds.</span>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ win.acks }}" hint-placeholder-val="{{ false }}">
+  <div role="dialog" aria-label="Acknowledgements" data-contract="C37" style="{{ winStyle.acks }}">
+    <div style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)">
+      <button class="tb" aria-label="Close Acknowledgements" title="Close (⌘W)" onClick="{{ act.closeWin }}" style="width:14px;height:14px;border-radius:50%;background:var(--traffic-close)"></button>
+      <span style="flex:1;text-align:center;font-weight:600;margin-right:22px">Acknowledgements</span>
+    </div>
+    <div style="flex:1;overflow:auto;padding:12px 18px;display:flex;flex-direction:column;gap:12px">
+      <sc-for list="{{ acks }}" as="a" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:3px;padding-bottom:12px;border-bottom:1px solid var(--line)">
+          <div style="display:flex;gap:8px;align-items:center"><span style="font-weight:600;font-size:var(--text-headline)">{{ a.name }}</span><span class="chip" style="background:var(--bg-control);color:var(--fg)">{{ a.licence }}</span></div>
+          <div class="muted">{{ a.copyright }}</div>
+          <a href="{{ a.source }}" target="_blank" rel="noopener">View the source <span class="cap">(opens in your browser)</span></a>
+        </div>
+      </sc-for>
+      <p class="cap muted">iStation’s own code is MIT. Code ported from ProjectPSX keeps its MIT notice; code from Play! keeps its BSD notices.</p>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ win.about }}" hint-placeholder-val="{{ false }}">
+  <div role="dialog" aria-label="About iStation" data-contract="C38" style="position:absolute;left:50%;top:120px;width:300px;margin-left:-150px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;border-radius:var(--radius-window);border:1px solid var(--line);background:var(--bg-window);box-shadow:0 20px 60px var(--shadow)">
+    <button class="tb" aria-label="Close About" onClick="{{ act.closeWin }}" style="position:absolute;left:14px;top:14px;width:14px;height:14px;border-radius:50%;background:var(--traffic-close)"></button>
+    <svg width="64" height="64" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent-text)"><path class="ic" d="{{ icon.disc }}"></path></svg>
+    <div style="font-size:var(--text-title2);font-weight:700">iStation</div>
+    <div class="muted">{{ about.version }}</div>
+    <div class="cap muted">{{ about.routine }}</div>
+    <p class="cap muted">Plays PS1 games. PS2 games come in a later version.</p>
+    <button class="btn" onClick="{{ act.openAcks }}">Acknowledgements…</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ sheet.on }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;background:var(--bg-overlay)"></div>
+  <div role="dialog" aria-label="{{ sheet.title }}" style="{{ sheet.style }}">
+    <h2 style="margin:0;font-size:var(--text-title3)">{{ sheet.title }}</h2>
+    <sc-if value="{{ sheet.subtitle }}" hint-placeholder-val="{{ false }}"><p class="muted" style="margin-top:-8px">{{ sheet.subtitle }}</p></sc-if>
+
+    <sc-if value="{{ job.on }}" hint-placeholder-val="{{ false }}">
+      <ol aria-label="Steps" data-contract="{{ job.contract }}" style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ job.steps }}" as="st" hint-placeholder-count="3">
+          <li style="display:flex;gap:10px;align-items:flex-start">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" class="{{ st.spinClass }}" style="{{ st.iconStyle }}"><path class="ic" d="{{ st.icon }}"></path></svg>
+            <span style="flex:1;display:flex;flex-direction:column"><span style="{{ st.labelStyle }}">{{ st.label }}</span><span class="cap muted">{{ st.detail }}</span></span>
+            <span class="cap" style="{{ st.stateStyle }}">{{ st.state }}</span>
+          </li>
+        </sc-for>
+      </ol>
+      <sc-if value="{{ job.progress }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <progress value="{{ job.progress.value }}" max="{{ job.progress.max }}" aria-label="{{ job.progress.label }}"></progress>
+          <div class="cap muted ellip">{{ job.progress.text }}</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ job.summary }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="{{ job.summaryStyle }}">{{ job.summary }}</div>
+      </sc-if>
+      <sc-if value="{{ job.results }}" hint-placeholder-val="{{ false }}">
+        <ul aria-label="Results" style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;max-height:220px;overflow:auto">
+          <sc-for list="{{ job.results }}" as="res" hint-placeholder-count="5">
+            <li style="display:flex;gap:8px;align-items:flex-start">
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="{{ res.iconStyle }}"><path class="ic" d="{{ res.icon }}"></path></svg>
+              <span style="flex:1;min-width:0;display:flex;flex-direction:column"><span class="mono cap ellip">{{ res.file }}</span><span class="cap" style="{{ res.noteStyle }}">{{ res.note }}</span></span>
+              <sc-if value="{{ res.code }}" hint-placeholder-val="{{ false }}"><span class="mono cap muted">{{ res.code }}</span></sc-if>
+            </li>
+          </sc-for>
+        </ul>
+      </sc-if>
+      <sc-if value="{{ job.raw }}" hint-placeholder-val="{{ false }}"><pre class="mono cap" style="margin:0;padding:8px 10px;border-radius:var(--radius-control);background:var(--bg-content);border:1px solid var(--line);white-space:pre-wrap;word-break:break-all">{{ job.raw }}</pre></sc-if>
+    </sc-if>
+
+    <sc-if value="{{ pick.on }}" hint-placeholder-val="{{ false }}">
+      <div class="mono cap muted" style="display:flex;gap:6px;align-items:center"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="{{ icon.folder }}"></path></svg>{{ pick.where }}</div>
+      <div role="listbox" aria-label="Files" aria-multiselectable="{{ pick.multi }}" style="border:1px solid var(--line);border-radius:var(--radius-control);background:var(--bg-content);padding:4px;max-height:260px;overflow:auto">
+        <sc-for list="{{ pick.files }}" as="f" hint-placeholder-count="4">
+          <button class="pick" role="option" aria-selected="{{ f.selected }}" aria-label="{{ f.aria }}" style="{{ f.bg }}" onClick="{{ f.toggle }}" onDoubleClick="{{ f.open }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="flex:none;color:var(--fg-muted)"><path class="ic" d="{{ f.icon }}"></path></svg>
+            <span class="ellip" style="flex:1">{{ f.name }}</span>
+            <span class="cap muted">{{ f.size }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <p class="cap muted">{{ pick.note }}</p>
+    </sc-if>
+
+    <sc-if value="{{ states.on }}" hint-placeholder-val="{{ false }}">
+      <div data-contract="C31 C32" style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:10px">
+        <sc-for list="{{ states.slots }}" as="sl" hint-placeholder-count="8">
+          <button class="slot" style="{{ sl.ring }}" onClick="{{ sl.select }}" onDoubleClick="{{ sl.commit }}" aria-label="{{ sl.aria }}" aria-pressed="{{ sl.pressed }}">
+            <span style="{{ sl.thumb }}"><span class="mono" style="font-size:10px;color:var(--fg-on-screen-muted)">{{ sl.thumbText }}</span></span>
+            <span style="font-weight:600">{{ sl.title }}</span>
+            <span class="cap muted ellip">{{ sl.when }}</span>
+            <span class="mono cap muted ellip">{{ sl.frame }}</span>
+            <sc-if value="{{ sl.old }}" hint-placeholder-val="{{ false }}"><span class="chip" style="background:var(--warn-bg);color:var(--warn);align-self:flex-start">Older format</span></sc-if>
+          </button>
+        </sc-for>
+      </div>
+      <p class="cap muted">{{ states.note }}</p>
+    </sc-if>
+
+    <sc-if value="{{ keys.on }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:4px 28px;max-height:440px;overflow:auto">
+        <sc-for list="{{ keys.groups }}" as="g" hint-placeholder-count="4">
+          <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px">
+            <div class="cap muted" style="font-weight:600;padding-bottom:2px">{{ g.title }}</div>
+            <sc-for list="{{ g.items }}" as="k" hint-placeholder-count="5"><div style="display:flex;justify-content:space-between;gap:12px"><span>{{ k.label }}</span><span class="kbd">{{ k.key }}</span></div></sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pause.on }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ pause.items }}" as="it" hint-placeholder-count="5">
+          <button class="{{ it.cls }}" style="min-height:48px;border-radius:12px" onClick="{{ it.go }}">{{ it.label }}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ rename.on }}" hint-placeholder-val="{{ false }}">
+      <label for="rn" class="muted">Name in your library. The file keeps its own name.</label>
+      <input id="rn" class="field" value="{{ rename.value }}" onChange="{{ rename.change }}" autoFocus="{{ true }}">
+    </sc-if>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+      <sc-for list="{{ sheet.buttons }}" as="b" hint-placeholder-count="2">
+        <button class="{{ b.cls }}" onClick="{{ b.go }}" disabled="{{ b.disabled }}" title="{{ b.tip }}" autoFocus="{{ b.focus }}">{{ b.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ dialog.on }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;background:var(--bg-overlay)"></div>
+  <div role="alertdialog" aria-label="{{ dialog.title }}" data-contract="{{ dialog.contract }}" style="{{ dialog.style }}">
+    <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true" style="{{ dialog.iconStyle }}"><path class="ic" d="{{ dialog.icon }}"></path></svg>
+    <div style="font-weight:700;font-size:var(--text-headline)">{{ dialog.title }}</div>
+    <p style="font-size:var(--text-callout)">{{ dialog.message }}</p>
+    <sc-if value="{{ dialog.details }}" hint-placeholder-val="{{ false }}">
+      <details style="align-self:stretch;text-align:left"><summary>Details</summary><pre class="mono cap" style="margin:6px 0 0;padding:8px;border-radius:var(--radius-control);background:var(--bg-content);border:1px solid var(--line);white-space:pre-wrap;word-break:break-word">{{ dialog.details }}</pre></details>
+    </sc-if>
+    <div style="{{ dialog.buttonRow }}">
+      <sc-for list="{{ dialog.buttons }}" as="b" hint-placeholder-count="2">
+        <button class="{{ b.cls }}" style="flex:1" onClick="{{ b.go }}" autoFocus="{{ b.focus }}">{{ b.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ toast.on }}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="position:absolute;left:50%;bottom:24px;transform:translateX(-50%);max-width:80%;padding:8px 14px;border-radius:var(--radius-pill);background:var(--bg-raised);color:var(--fg);border:1px solid var(--line);box-shadow:0 6px 20px var(--shadow)">{{ toast.text }}</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"text","default":"library","section":"Prototype"},"still":{"editor":"boolean","default":false,"section":"Prototype"},"level":{"editor":"enum","options":["target","today"],"default":"target","section":"Prototype"},"routine":{"editor":"enum","options":["appstore","personal"],"default":"appstore","section":"Prototype"},"theme":{"editor":"enum","options":["dark","light","contrast"],"default":"dark","section":"Prototype"},"$preview":{"width":1280,"height":800}}'>
+/*TOKENS:BEGIN*/var TOKENS = {"name":"iStation: Graphite and Amber","version":1,"about":"Every color, font, size, space, radius and duration the iStation apps draw with, named for its role. The prototype (html/main.html) embeds this file verbatim as TOKENS; tools/check.mjs fails if the two differ. In SwiftUI each role becomes a case of the styles module (Palette, Typography, Metrics, Motion), as the swiftui map says.","themes":["dark","light","contrast"],"color":{"dark":{"bg-window":"#1E1E21","bg-sidebar":"#26262A","bg-content":"#19191B","bg-raised":"#2B2B30","bg-toolbar":"#232327","bg-control":"#3A3A40","bg-control-hover":"#45454C","bg-control-pressed":"#505058","bg-hover-row":"#2A2A2F","bg-selected":"#4A3B1F","bg-screen":"#000000","bg-picture":"#1C1C1F","bg-overlay":"#00000099","line":"#38383E","line-strong":"#7A7A82","focus":"#8AB4FF","fg":"#EDEDEF","fg-muted":"#AEAEB5","fg-faint":"#6E6E76","fg-on-screen":"#F2F2F2","fg-on-screen-muted":"#A6A6A6","fg-on-accent":"#1B1305","fg-on-danger":"#FFFFFF","accent":"#F2A93B","accent-hover":"#F6B85A","accent-pressed":"#DC9426","accent-text":"#F5B65A","ok":"#62D6AA","ok-bg":"#16382D","warn":"#F2C14E","warn-bg":"#3A2F12","danger":"#FF8177","danger-bg":"#421F1C","danger-solid":"#C2362D","info":"#8AB4FF","info-bg":"#1B2C45","verify":"#CDA8FF","verify-bg":"#32244A","shadow":"#00000080","traffic-close":"#FF5F57","traffic-minimize":"#FEBC2E","traffic-zoom":"#28C840"},"light":{"bg-window":"#F3F3F5","bg-sidebar":"#E8E8EC","bg-content":"#FFFFFF","bg-raised":"#FFFFFF","bg-toolbar":"#EFEFF2","bg-control":"#E6E6EA","bg-control-hover":"#DCDCE1","bg-control-pressed":"#D0D0D6","bg-hover-row":"#F0F0F4","bg-selected":"#F7E2BC","bg-screen":"#000000","bg-picture":"#1C1C1F","bg-overlay":"#00000059","line":"#DADADF","line-strong":"#8B8B93","focus":"#2F6FDB","fg":"#1C1C1E","fg-muted":"#5C5C64","fg-faint":"#A3A3AA","fg-on-screen":"#F2F2F2","fg-on-screen-muted":"#A6A6A6","fg-on-accent":"#FFFFFF","fg-on-danger":"#FFFFFF","accent":"#A35F00","accent-hover":"#935500","accent-pressed":"#8C5100","accent-text":"#8A5000","ok":"#0B7350","ok-bg":"#DCF2E9","warn":"#7D5800","warn-bg":"#FAEFD0","danger":"#B0261E","danger-bg":"#FBE4E2","danger-solid":"#B0261E","info":"#1E5CB8","info-bg":"#E1EBFA","verify":"#6A3DAE","verify-bg":"#EFE7FA","shadow":"#00000033","traffic-close":"#FF5F57","traffic-minimize":"#FEBC2E","traffic-zoom":"#28C840"},"contrast":{"bg-window":"#000000","bg-sidebar":"#0B0B0B","bg-content":"#000000","bg-raised":"#121212","bg-toolbar":"#0B0B0B","bg-control":"#1F1F1F","bg-control-hover":"#2C2C2C","bg-control-pressed":"#3A3A3A","bg-hover-row":"#1A1A1A","bg-selected":"#3D2D00","bg-screen":"#000000","bg-picture":"#141414","bg-overlay":"#000000CC","line":"#8F8F8F","line-strong":"#FFFFFF","focus":"#FFD60A","fg":"#FFFFFF","fg-muted":"#D9D9D9","fg-faint":"#8F8F8F","fg-on-screen":"#FFFFFF","fg-on-screen-muted":"#D0D0D0","fg-on-accent":"#000000","fg-on-danger":"#000000","accent":"#FFC24D","accent-hover":"#FFD27A","accent-pressed":"#E6AA30","accent-text":"#FFC24D","ok":"#7CF0C0","ok-bg":"#002B1D","warn":"#FFE066","warn-bg":"#2E2500","danger":"#FF9A92","danger-bg":"#3A0A07","danger-solid":"#FF9A92","info":"#A3CCFF","info-bg":"#00213F","verify":"#DEC6FF","verify-bg":"#2A0F4A","shadow":"#000000","traffic-close":"#FF5F57","traffic-minimize":"#FEBC2E","traffic-zoom":"#28C840"}},"contrastPairs":[{"fg":"fg","bg":"bg-window","min":4.5},{"fg":"fg","bg":"bg-sidebar","min":4.5},{"fg":"fg","bg":"bg-content","min":4.5},{"fg":"fg","bg":"bg-raised","min":4.5},{"fg":"fg","bg":"bg-toolbar","min":4.5},{"fg":"fg","bg":"bg-control","min":4.5},{"fg":"fg","bg":"bg-control-hover","min":4.5},{"fg":"fg","bg":"bg-control-pressed","min":4.5},{"fg":"fg","bg":"bg-hover-row","min":4.5},{"fg":"fg","bg":"bg-selected","min":4.5},{"fg":"fg-muted","bg":"bg-window","min":4.5},{"fg":"fg-muted","bg":"bg-sidebar","min":4.5},{"fg":"fg-muted","bg":"bg-content","min":4.5},{"fg":"fg-muted","bg":"bg-raised","min":4.5},{"fg":"fg-muted","bg":"bg-toolbar","min":4.5},{"fg":"fg-muted","bg":"bg-control","min":4.5},{"fg":"fg-muted","bg":"bg-hover-row","min":4.5},{"fg":"fg-muted","bg":"bg-selected","min":4.5},{"fg":"accent-text","bg":"bg-content","min":4.5},{"fg":"accent-text","bg":"bg-raised","min":4.5},{"fg":"accent-text","bg":"bg-sidebar","min":4.5},{"fg":"fg-on-accent","bg":"accent","min":4.5},{"fg":"fg-on-accent","bg":"accent-hover","min":4.5},{"fg":"fg-on-accent","bg":"accent-pressed","min":4.5},{"fg":"fg-on-danger","bg":"danger-solid","min":4.5},{"fg":"ok","bg":"ok-bg","min":4.5},{"fg":"ok","bg":"bg-content","min":4.5},{"fg":"ok","bg":"bg-raised","min":4.5},{"fg":"warn","bg":"warn-bg","min":4.5},{"fg":"warn","bg":"bg-content","min":4.5},{"fg":"warn","bg":"bg-raised","min":4.5},{"fg":"danger","bg":"danger-bg","min":4.5},{"fg":"danger","bg":"bg-content","min":4.5},{"fg":"danger","bg":"bg-raised","min":4.5},{"fg":"info","bg":"info-bg","min":4.5},{"fg":"info","bg":"bg-content","min":4.5},{"fg":"info","bg":"bg-raised","min":4.5},{"fg":"verify","bg":"verify-bg","min":4.5},{"fg":"fg-on-screen","bg":"bg-screen","min":4.5},{"fg":"fg-on-screen-muted","bg":"bg-screen","min":4.5},{"fg":"fg-on-screen-muted","bg":"bg-picture","min":4.5},{"fg":"focus","bg":"bg-content","min":3},{"fg":"focus","bg":"bg-window","min":3},{"fg":"line-strong","bg":"bg-content","min":3},{"fg":"line-strong","bg":"bg-raised","min":3},{"fg":"accent","bg":"bg-content","min":3}],"font":{"ui":"-apple-system, BlinkMacSystemFont, \"SF Pro Text\", system-ui, \"Helvetica Neue\", sans-serif","display":"-apple-system, BlinkMacSystemFont, \"SF Pro Display\", system-ui, \"Helvetica Neue\", sans-serif","mono":"ui-monospace, \"SF Mono\", Menlo, Consolas, monospace"},"type":{"mac":{"largetitle":26,"title":20,"title2":17,"title3":15,"headline":13,"body":13,"callout":12,"caption":11},"ios":{"largetitle":34,"title":28,"title2":22,"title3":20,"headline":17,"body":17,"callout":16,"caption":13}},"textScale":{"s":0.92,"m":1,"l":1.12,"xl":1.25},"weight":{"regular":400,"medium":500,"semibold":600,"bold":700},"space":{"1":4,"2":8,"3":12,"4":16,"5":20,"6":24,"8":32,"10":40},"radius":{"control":6,"card":10,"sheet":12,"window":12,"device":44,"pill":999},"motion":{"fast":120,"base":200,"slow":320,"ease":"cubic-bezier(0.2, 0, 0, 1)","reduced":0},"size":{"mac":{"control":28,"toolbar":52,"sidebar":220,"inspector":300,"row":30,"tile":168,"windowMinWidth":800,"windowMinHeight":560,"windowWidth":1280,"windowHeight":800,"pictureMinWidth":640,"pictureMinHeight":480},"ios":{"control":44,"toolbar":52,"sidebar":320,"inspector":320,"row":64,"tile":160,"windowMinWidth":320,"windowMinHeight":568,"windowWidth":390,"windowHeight":844,"pictureMinWidth":320,"pictureMinHeight":240}},"swiftui":{"bg-window":"Palette.window: Color(nsColor: .windowBackgroundColor) / Color(uiColor: .systemBackground)","bg-sidebar":"Palette.sidebar: the NavigationSplitView sidebar's own material","bg-content":"Palette.content: Color(nsColor: .controlBackgroundColor) / .secondarySystemBackground","bg-raised":"Palette.raised: sheet and popover background","bg-toolbar":"Palette.toolbar: the window toolbar's own material","bg-control":"Palette.control: bordered button fill (.buttonStyle(.bordered))","bg-selected":"Palette.selected: a List or Table row's selection, tinted by the accent","bg-screen":"Palette.screen (exists today): Color.black","bg-picture":"the frame the console draws; a placeholder in the design only","bg-overlay":"the system's sheet and alert dimming; not drawn by the app","line":"Palette.separator: Color(nsColor: .separatorColor)","line-strong":"Palette.controlBorder: a field's or bordered button's edge","focus":"the system focus ring (.focusable(), FocusState); tinted by the accent on macOS","fg":"Palette.text: .primary","fg-muted":"Palette.secondaryText (exists today): .secondary","fg-faint":"Palette.disabledText: .tertiary, disabled controls only","fg-on-screen":"Palette.onScreen (exists today): Color.white","fg-on-screen-muted":"Palette.onScreenSecondary","fg-on-accent":"Palette.onAccent","fg-on-danger":"Palette.onDestructive","accent":"Palette.accent: the app's AccentColor asset; .tint(Palette.accent)","accent-text":"Palette.accentText: links and accent-colored labels","ok":"Palette.ok","warn":"Palette.warning","danger":"Palette.danger","info":"Palette.info","verify":"Palette.verify (design pages only)","font.ui":"Typography: Font.body and the system text styles","font.mono":"Typography.mono: Font.system(.body, design: .monospaced)","type.*":"Typography: .largeTitle, .title, .title2, .title3, .headline, .body, .callout, .caption; scaled by DynamicTypeSize","space.*":"Metrics.space1 to space10","radius.*":"Metrics.radiusControl, radiusCard, radiusSheet","motion.*":"Motion.fast, base, slow: Animation.snappy(duration:); none when accessibilityReduceMotion"}};/*TOKENS:END*/
+
+var ICON = {
+  plus: 'M12 5v14M5 12h14',
+  folder: 'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
+  folderPlus: 'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM12 10v6M9 13h6',
+  play: 'M8 5.5v13l10.5-6.5z',
+  pause: 'M8.5 5v14M15.5 5v14',
+  stop: 'M7 7h10v10H7z',
+  reset: 'M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4',
+  save: 'M5 4h11l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6',
+  load: 'M12 4v11M7 10l5 5 5-5M5 20h14',
+  camera: 'M4 8h3l2-3h6l2 3h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z',
+  fullscreen: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5',
+  sidebar: 'M4 5h16v14H4zM9.5 5v14',
+  list: 'M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01',
+  grid: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+  info: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v5M12 8h.01',
+  search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4',
+  chevronLeft: 'M15 5l-7 7 7 7',
+  chevronRight: 'M9 5l7 7-7 7',
+  check: 'M5 12.5l4.5 4.5L19 7',
+  checkCircle: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8 12.5l3 3 5-6',
+  warn: 'M12 4l9 16H3zM12 10v4M12 17h.01',
+  error: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9 9l6 6M15 9l-6 6',
+  stopCircle: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.5h5v5h-5z',
+  pending: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z',
+  spinner: 'M12 3a9 9 0 1 0 9 9',
+  x: 'M6 6l12 12M18 6L6 18',
+  disc: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 14.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
+  stack: 'M12 3l9 5-9 5-9-5zM3 13l9 5 9-5',
+  exe: 'M7 3h7l4 4v14H7zM14 3v4h4M10 13l-2 2 2 2M14 13l2 2-2 2',
+  doc: 'M7 3h7l4 4v14H7zM14 3v4h4M10 12h5M10 16h5',
+  card: 'M6 3h9l3 3v15H6zM9 7v2M12 7v2M15 7v2',
+  chip: 'M7 7h10v10H7zM10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4',
+  gamepad: 'M7.5 8h9A4.5 4.5 0 0 1 21 12.5v.5a3.5 3.5 0 0 1-6 2.4L13.7 14h-3.4L9 15.4A3.5 3.5 0 0 1 3 13v-.5A4.5 4.5 0 0 1 7.5 8zM8 10.5v3M6.5 12h3M15.5 11.5h.01M17.5 13h.01',
+  keyboard: 'M3 7h18v10H3zM6.5 10h.01M9.5 10h.01M12.5 10h.01M15.5 10h.01M18 10h.01M7 14h10',
+  gear: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM10.5 3h3l.5 2.3 1.6.9 2.2-.8 1.5 2.6-1.7 1.6v1.8l1.7 1.6-1.5 2.6-2.2-.8-1.6.9-.5 2.3h-3l-.5-2.3-1.6-.9-2.2.8L3.5 16l1.7-1.6v-1.8L3.5 11 5 8.4l2.2.8 1.6-.9z',
+  clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2',
+  tools: 'M14.5 6.5a4 4 0 0 0-5.3 5.3L4 17l3 3 5.2-5.2a4 4 0 0 0 5.3-5.3l-2.5 2.5-2.5-.5-.5-2.5z',
+  sound: 'M4 10h4l5-4v12l-5-4H4zM16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11',
+  display: 'M3 5h18v12H3zM8 21h8M12 17v4',
+  palette: 'M12 21a9 9 0 1 1 9-9c0 2-1.5 3-3 3h-2a2 2 0 0 0-1.5 3.3A1.7 1.7 0 0 1 12 21zM7.5 11h.01M10 7.5h.01M14.5 7.5h.01',
+  person: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0',
+  trash: 'M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13',
+  pencil: 'M4 20h4L19 9l-4-4L4 16z',
+  external: 'M14 4h6v6M20 4l-9 9M18 14v6H4V6h6',
+  locate: 'M12 21s7-6.3 7-12a7 7 0 1 0-14 0c0 5.7 7 12 7 12zM12 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+  finder: 'M4 5h16v14H4zM9 9.5v2M15 9.5v2M9 15c2 1.3 4 1.3 6 0',
+  copy: 'M8 8h11v12H8zM5 16V4h11',
+  up: 'M12 5v14M6 11l6-6 6 6',
+  down: 'M12 5v14M6 13l6 6 6-6',
+  left: 'M5 12h14M11 6l-6 6 6 6',
+  right: 'M5 12h14M13 6l6 6-6 6',
+  shapeTriangle: 'M12 5l8 14H4z',
+  shapeCircle: 'M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z',
+  shapeCross: 'M6 6l12 12M18 6L6 18',
+  shapeSquare: 'M5 5h14v14H5z'
+};
+
+/* Canned data, shaped like what the backend and the system report. Names and serials are placeholders. */
+var BIOS_OK = { file: 'my-console-bios.bin', folder: '~/Documents/Console', bytes: 524288, sha1: '3f9a1c0e52d488b0e7a14c269d0f51aa7b21c3e8', checked: 'Nov 20' };
+var BIOS_WRONG = { file: 'bios-backup.zip', folder: '~/Downloads', bytes: 271384 };
+
+var GAMES = [
+  { id: 'g1', name: 'Harbor Lights (USA)', file: 'Harbor Lights (USA).cue', folder: '~/Games/PS1', format: 'cue', tracks: 2, discs: 1, console: 'ps1', serial: 'SLUS-01042', bytes: 512340096, played: 'Today, 9:41', added: 'Nov 14', access: 'ok' },
+  { id: 'g2', name: 'Moonbase Courier', file: 'Moonbase Courier.iso', folder: '~/Games/PS1', format: 'iso', tracks: 1, discs: 1, console: 'ps1', serial: 'SCUS-94210', bytes: 487915520, played: 'Yesterday, 21:10', added: 'Nov 14', access: 'ok' },
+  { id: 'g3', name: 'Tidepool', file: 'Tidepool.m3u', folder: '~/Games/PS1/Tidepool', format: 'm3u', tracks: 0, discs: 3, console: 'ps1', serial: 'SLUS-00920', bytes: 1953021952, played: 'Nov 12', added: 'Nov 12', access: 'ok' },
+  { id: 'g4', name: 'Glass Orchard (Europe)', file: 'Glass Orchard (Europe).cue', folder: '~/Games/PS1', format: 'cue', tracks: 1, discs: 1, console: 'ps1', serial: 'SLES-02155', bytes: 398458880, played: '', added: 'Nov 14', access: 'ok' },
+  { id: 'g5', name: 'gpu-test', file: 'gpu-test.exe', folder: '~/Games/Homebrew', format: 'exe', tracks: 0, discs: 0, console: 'ps1', serial: '', bytes: 34816, played: 'Nov 18', added: 'Nov 18', access: 'ok' },
+  { id: 'g6', name: 'Night Ferry', file: 'Night Ferry.iso', folder: '~/Games/PS2', format: 'iso', tracks: 1, discs: 1, console: 'ps2', serial: 'SLUS-21311', bytes: 3912040448, played: '', added: 'Nov 14', access: 'ok' },
+  { id: 'g7', name: 'Lantern Street', file: 'Lantern Street.cue', folder: '~/Games/PS1', format: 'cue', tracks: 1, discs: 1, console: 'ps1', serial: 'SLUS-00777', bytes: -1, played: 'Oct 30', added: 'Oct 2', access: 'missing' }
+];
+
+var SCAN_FILES = [
+  { file: 'PS1/Harbor Lights (USA).cue', outcome: 'skip', note: 'Already in your library' },
+  { file: 'PS1/Moonbase Courier.iso', outcome: 'skip', note: 'Already in your library' },
+  { file: 'PS1/Tidepool/Tidepool.m3u', outcome: 'add', id: 'g3', note: 'PS1 · SLUS-00920 · 3 discs' },
+  { file: 'PS1/Glass Orchard (Europe).cue', outcome: 'add', id: 'g4', note: 'PS1 · SLES-02155' },
+  { file: 'Homebrew/gpu-test.exe', outcome: 'add', id: 'g5', note: 'PS-EXE · no serial' },
+  { file: 'PS2/Night Ferry.iso', outcome: 'add', id: 'g6', note: 'PS2 · SLUS-21311 · plays in a later version' },
+  { file: 'Backups/Photos 2019.iso', outcome: 'fail', note: 'No SYSTEM.CNF on this disc, so it isn’t a PS1 or PS2 game.', code: 'SystemCNF → nil' },
+  { file: 'Backups/half-copy.cue', outcome: 'fail', note: 'This disc image ends early. It may not have finished copying.', code: 'DiscError.truncated' },
+  { file: 'Backups/locked.iso', outcome: 'fail', note: 'iStation couldn’t open this file.', code: 'DiscError.unreadable' }
+];
+
+var CARDS = [
+  { id: 'c1', name: 'Harbor Lights (USA) 1', file: 'Harbor Lights (USA) 1.mcr', game: 'Harbor Lights (USA)', bytes: 131072, blocks: 3, written: 'Today, 9:40' },
+  { id: 'c2', name: 'Moonbase Courier 1', file: 'Moonbase Courier 1.mcr', game: 'Moonbase Courier', bytes: 131072, blocks: 1, written: 'Yesterday, 21:08' },
+  { id: 'c3', name: 'Tidepool 1', file: 'Tidepool 1.mcr', game: 'Tidepool', bytes: 131072, blocks: 6, written: 'Nov 12' },
+  { id: 'c4', name: 'Shared 1', file: 'Shared 1.mcr', game: '', bytes: 131072, blocks: 0, written: 'Nov 14' }
+];
+
+var SLOTS = [
+  { n: 1, saved: 'Today, 9:30', frame: 102442, format: 2 },
+  { n: 2, saved: 'Yesterday, 21:02', frame: 88310, format: 2 },
+  { n: 3, saved: '', frame: 0, format: 0 },
+  { n: 4, saved: '', frame: 0, format: 0 },
+  { n: 5, saved: 'Oct 2', frame: 4410, format: 1 },
+  { n: 6, saved: '', frame: 0, format: 0 },
+  { n: 7, saved: '', frame: 0, format: 0 },
+  { n: 8, saved: '', frame: 0, format: 0 }
+];
+
+var PADS = [
+  { name: 'Wireless Controller', detail: 'Extended gamepad · battery 80%', icon: 'gamepad', port: 'Port 1', portId: 'port-pad' },
+  { name: 'Keyboard', detail: 'Always available', icon: 'keyboard', port: 'Port 2', portId: 'port-kb' }
+];
+
+var MAPPING = [
+  ['Up', 'Direction pad up', '↑'], ['Down', 'Direction pad down', '↓'], ['Left', 'Direction pad left', '←'], ['Right', 'Direction pad right', '→'],
+  ['Cross', 'Button A', 'X'], ['Circle', 'Button B', 'C'], ['Square', 'Button X', 'Z'], ['Triangle', 'Button Y', 'S'],
+  ['L1', 'Left shoulder', 'Q'], ['R1', 'Right shoulder', 'E'], ['L2', 'Left trigger', '1'], ['R2', 'Right trigger', '3'],
+  ['Select', 'Options button', 'Space'], ['Start', 'Menu button', 'Return']
+];
+
+var ACKS = {
+  macOS: [
+    { name: 'iStation', licence: 'MIT', copyright: 'Copyright (c) 2026 iStation contributors', source: 'https://github.com/QuantumCompiler/iStation' },
+    { name: 'ProjectPSX', licence: 'MIT', copyright: 'Copyright (c) 2019 Pedro Cortés', source: 'https://github.com/BluestormDNA/ProjectPSX' },
+    { name: 'Play!', licence: 'BSD-2-Clause', copyright: 'Copyright (c) 2006-2026, Jean-Philip Desjardins', source: 'https://github.com/jpd002/Play-' },
+    { name: 'Play! Framework', licence: 'BSD-2-Clause', copyright: 'Copyright (c) 2006-2026, Jean-Philip Desjardins', source: 'https://github.com/jpd002/Play--Framework' },
+    { name: 'Play! CodeGen', licence: 'BSD-2-Clause', copyright: 'Copyright (c) 2010-2026, Jean-Philip Desjardins', source: 'https://github.com/jpd002/Play--CodeGen' },
+    { name: 'Nuanceur', licence: 'BSD-2-Clause', copyright: 'Copyright (c) 2016-2026, Jean-Philip Desjardins', source: 'https://github.com/jpd002/Nuanceur' }
+  ],
+  iOS: [
+    { name: 'iStation', licence: 'MIT', copyright: 'Copyright (c) 2026 iStation contributors', source: 'https://github.com/QuantumCompiler/iStation' },
+    { name: 'ProjectPSX', licence: 'MIT', copyright: 'Copyright (c) 2019 Pedro Cortés', source: 'https://github.com/BluestormDNA/ProjectPSX' }
+  ]
+};
+
+/* Recorded 2026-11-21 from istation-run over lib/src/darwin/tools/istation-run's CPU-check image (built in code, never Sony's): record 1,000 of its instruction trace, a full-state record. */
+var RECORDED = {
+  pc: 3217031752, epc: 3217031736, cycles: 19753, hi: 4660, lo: 1450744508, sr: 0, cause: 36,
+  gpr: [0, 0, 20235, 8899, 40404, 2844222787, 67, 878082202, 0, 1450744508, 3217031772, 86, 0, 0, 0, 0, 2147549184, 2147483648, 32, 0, 0, 0, 0, 0, 0, 0, 3217031740, 0, 0, 0, 0, 3217031720],
+  rate: '136 M instructions/s',
+  run60: '[istation-run] 60 frames, 1698623 instructions, 33972213 CPU cycles, 33972249 system cycles, 0.012 s emulating, 136 M instructions/s',
+  diffWord: 'first divergence at record 0 of 56689 and 56625: word\n  left:  instruction(DataTracing.InstructionRecord(pc: 3217031168, word: 1082155008, cycles: 20, registerChecksum: 7196740607524074293))\n  right: instruction(DataTracing.InstructionRecord(pc: 3217031168, word: 0, cycles: 20, registerChecksum: 7196740607524074293))',
+  identical: 'identical: 60 records',
+  neverStarted: 'istation-run: the EXE never started: the BIOS didn’t reach its shell in 30 frames'
+};
+var REG_NAMES = ['zero', 'at', 'v0', 'v1', 'a0', 'a1', 'a2', 'a3', 't0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 's0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 't8', 't9', 'k0', 'k1', 'gp', 'sp', 'fp', 'ra'];
+
+var SHORTCUTS = [
+  { title: 'Library', items: [['Add Games…', '⌘O'], ['Add Folder…', '⇧⌘O'], ['Search', '⌘F'], ['All Games', '⌘1'], ['PS1', '⌘2'], ['PS2', '⌘3'], ['Recently Played', '⌘4'], ['Memory Cards', '⌘5'], ['BIOS', '⌘6'], ['Tools (personal build)', '⌘7'], ['Show or hide the sidebar', '⌃⌘S'], ['Show or hide game info', '⌘I'], ['Play the selected game', '↩'], ['Move the selection', '↑ ↓'], ['Remove from Library…', '⌘⌫']] },
+  { title: 'Playing', items: [['Pause or resume', '⌘P'], ['Reset…', '⌘R'], ['Save State…', '⌘S'], ['Load State…', '⌘L'], ['Save Screenshot', '⇧⌘S'], ['Full screen', '⌃⌘F'], ['Debug drawer (personal build)', '⌥⌘D'], ['Stop playing…', '⌘.']] },
+  { title: 'Windows', items: [['Settings', '⌘,'], ['Acknowledgements', '⌥⌘A'], ['Keyboard Shortcuts', '⌘/'], ['Close a window, sheet or alert', 'Esc']] },
+  { title: 'Jobs and tools', items: [['Stop the running job', '⌘.'], ['Record a trace (personal build)', '⇧⌘R']] }
+];
+
+var PRESET_NAMES = ['welcome', 'bios-picker', 'bios-checking', 'bios-wrong-size', 'bios-done', 'library-empty', 'library', 'library-grid', 'library-inspector', 'library-search-empty', 'library-missing', 'library-ps2', 'ps2-refused', 'remove-confirm', 'library-min', 'library-light', 'library-contrast', 'rename', 'scan-picker', 'scan-running', 'scan-stopped', 'scan-done', 'player-opening', 'player-running', 'player-paused', 'player-fullscreen', 'reset-confirm', 'stop-confirm', 'player-debug', 'player-min', 'states-save', 'states-overwrite', 'states-load', 'states-version-error', 'cards', 'cards-empty', 'card-delete', 'bios-pane', 'settings-controllers', 'settings-no-controllers', 'settings-video', 'settings-audio', 'settings-cards', 'settings-appearance', 'settings-personal', 'acknowledgements', 'about', 'shortcuts', 'tools-console', 'tools-tty', 'tools-trace-running', 'tools-trace-done', 'tools-compare', 'tools-vram', 'today-library', 'today-bios-done', 'today-player', 'today-tools', 'ios-welcome', 'ios-library', 'ios-opening', 'ios-player', 'ios-pause', 'ios-settings', 'ios-states'];
+
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+function fmtInt(n) { return Math.round(n).toLocaleString('en-US'); }
+function fmtBytes(n) {
+  if (n < 0) return 'Unknown';
+  if (n < 1000) return n + ' bytes';
+  var units = ['KB', 'MB', 'GB'], v = n, i = -1;
+  while (v >= 1000 && i < 2) { v = v / 1000; i++; }
+  return (v >= 100 ? v.toFixed(0) : v.toFixed(1)) + ' ' + units[i];
+}
+function hex(n) { return '0x' + (n >>> 0).toString(16).toUpperCase().padStart(8, '0'); }
+function sha(s) { return 'SHA-1 ' + s.replace(/(.{4})/g, '$1 ').trim(); }
+function initials(name) {
+  var words = name.replace(/\(.*?\)/g, '').trim().split(/[\s-]+/).filter(Boolean);
+  return ((words[0] || '?')[0] + (words[1] ? words[1][0] : (words[0] || '?')[1] || '')).toUpperCase();
+}
+function gameById(s, id) { for (var i = 0; i < s.games.length; i++) if (s.games[i].id === id) return s.games[i]; return null; }
+
+/* ---------- state ---------- */
+
+function baseState(p) {
+  return {
+    start: 'library', platform: 'mac', routine: 'appstore', level: 'target', theme: 'dark', textSize: 'm',
+    w: 1280, h: 800, t: 0,
+    bios: clone(BIOS_OK),
+    games: clone(GAMES),
+    nav: 'all', view: 'list', selected: 'g1', inspector: false, sidebar: true, query: '',
+    screen: 'library',
+    player: null, job: null, sheet: '', picker: null, states: null, dialog: null, win: '', rename: '',
+    settingsTab: 'controllers',
+    prefs: { scale: 'fit', aspect: '4:3', smoothing: false, hudFrames: true, volume: 80, muteBackground: true, cardPolicy: 'per-game', debugDrawer: true, keepTTY: true },
+    pads: 2,
+    cards: clone(CARDS), cardSel: 'c1',
+    slots: clone(SLOTS),
+    toolsTab: 'console',
+    trace: { frames: 60, instructions: true, interval: 1000, frameTrace: true, from: 0 },
+    traceResult: '',
+    diff: '',
+    toast: null
+  };
+}
+
+function playerFor(id, status, frame) { return { gameId: id, status: status, frame: frame, fps: status === 'running' ? 60 : 0, fullscreen: false, debug: false }; }
+
+function scanJob(n, status) {
+  return { kind: 'scan', status: status, step: n >= SCAN_FILES.length ? 2 : 1, n: n, total: SCAN_FILES.length, folder: '~/Games', ticks: 0 };
+}
+
+var PRESETS = {
+  'welcome': function (s) { s.bios = null; s.games = []; s.screen = 'welcome'; },
+  'bios-picker': function (s) { PRESETS.welcome(s); s.sheet = 'picker'; s.picker = { purpose: 'bios', sel: ['my-console-bios.bin'] }; },
+  'bios-checking': function (s) { PRESETS.welcome(s); s.sheet = 'job'; s.job = { kind: 'bios', status: 'running', step: 3, n: 24, total: 60, file: 'my-console-bios.bin', ticks: 0 }; },
+  'bios-wrong-size': function (s) { PRESETS.welcome(s); s.sheet = 'job'; s.job = { kind: 'bios', status: 'failed', step: 1, n: 0, total: 60, file: 'bios-backup.zip', ticks: 0 }; },
+  'bios-done': function (s) { PRESETS.welcome(s); s.sheet = 'job'; s.job = { kind: 'bios', status: 'done', step: 4, n: 60, total: 60, file: 'my-console-bios.bin', ticks: 0 }; },
+  'library-empty': function (s) { s.games = []; s.selected = ''; },
+  'library': function (s) { },
+  'library-grid': function (s) { s.view = 'grid'; s.selected = 'g3'; },
+  'library-inspector': function (s) { s.inspector = true; s.selected = 'g3'; },
+  'library-search-empty': function (s) { s.query = 'zebra'; },
+  'library-missing': function (s) { s.inspector = true; s.selected = 'g7'; },
+  'library-ps2': function (s) { s.inspector = true; s.nav = 'ps2'; s.selected = 'g6'; },
+  'ps2-refused': function (s) { s.selected = 'g6'; s.dialog = { kind: 'ps2', id: 'g6' }; },
+  'remove-confirm': function (s) { s.selected = 'g4'; s.inspector = true; s.dialog = { kind: 'remove', id: 'g4' }; },
+  'library-min': function (s) { s.w = 800; s.h = 560; },
+  'library-light': function (s) { s.theme = 'light'; s.inspector = true; },
+  'library-contrast': function (s) { s.theme = 'contrast'; s.inspector = true; },
+  'rename': function (s) { s.inspector = true; s.selected = 'g5'; s.sheet = 'rename'; s.rename = 'gpu-test'; },
+  'scan-picker': function (s) { s.games = s.games.filter(function (g) { return g.id === 'g1' || g.id === 'g2'; }); s.sheet = 'picker'; s.picker = { purpose: 'folder', sel: ['Games'] }; },
+  'scan-running': function (s) { PRESETS['scan-picker'](s); s.sheet = 'job'; s.picker = null; s.job = scanJob(4, 'running'); addScanned(s, 4); },
+  'scan-stopped': function (s) { PRESETS['scan-picker'](s); s.sheet = 'job'; s.picker = null; s.job = scanJob(5, 'stopped'); addScanned(s, 5); },
+  'scan-done': function (s) { PRESETS['scan-picker'](s); s.sheet = 'job'; s.picker = null; s.job = scanJob(9, 'done'); s.job.step = 3; addScanned(s, 9); },
+  'player-opening': function (s) { s.sheet = 'job'; s.job = { kind: 'open', status: 'running', step: 2, n: 0, total: 0, id: 'g1', ticks: 0 }; },
+  'player-running': function (s) { s.screen = 'player'; s.player = playerFor('g1', 'running', 18342); },
+  'player-paused': function (s) { s.screen = 'player'; s.player = playerFor('g1', 'paused', 18342); },
+  'player-fullscreen': function (s) { s.screen = 'player'; s.player = playerFor('g1', 'running', 18342); s.player.fullscreen = true; },
+  'reset-confirm': function (s) { PRESETS['player-paused'](s); s.dialog = { kind: 'reset' }; },
+  'stop-confirm': function (s) { PRESETS['player-paused'](s); s.dialog = { kind: 'stop' }; },
+  'player-debug': function (s) { s.routine = 'personal'; PRESETS['player-paused'](s); s.player.debug = true; },
+  'player-min': function (s) { s.w = 800; s.h = 560; PRESETS['player-running'](s); },
+  'states-save': function (s) { PRESETS['player-paused'](s); s.sheet = 'states'; s.states = { mode: 'save', sel: 3 }; },
+  'states-overwrite': function (s) { PRESETS['player-paused'](s); s.sheet = 'states'; s.states = { mode: 'save', sel: 1 }; s.dialog = { kind: 'overwrite', slot: 1 }; },
+  'states-load': function (s) { PRESETS['player-paused'](s); s.sheet = 'states'; s.states = { mode: 'load', sel: 2 }; },
+  'states-version-error': function (s) { PRESETS['player-paused'](s); s.sheet = 'states'; s.states = { mode: 'load', sel: 5 }; s.dialog = { kind: 'version', slot: 5 }; },
+  'cards': function (s) { s.nav = 'cards'; s.cardSel = 'c3'; },
+  'cards-empty': function (s) { s.nav = 'cards'; s.cards = []; s.cardSel = ''; },
+  'card-delete': function (s) { s.nav = 'cards'; s.cardSel = 'c3'; s.dialog = { kind: 'card-delete', id: 'c3' }; },
+  'bios-pane': function (s) { s.nav = 'bios'; },
+  'settings-controllers': function (s) { s.win = 'settings'; s.settingsTab = 'controllers'; },
+  'settings-no-controllers': function (s) { s.win = 'settings'; s.settingsTab = 'controllers'; s.pads = 1; },
+  'settings-video': function (s) { s.win = 'settings'; s.settingsTab = 'video'; },
+  'settings-audio': function (s) { s.win = 'settings'; s.settingsTab = 'audio'; },
+  'settings-cards': function (s) { s.win = 'settings'; s.settingsTab = 'cards'; },
+  'settings-appearance': function (s) { s.win = 'settings'; s.settingsTab = 'appearance'; },
+  'settings-personal': function (s) { s.routine = 'personal'; s.win = 'settings'; s.settingsTab = 'personal'; },
+  'acknowledgements': function (s) { s.win = 'acks'; },
+  'about': function (s) { s.win = 'about'; },
+  'shortcuts': function (s) { s.sheet = 'shortcuts'; },
+  'tools-console': function (s) { s.routine = 'personal'; s.nav = 'tools'; s.toolsTab = 'console'; },
+  'tools-tty': function (s) { s.routine = 'personal'; s.nav = 'tools'; s.toolsTab = 'tty'; },
+  'tools-trace-running': function (s) { s.routine = 'personal'; s.nav = 'tools'; s.toolsTab = 'trace'; s.sheet = 'job'; s.job = { kind: 'trace', status: 'running', step: 1, n: 23, total: 60, ticks: 0 }; },
+  'tools-trace-done': function (s) { s.routine = 'personal'; s.nav = 'tools'; s.toolsTab = 'trace'; s.traceResult = RECORDED.run60; },
+  'tools-compare': function (s) { s.routine = 'personal'; s.nav = 'tools'; s.toolsTab = 'compare'; s.diff = 'word'; },
+  'tools-vram': function (s) { s.routine = 'personal'; s.nav = 'tools'; s.toolsTab = 'vram'; },
+  'today-library': function (s) { s.level = 'today'; s.inspector = true; },
+  'today-bios-done': function (s) { s.level = 'today'; PRESETS['bios-done'](s); },
+  'today-player': function (s) { s.level = 'today'; s.screen = 'player'; s.player = playerFor('', 'running', 1234); },
+  'today-tools': function (s) { s.level = 'today'; s.routine = 'personal'; s.nav = 'tools'; s.toolsTab = 'console'; },
+  'ios-welcome': function (s) { iosBase(s); PRESETS.welcome(s); },
+  'ios-library': function (s) { iosBase(s); },
+  'ios-opening': function (s) { iosBase(s); s.sheet = 'job'; s.job = { kind: 'open', status: 'running', step: 2, n: 0, total: 0, id: 'g1', ticks: 0 }; },
+  'ios-player': function (s) { iosBase(s); s.w = 844; s.h = 390; s.screen = 'player'; s.player = playerFor('g1', 'running', 18342); },
+  'ios-pause': function (s) { PRESETS['ios-player'](s); s.player.status = 'paused'; s.player.fps = 0; s.sheet = 'pause'; },
+  'ios-settings': function (s) { iosBase(s); s.win = 'settings'; },
+  'ios-states': function (s) { PRESETS['ios-player'](s); s.player.status = 'paused'; s.player.fps = 0; s.sheet = 'states'; s.states = { mode: 'load', sel: 1 }; }
+};
+
+function iosBase(s) { s.platform = 'ios'; s.w = 390; s.h = 844; }
+
+function addScanned(s, n) {
+  for (var i = 0; i < n && i < SCAN_FILES.length; i++) {
+    var f = SCAN_FILES[i];
+    if (f.outcome === 'add' && !gameById(s, f.id)) {
+      for (var j = 0; j < GAMES.length; j++) if (GAMES[j].id === f.id) { var g = clone(GAMES[j]); g.played = ''; g.added = 'Today'; s.games.push(g); }
+    }
+  }
+}
+
+function initialState(props) {
+  var p = props || {};
+  var s = baseState(p);
+  var name = p.start && PRESETS[p.start] ? p.start : 'library';
+  s.start = name;
+  PRESETS[name](s);
+  if (p.level === 'today' || p.level === 'target') s.level = p.level;
+  if (p.routine === 'personal' || p.routine === 'appstore') s.routine = p.routine;
+  if (p.theme === 'dark' || p.theme === 'light' || p.theme === 'contrast') s.theme = p.theme;
+  return s;
+}
+
+/* ---------- the clock ---------- */
+
+function advance(s0) {
+  var s = clone(s0);
+  s.t = s.t + 1;
+  if (s.toast && s.t >= s.toast.until) s.toast = null;
+  if (s.player && s.player.status === 'running' && !s.dialog && s.sheet !== 'states' && s.sheet !== 'pause') { s.player.frame += 6; s.player.fps = 60; }
+  var j = s.job;
+  if (j && j.status === 'running') {
+    j.ticks += 1;
+    if (j.kind === 'bios') {
+      if (j.file !== BIOS_OK.file && j.step >= 1) { j.status = 'failed'; j.step = 1; }
+      else if (j.step < 3) { if (j.ticks % 4 === 0) j.step += 1; }
+      else if (j.step === 3) { j.n = Math.min(60, j.n + 3); if (j.n >= 60) j.step = 4; }
+      else if (j.step === 4) {
+        if (s.level === 'today' || j.ticks % 5 === 0) { j.status = 'done'; s.bios = clone(BIOS_OK); s.bios.checked = 'Today'; }
+      }
+    } else if (j.kind === 'scan') {
+      if (j.step === 0) { if (j.ticks % 6 === 0) j.step = 1; }
+      else if (j.step === 1) { if (j.ticks % 6 === 0) { j.n += 1; addScanned(s, j.n); } if (j.n >= j.total) j.step = 2; }
+      else if (j.step === 2) { if (j.ticks % 3 === 0) { j.step = 3; j.status = 'done'; } }
+    } else if (j.kind === 'open') {
+      if (j.ticks % 4 === 0) j.step += 1;
+      if (j.step >= 4) { s.job = null; s.sheet = ''; s.screen = 'player'; s.player = playerFor(j.id, 'running', 0); s.inspector = false; if (s.platform === 'ios') { s.w = 844; s.h = 390; } }
+    } else if (j.kind === 'trace') {
+      if (j.step === 0) { if (j.ticks % 3 === 0) j.step = 1; }
+      else if (j.step === 1) { j.n = Math.min(j.total, j.n + 1); if (j.n >= j.total) j.step = 2; }
+      else if (j.step === 2) { if (j.ticks % 3 === 0) { j.status = 'done'; j.step = 3; s.traceResult = RECORDED.run60; } }
+    }
+  }
+  return s;
+}
+
+/* ---------- actions ---------- */
+
+function visibleGames(s) {
+  var q = s.query.trim().toLowerCase();
+  var today = s.level === 'today';
+  return s.games.filter(function (g) {
+    if (s.nav === 'ps1' && g.console !== 'ps1') return false;
+    if (s.nav === 'ps2' && g.console !== 'ps2') return false;
+    if (s.nav === 'recent' && !g.played) return false;
+    if (q && (g.name + ' ' + (today ? '' : g.serial)).toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  });
+}
+
+function canPlay(s, g) {
+  if (!g) return { ok: false, why: '' };
+  if (s.level === 'today') return { ok: false, why: g.format === 'exe' ? 'A PS-EXE plays once the console can boot one (gap G5).' : 'Discs play from v0.2.0.' };
+  if (g.access === 'missing') return { ok: false, why: 'iStation can’t find this file.' };
+  if (g.console === 'ps2') return { ok: false, why: 'PS2 games play in a later version of iStation.' };
+  return { ok: true, why: '' };
+}
+
+function reduce(s0, a) {
+  var s = clone(s0);
+  var g = gameById(s, s.selected);
+  switch (a.type) {
+    case 'nav':
+      s.nav = a.id; s.screen = 'library'; if (a.id === 'cards' || a.id === 'bios' || a.id === 'tools') s.inspector = false;
+      var list = visibleGames(s); if (list.length && !list.some(function (x) { return x.id === s.selected; })) s.selected = list[0].id;
+      break;
+    case 'select': s.selected = a.id; break;
+    case 'move':
+      var vis = visibleGames(s), idx = -1;
+      for (var i = 0; i < vis.length; i++) if (vis[i].id === s.selected) idx = i;
+      if (vis.length) s.selected = vis[Math.max(0, Math.min(vis.length - 1, idx + a.by))].id;
+      break;
+    case 'toggleInspector': s.inspector = !s.inspector; break;
+    case 'toggleSidebar': s.sidebar = !s.sidebar; break;
+    case 'view': s.view = a.view; break;
+    case 'query': s.query = a.value; break;
+    case 'clearQuery': s.query = ''; break;
+    case 'pick': s.sheet = 'picker'; s.picker = { purpose: a.purpose, sel: [] }; break;
+    case 'pickToggle':
+      var p = s.picker, at = p.sel.indexOf(a.name);
+      if (p.purpose === 'games') { if (at >= 0) p.sel.splice(at, 1); else p.sel.push(a.name); } else p.sel = [a.name];
+      break;
+    case 'pickOpen': return openPicked(s);
+    case 'closeSheet':
+      if (s.sheet === 'job' && s.job && s.job.status === 'running') { s.job.status = 'stopped'; break; }
+      if (s.sheet === 'job' && s.job && s.job.kind === 'bios' && s.job.status === 'done') { s.screen = 'library'; }
+      if (s.sheet === 'pause' && s.player) s.player.status = 'running';
+      if (s.sheet === 'states' && s.player && s.platform === 'ios') s.player.status = 'running';
+      s.sheet = ''; s.picker = null; s.states = null; s.job = s.job && s.job.status === 'running' ? s.job : null;
+      break;
+    case 'stopJob': if (s.job && s.job.status === 'running') { s.job.status = 'stopped'; if (s.job.kind === 'open') { s.job = null; s.sheet = ''; } } break;
+    case 'rescan': s.job = scanJob(0, 'running'); s.job.step = 0; break;
+    case 'play':
+      var target = gameById(s, a.id || s.selected); if (!target) break;
+      s.selected = target.id;
+      if (target.access === 'missing') { s.dialog = { kind: 'missing', id: target.id }; break; }
+      if (target.console === 'ps2') { s.dialog = { kind: 'ps2', id: target.id }; break; }
+      if (!canPlay(s, target).ok) break;
+      s.sheet = 'job'; s.job = { kind: 'open', status: 'running', step: 0, n: 0, total: 0, id: target.id, ticks: 0 };
+      break;
+    case 'runBios': s.screen = 'player'; s.player = playerFor('', 'running', 0); s.inspector = false; s.sheet = ''; s.job = null; break;
+    case 'togglePause': if (s.player) { s.player.status = s.player.status === 'running' ? 'paused' : 'running'; s.player.fps = s.player.status === 'running' ? 60 : 0; } break;
+    case 'fullscreen': if (s.player) s.player.fullscreen = !s.player.fullscreen; break;
+    case 'debug': if (s.player && s.routine === 'personal' && s.level === 'target') s.player.debug = !s.player.debug; break;
+    case 'ask': s.dialog = { kind: a.kind, id: a.id || '', slot: a.slot || 0 }; if (s.player && (a.kind === 'reset' || a.kind === 'stop')) { s.player.status = 'paused'; s.player.fps = 0; } break;
+    case 'cancelDialog': s.dialog = null; break;
+    case 'confirm': return confirmDialog(s, a.choice || 'ok');
+    case 'states': if (s.player) { s.player.status = 'paused'; s.player.fps = 0; } s.sheet = 'states'; s.states = { mode: a.mode, sel: a.mode === 'save' ? firstEmptySlot(s) : 1 }; break;
+    case 'slotSelect': s.states.sel = a.n; break;
+    case 'slotCommit':
+      var slot = s.slots[s.states.sel - 1];
+      if (s.states.mode === 'save') { if (slot.saved) s.dialog = { kind: 'overwrite', slot: slot.n }; else return saveInto(s, slot.n); }
+      else { if (!slot.saved) break; if (slot.format !== 2) s.dialog = { kind: 'version', slot: slot.n }; else s.dialog = { kind: 'load', slot: slot.n }; }
+      break;
+    case 'screenshot': s.toast = { text: 'Saved “Harbor Lights (USA) 2026-11-21 at 09.41.12.png” to iStation’s Screenshots folder.', until: s.t + 30 }; break;
+    case 'toast': s.toast = { text: a.text, until: s.t + 30 }; break;
+    case 'openWin': s.win = a.win; if (a.tab) s.settingsTab = a.tab; break;
+    case 'closeWin': s.win = ''; break;
+    case 'settingsTab': s.settingsTab = a.tab; break;
+    case 'theme': s.theme = a.theme; break;
+    case 'textSize': s.textSize = a.size; break;
+    case 'pref': s.prefs[a.key] = a.value; break;
+    case 'cardSelect': s.cardSel = a.id; break;
+    case 'cardDuplicate':
+      var c = null; s.cards.forEach(function (x) { if (x.id === s.cardSel) c = x; });
+      if (c) { var copy = clone(c); copy.id = 'c' + (s.cards.length + 1) + 'x' + s.t; copy.name = c.name + ' copy'; copy.file = c.name + ' copy.mcr'; copy.written = 'Today'; s.cards.push(copy); s.cardSel = copy.id; }
+      break;
+    case 'toolsTab': s.toolsTab = a.tab; break;
+    case 'traceField': s.trace[a.key] = a.value; break;
+    case 'traceStart': s.sheet = 'job'; s.job = { kind: 'trace', status: 'running', step: 0, n: 0, total: Math.max(1, s.trace.frames), ticks: 0 }; break;
+    case 'compare': s.diff = 'word'; break;
+    case 'renameChange': s.rename = a.value; break;
+    case 'openRename': if (g) { s.rename = g.name; s.sheet = 'rename'; } break;
+    case 'sheetKeys': s.sheet = 'shortcuts'; break;
+    case 'pickOpenFile': s.picker.sel = [a.name]; return openPicked(s);
+    case 'slotCommitAt': s.states.sel = a.n; return reduce(s, { type: 'slotCommit' });
+    case 'renameSave': if (g) g.name = s.rename.trim() || g.name; s.sheet = ''; break;
+    case 'escape':
+      if (s.dialog) s.dialog = null;
+      else if (s.sheet) return reduce(s, { type: 'closeSheet' });
+      else if (s.win) s.win = '';
+      else if (s.player && s.player.fullscreen) s.player.fullscreen = false;
+      break;
+    case 'iosPause': if (s.player) { s.player.status = 'paused'; s.player.fps = 0; } s.sheet = 'pause'; break;
+  }
+  return s;
+}
+
+function firstEmptySlot(s) { for (var i = 0; i < s.slots.length; i++) if (!s.slots[i].saved) return s.slots[i].n; return 1; }
+
+function saveInto(s, n) {
+  var slot = s.slots[n - 1];
+  slot.saved = 'Just now'; slot.frame = s.player ? s.player.frame : 0; slot.format = 2;
+  s.sheet = ''; s.states = null; s.dialog = null;
+  s.toast = { text: 'Saved to slot ' + n + '.', until: s.t + 30 };
+  return s;
+}
+
+function openPicked(s) {
+  var p = s.picker; s.picker = null;
+  if (p.purpose === 'bios') { s.sheet = 'job'; s.job = { kind: 'bios', status: 'running', step: 0, n: 0, total: 60, file: p.sel[0] || BIOS_OK.file, ticks: 0 }; return s; }
+  if (p.purpose === 'folder') { s.sheet = 'job'; s.job = scanJob(0, 'running'); s.job.step = 0; return s; }
+  if (p.purpose === 'games') {
+    p.sel.forEach(function (name) { GAMES.forEach(function (g0) { if (g0.file === name && !gameById(s, g0.id)) { var g = clone(g0); g.played = ''; g.added = 'Today'; s.games.push(g); s.selected = g.id; } }); });
+    s.sheet = ''; return s;
+  }
+  if (p.purpose === 'locate') { var g7 = gameById(s, 'g7'); if (g7) { g7.access = 'ok'; g7.folder = '~/Games/PS1/Moved'; g7.bytes = 402653184; } s.sheet = ''; return s; }
+  if (p.purpose === 'traceLeft' || p.purpose === 'traceRight') { s.sheet = ''; s.diff = ''; return s; }
+  s.sheet = ''; return s;
+}
+
+function confirmDialog(s, choice) {
+  var d = s.dialog; s.dialog = null;
+  if (choice === 'cancel') return s;
+  switch (d.kind) {
+    case 'reset': if (s.player) { s.player.frame = 0; s.player.status = 'running'; s.player.fps = 60; } break;
+    case 'stop':
+      if (choice === 'save') { s.sheet = 'states'; s.states = { mode: 'save', sel: firstEmptySlot(s) }; break; }
+      s.screen = 'library'; s.player = null; s.sheet = ''; s.states = null; if (s.platform === 'ios') { s.w = 390; s.h = 844; } break;
+    case 'remove':
+      s.games = s.games.filter(function (x) { return x.id !== d.id; });
+      s.selected = s.games.length ? s.games[0].id : ''; break;
+    case 'card-delete':
+      s.cards = s.cards.filter(function (x) { return x.id !== d.id; });
+      s.cardSel = s.cards.length ? s.cards[0].id : '';
+      s.toast = { text: 'Moved to the Trash.', until: s.t + 30 }; break;
+    case 'overwrite': return saveInto(s, d.slot);
+    case 'load': if (s.player) { s.player.frame = s.slots[d.slot - 1].frame; s.player.status = 'running'; s.player.fps = 60; } s.sheet = ''; s.states = null; break;
+    case 'missing':
+      if (choice === 'remove') { s.games = s.games.filter(function (x) { return x.id !== d.id; }); s.selected = s.games.length ? s.games[0].id : ''; break; }
+      s.sheet = 'picker'; s.picker = { purpose: 'locate', sel: ['Lantern Street.cue'] }; break;
+    default: break;
+  }
+  return s;
+}
+
+/* ---------- keys ---------- */
+
+function keyAction(s, e) {
+  var cmd = e.metaKey || e.ctrlKey, k = (e.key || '').toLowerCase();
+  // ⌥ changes e.key on a Mac layout (⌥A is "å"), and some senders leave it empty: the physical key decides then.
+  var code = e.code || '', fromCode = /^Key[A-Z]$/.test(code) ? code.slice(3).toLowerCase() : /^Digit\d$/.test(code) ? code.slice(5) : { Period: '.', Slash: '/', Comma: ',', Backspace: 'backspace', Enter: 'enter', Escape: 'escape' }[code];
+  if (fromCode && (k === '' || k === 'unidentified' || e.altKey)) k = fromCode;
+  var combo = (e.ctrlKey && e.metaKey ? 'ctrl+' : '') + (cmd ? 'cmd+' : '') + (e.shiftKey ? 'shift+' : '') + (e.altKey ? 'alt+' : '') + k;
+  if (k === 'escape') return { type: 'escape' };
+  if (s.dialog) return null;
+  if (combo === 'cmd+,') return { type: 'openWin', win: 'settings' };
+  if (combo === 'cmd+/' || combo === 'cmd+shift+?' || combo === 'cmd+shift+/') return { type: 'sheetKeys' };
+  if (combo === 'cmd+alt+a') return { type: 'openWin', win: 'acks' };
+  if (combo === 'cmd+.' && s.job && s.job.status === 'running') return { type: 'stopJob' };
+  if (s.sheet || s.win) return null;
+  var today = s.level === 'today';
+  if (s.screen === 'player' && s.player) {
+    if (combo === 'cmd+p') return { type: 'togglePause' };
+    if (combo === 'cmd+r') return { type: 'ask', kind: 'reset' };
+    if (combo === 'cmd+s' && !today) return { type: 'states', mode: 'save' };
+    if (combo === 'cmd+l' && !today) return { type: 'states', mode: 'load' };
+    if (combo === 'cmd+shift+s' && !today) return { type: 'screenshot' };
+    if (combo === 'ctrl+cmd+f') return { type: 'fullscreen' };
+    if (combo === 'cmd+alt+d') return { type: 'debug' };
+    if (combo === 'cmd+.') return { type: 'ask', kind: 'stop' };
+    return null;
+  }
+  if (combo === 'cmd+o' && s.bios) return { type: 'pick', purpose: 'games' };
+  if (combo === 'cmd+o' && !s.bios) return { type: 'pick', purpose: 'bios' };
+  if (combo === 'cmd+shift+o' && s.bios) return { type: 'pick', purpose: 'folder' };
+  if (combo === 'cmd+f') return { type: 'focusSearch' };
+  var navKeys = { 'cmd+1': 'all', 'cmd+2': 'ps1', 'cmd+3': 'ps2', 'cmd+4': 'recent', 'cmd+5': 'cards', 'cmd+6': 'bios', 'cmd+7': 'tools' };
+  if (navKeys[combo] && s.bios) { var id = navKeys[combo]; if (sidebarIds(s).indexOf(id) >= 0) return { type: 'nav', id: id }; return null; }
+  if (combo === 'ctrl+cmd+s') return { type: 'toggleSidebar' };
+  if (combo === 'cmd+i') return { type: 'toggleInspector' };
+  if (combo === 'cmd+shift+r' && s.nav === 'tools') return { type: 'traceStart' };
+  if (s.nav === 'cards' && combo === 'cmd+backspace') return { type: 'ask', kind: 'card-delete', id: s.cardSel };
+  if (isGameNav(s.nav)) {
+    if (combo === 'arrowdown') return { type: 'move', by: 1 };
+    if (combo === 'arrowup') return { type: 'move', by: -1 };
+    if (combo === 'enter' || combo === 'cmd+arrowdown') return { type: 'play' };
+    if (combo === 'cmd+backspace' && s.selected) return { type: 'ask', kind: 'remove', id: s.selected };
+  }
+  return null;
+}
+
+function isGameNav(nav) { return nav === 'all' || nav === 'ps1' || nav === 'ps2' || nav === 'recent'; }
+function sidebarIds(s) {
+  var today = s.level === 'today', ids = ['all'];
+  if (!today) ids.push('ps1', 'ps2');
+  ids.push('recent');
+  if (!today) ids.push('cards');
+  ids.push('bios');
+  if (s.routine === 'personal') ids.push('tools');
+  return ids;
+}
+
+/* ---------- the view: everything the markup reads ---------- */
+
+function view(s, d, refs) {
+  var mac = s.platform === 'mac', ios = !mac;
+  var today = s.level === 'today', personal = s.routine === 'personal';
+  var go = function (a) { return function () { d(a); }; };
+  var V = { icon: ICON, startName: s.start, query: s.query, prefs: s.prefs, rootRef: refs.root, searchRef: refs.search };
+
+  /* tokens → CSS variables on the root */
+  var colors = TOKENS.color[s.theme], type = TOKENS.type[mac ? 'mac' : 'ios'], scale = TOKENS.textScale[s.textSize], size = TOKENS.size[mac ? 'mac' : 'ios'];
+  var vars = [];
+  Object.keys(colors).forEach(function (k) { vars.push('--' + k + ':' + colors[k]); });
+  Object.keys(type).forEach(function (k) { vars.push('--text-' + k + ':' + (type[k] * scale).toFixed(2) + 'px'); });
+  Object.keys(TOKENS.font).forEach(function (k) { vars.push('--font-' + k + ':' + TOKENS.font[k]); });
+  Object.keys(TOKENS.space).forEach(function (k) { vars.push('--space-' + k + ':' + TOKENS.space[k] + 'px'); });
+  Object.keys(TOKENS.radius).forEach(function (k) { vars.push('--radius-' + k + ':' + TOKENS.radius[k] + 'px'); });
+  ['fast', 'base', 'slow'].forEach(function (k) { vars.push('--motion-' + k + ':' + TOKENS.motion[k] + 'ms'); });
+  vars.push('--ease:' + TOKENS.motion.ease);
+  ['control', 'toolbar', 'sidebar', 'inspector', 'row', 'tile'].forEach(function (k) { vars.push('--size-' + k + ':' + size[k] + 'px'); });
+  V.rootStyle = vars.join(';') + ';position:relative;width:' + s.w + 'px;height:' + s.h + 'px;overflow:hidden;background:var(--bg-window);color:var(--fg);font-family:var(--font-ui);font-size:var(--text-body)';
+
+  V.onKey = refs.onKey;
+  V.onQuery = function (e) { d({ type: 'query', value: e.target.value }); };
+
+  var games = visibleGames(s), sel = gameById(s, s.selected), player = s.player;
+  var inPlayer = s.screen === 'player' && !!player;
+  var narrow = s.w < 1000;
+
+  V.act = {
+    pickBios: go({ type: 'pick', purpose: 'bios' }), pickGames: go({ type: 'pick', purpose: 'games' }), pickFolder: go({ type: 'pick', purpose: 'folder' }),
+    openAcks: go({ type: 'openWin', win: 'acks' }), openSettings: go({ type: 'openWin', win: 'settings' }), closeWin: go({ type: 'closeWin' }),
+    clearQuery: go({ type: 'clearQuery' }), runBios: go({ type: 'runBios' }), finder: go({ type: 'toast', text: 'Shows the file in the Finder.' }),
+    removeAsk: go({ type: 'ask', kind: 'remove', id: s.selected }), rename: go({ type: 'openRename' }),
+    togglePause: go({ type: 'togglePause' }), openTools: go({ type: 'nav', id: 'tools' }),
+    cardDuplicate: go({ type: 'cardDuplicate' }), cardDelete: go({ type: 'ask', kind: 'card-delete', id: s.cardSel }),
+    traceStart: go({ type: 'traceStart' }), compare: go({ type: 'compare' }),
+    pickTraceLeft: go({ type: 'pick', purpose: 'traceLeft' }), pickTraceRight: go({ type: 'pick', purpose: 'traceRight' }),
+    toastDefaults: go({ type: 'toast', text: 'Port 1 is back to the default buttons.' }), toastChooseFolder: go({ type: 'toast', text: 'Opens a folder picker.' }),
+    toggleSmoothing: go({ type: 'pref', key: 'smoothing', value: !s.prefs.smoothing }), toggleHudFrames: go({ type: 'pref', key: 'hudFrames', value: !s.prefs.hudFrames }),
+    toggleMute: go({ type: 'pref', key: 'muteBackground', value: !s.prefs.muteBackground }), toggleDrawer: go({ type: 'pref', key: 'debugDrawer', value: !s.prefs.debugDrawer }),
+    toggleTTY: go({ type: 'pref', key: 'keepTTY', value: !s.prefs.keepTTY }),
+    setVolume: function (e) { d({ type: 'pref', key: 'volume', value: Number(e.target.value) || 0 }); },
+    iosPause: go({ type: 'iosPause' })
+  };
+
+  /* ---- macOS window ---- */
+  var M = { on: mac };
+  M.sidebarOn = mac && s.sidebar && !inPlayer && s.screen !== 'welcome' && !(s.inspector && !!sel && s.w < 1100 && isGameNav(s.nav));
+  M.toolbarOn = mac && !(inPlayer && player.fullscreen);
+  M.lightsInToolbar = mac && !M.sidebarOn;
+  M.routineChip = personal;
+  var counts = {
+    all: s.games.length, ps1: s.games.filter(function (g) { return g.console === 'ps1'; }).length,
+    ps2: s.games.filter(function (g) { return g.console === 'ps2'; }).length, recent: s.games.filter(function (g) { return !!g.played; }).length,
+    cards: s.cards.length
+  };
+  function sbItem(id, label, icon, key, count) {
+    var on = s.nav === id;
+    return { label: label, icon: ICON[icon], count: count === '' ? '' : String(count), go: go({ type: 'nav', id: id }), current: on ? 'page' : 'false', bg: on ? 'background:var(--bg-selected)' : '', tip: label + ' (' + key + ')' };
+  }
+  var libItems = [sbItem('all', 'All Games', 'stack', '⌘1', counts.all)];
+  if (!today) libItems.push(sbItem('ps1', 'PS1', 'disc', '⌘2', counts.ps1), sbItem('ps2', 'PS2', 'disc', '⌘3', counts.ps2));
+  libItems.push(sbItem('recent', 'Recently Played', 'clock', '⌘4', counts.recent));
+  var conItems = [];
+  if (!today) conItems.push(sbItem('cards', 'Memory Cards', 'card', '⌘5', counts.cards));
+  conItems.push(sbItem('bios', 'BIOS', 'chip', '⌘6', ''));
+  M.sections = [{ title: 'Library', items: libItems }, { title: 'Console', items: conItems }];
+  if (personal) M.sections.push({ title: 'Personal build', items: [sbItem('tools', 'Tools', 'tools', '⌘7', '')] });
+
+  function tb(label, icon, key, a, opts) {
+    var o = opts || {};
+    return { button: true, sep: false, label: label, icon: ICON[icon], tip: label + (key ? ' (' + key + ')' : ''), go: a ? go(a) : refs.noop, pressed: o.pressed === undefined ? null : (o.pressed ? 'true' : 'false'), disabled: !!o.disabled, contract: o.contract || '' };
+  }
+  var SEP = { button: false, sep: true, label: '', icon: '', tip: '', go: refs.noop, pressed: null, disabled: false, contract: '' };
+  M.toolsLeft = []; M.toolsRight = []; M.searchOn = false;
+  var navTitles = { all: 'All Games', ps1: 'PS1', ps2: 'PS2', recent: 'Recently Played', cards: 'Memory Cards', bios: 'BIOS', tools: 'Tools' };
+  if (s.screen === 'welcome' || !s.bios) { M.title = 'iStation'; M.subtitle = ''; }
+  else if (inPlayer) {
+    var pg = gameById(s, player.gameId);
+    M.title = pg ? pg.name : 'BIOS'; M.subtitle = statusLine(s);
+    M.toolsLeft = [tb('Stop and go back to the library', 'chevronLeft', '⌘.', { type: 'ask', kind: 'stop' }, { contract: 'C50' })];
+    M.toolsRight = [tb(player.status === 'running' ? 'Pause' : 'Resume', player.status === 'running' ? 'pause' : 'play', '⌘P', { type: 'togglePause' }, { contract: 'C07' }), tb('Reset', 'reset', '⌘R', { type: 'ask', kind: 'reset' }, { contract: 'C06' })];
+    if (!today && pg) M.toolsRight.push(SEP, tb('Save State', 'save', '⌘S', { type: 'states', mode: 'save' }, { contract: 'C31' }), tb('Load State', 'load', '⌘L', { type: 'states', mode: 'load' }, { contract: 'C31' }), tb('Save Screenshot', 'camera', '⇧⌘S', { type: 'screenshot' }, { contract: 'C22' }));
+    M.toolsRight.push(SEP);
+    if (personal && !today) M.toolsRight.push(tb('Debug drawer', 'tools', '⌥⌘D', { type: 'debug' }, { pressed: player.debug, contract: 'C40' }));
+    M.toolsRight.push(tb('Full screen', 'fullscreen', '⌃⌘F', { type: 'fullscreen' }));
+  } else {
+    M.title = navTitles[s.nav];
+    M.toolsLeft = [tb(s.sidebar ? 'Hide the sidebar' : 'Show the sidebar', 'sidebar', '⌃⌘S', { type: 'toggleSidebar' })];
+    if (isGameNav(s.nav)) {
+      M.subtitle = games.length === 0 ? 'No games' : games.length === 1 ? '1 game' : games.length + ' games';
+      M.toolsRight = [tb('Add Games', 'plus', '⌘O', { type: 'pick', purpose: 'games' }, { contract: 'C11' }), tb('Add Folder', 'folderPlus', '⇧⌘O', { type: 'pick', purpose: 'folder' }, { contract: 'C20' }), SEP,
+        tb('Show as list', 'list', '', { type: 'view', view: 'list' }, { pressed: s.view === 'list' }), tb('Show as grid', 'grid', '', { type: 'view', view: 'grid' }, { pressed: s.view === 'grid' }), SEP,
+        tb('Game info', 'info', '⌘I', { type: 'toggleInspector' }, { pressed: s.inspector, disabled: !sel })];
+      M.searchOn = true;
+    } else if (s.nav === 'cards') { M.subtitle = s.cards.length + ' cards'; M.toolsRight = [tb('New Card', 'plus', '', { type: 'toast', text: 'Made “New card 1”.' })]; }
+    else if (s.nav === 'bios') { M.subtitle = s.bios.file; }
+    else if (s.nav === 'tools') { M.subtitle = 'Personal build only'; }
+  }
+  V.mac = M;
+
+  V.screen = {
+    welcome: s.screen === 'welcome' || !s.bios,
+    games: !inPlayer && !!s.bios && s.screen !== 'welcome' && isGameNav(s.nav),
+    bios: !inPlayer && !!s.bios && s.nav === 'bios' && s.screen !== 'welcome',
+    cards: !inPlayer && !!s.bios && s.nav === 'cards' && s.screen !== 'welcome',
+    tools: !inPlayer && !!s.bios && s.nav === 'tools' && s.screen !== 'welcome',
+    player: inPlayer
+  };
+
+  /* ---- library ---- */
+  var L = {};
+  var contentW = s.w - (M.sidebarOn ? size.sidebar : 0) - (s.inspector && sel ? size.inspector : 0);
+  var showFormat = contentW >= 880, showPlayed = contentW >= 700;
+  var cols = [{ label: 'Name', w: 'minmax(180px, 1fr)' }, { label: 'Console', w: '72px' }, { label: 'Serial', w: '104px' }];
+  if (showFormat) cols.push({ label: 'Format', w: '120px' });
+  cols.push({ label: 'Size', w: '80px' });
+  if (showPlayed) cols.push({ label: 'Last played', w: '130px' });
+  var grid = 'grid-template-columns:' + cols.map(function (c) { return c.w; }).join(' ') + ';column-gap:12px';
+  L.cols = cols.map(function (c) { return { label: c.label }; });
+  L.headStyle = 'display:grid;' + grid + ';padding:4px 12px;border-bottom:1px solid var(--line);margin-bottom:4px';
+  L.rows = games.map(function (g) {
+    var on = g.id === s.selected;
+    var known = !today || g.format === 'exe';
+    var consoleText = known ? g.console.toUpperCase() : 'Unknown';
+    var serialText = !known ? 'Unknown' : (g.serial || 'None');
+    var fmt = g.format === 'cue' ? '.cue · ' + g.tracks + (g.tracks === 1 ? ' track' : ' tracks') : g.format === 'm3u' ? '.m3u · ' + g.discs + ' discs' : g.format === 'exe' ? 'PS-EXE' : '.iso';
+    if (today && g.format !== 'exe') fmt = '.' + g.format;
+    var flag = '', flagStyle = '';
+    if (g.access === 'missing') { flag = 'File missing'; flagStyle = 'background:var(--warn-bg);color:var(--warn)'; }
+    else if (g.console === 'ps2' && !today) { flag = 'Plays later'; flagStyle = 'background:var(--bg-control);color:var(--fg-muted)'; }
+    var cells = [
+      { text: consoleText, style: known ? '' : 'color:var(--fg-muted)' },
+      { text: serialText, style: 'font-family:var(--font-mono);' + (known && g.serial ? '' : 'color:var(--fg-muted)') }
+    ];
+    if (showFormat) cells.push({ text: fmt, style: 'color:var(--fg-muted)' });
+    cells.push({ text: fmtBytes(g.bytes), style: 'color:var(--fg-muted);font-variant-numeric:tabular-nums' });
+    if (showPlayed) cells.push({ text: g.played || 'Never', style: 'color:var(--fg-muted)' });
+    var sub = (known ? consoleText + (g.serial ? ' · ' + g.serial : '') : 'Not read yet') + ' · ' + fmtBytes(g.bytes);
+    if (g.access === 'missing') sub = 'Can’t find the file';
+    else if (g.console === 'ps2') sub = 'PS2 · plays in a later version';
+    return {
+      id: g.id, name: g.name, icon: g.format === 'exe' ? ICON.exe : ICON.disc, initials: initials(g.name),
+      current: on ? 'true' : 'false', style: grid + (on ? ';background:var(--bg-selected)' : ''),
+      aria: g.name + ', ' + consoleText + (g.serial && known ? ', ' + g.serial : '') + (flag ? ', ' + flag : ''),
+      flag: flag, flagStyle: flagStyle, cells: cells,
+      select: go({ type: 'select', id: g.id }), play: go({ type: 'play', id: g.id }),
+      consoleShort: consoleText === 'Unknown' ? '?' : consoleText, serialShort: known ? (g.serial || 'PS-EXE') : '',
+      tileMeta: flag ? flag : (g.played ? 'Played ' + g.played : 'Never played'),
+      art: 'position:relative;display:flex;align-items:center;justify-content:center;width:var(--size-tile);height:var(--size-tile);border-radius:var(--radius-card);background:var(--bg-raised);border:' + (on ? '2px solid var(--accent)' : '1px solid var(--line)'),
+      iosSub: sub, subStyle: g.access === 'missing' ? 'color:var(--warn)' : 'color:var(--fg-muted)'
+    };
+  });
+  L.list = s.view === 'list' && games.length > 0;
+  L.grid = s.view === 'grid' && games.length > 0 && mac;
+  L.empty = s.games.length === 0;
+  L.noResults = s.games.length > 0 && games.length === 0;
+  L.noResultsText = s.query ? 'No games match “' + s.query + '”.' : 'No games here yet.';
+  L.todayBanner = today && s.games.length > 0;
+  if (ios) { L.list = false; L.grid = false; }
+  V.lib = L;
+
+  /* ---- inspector ---- */
+  var I = { on: mac && s.inspector && !!sel && V.screen.games };
+  if (sel) {
+    var cp = canPlay(s, sel);
+    var known2 = !today || sel.format === 'exe';
+    I.name = sel.name; I.initials = initials(sel.name);
+    I.art = 'height:140px;border-radius:var(--radius-card);background:var(--bg-raised);border:1px solid var(--line);display:flex;align-items:center;justify-content:center';
+    I.missing = sel.access === 'missing';
+    I.facts = [
+      { k: 'Console', v: known2 ? sel.console.toUpperCase() : 'Unknown until discs can be read', style: known2 ? '' : 'color:var(--fg-muted)' },
+      { k: 'Serial', v: known2 ? (sel.serial || 'None (homebrew)') : 'Unknown', style: 'font-family:var(--font-mono)' },
+      { k: 'Format', v: sel.format === 'cue' ? 'Cue sheet with ' + sel.tracks + (sel.tracks === 1 ? ' track' : ' tracks') : sel.format === 'm3u' ? 'Playlist of ' + sel.discs + ' discs' : sel.format === 'exe' ? 'PS-EXE program' : 'ISO image', style: '' },
+      { k: 'Size', v: fmtBytes(sel.bytes), style: '' },
+      { k: 'File', v: sel.file, style: 'font-family:var(--font-mono)' },
+      { k: 'Folder', v: sel.folder, style: 'font-family:var(--font-mono)' },
+      { k: 'Added', v: sel.added, style: '' },
+      { k: 'Last played', v: sel.played || 'Never', style: '' }
+    ];
+    if (!today && sel.console === 'ps1' && sel.format !== 'exe') {
+      var saves = sel.id === 'g1' ? s.slots.filter(function (x) { return !!x.saved; }).length : 0;
+      I.facts.push({ k: 'Save states', v: saves ? saves + ' saved' : 'None yet', style: '' });
+      var card = null; s.cards.forEach(function (c) { if (c.game === sel.name) card = c; });
+      I.facts.push({ k: 'Memory card', v: card ? card.name + ' · ' + card.blocks + ' of 15 blocks' : 'Made when the game first saves', style: '' });
+    }
+    I.banner = ''; I.bannerStyle = '';
+    if (sel.access === 'missing') { I.banner = 'iStation can’t find this file. It may have been moved, renamed or deleted.'; I.bannerStyle = 'padding:8px 10px;border-radius:var(--radius-control);background:var(--warn-bg);color:var(--warn)'; }
+    else if (sel.console === 'ps2' && !today) { I.banner = 'This disc boots on a PS2. This version of iStation plays PS1 games; PS2 games come in a later version.'; I.bannerStyle = 'padding:8px 10px;border-radius:var(--radius-control);background:var(--bg-control);color:var(--fg)'; }
+    I.primary = sel.access === 'missing'
+      ? { label: 'Locate…', go: go({ type: 'pick', purpose: 'locate' }), disabled: false, tip: 'Find the file', contract: 'C12' }
+      : { label: 'Play', go: go({ type: 'play', id: sel.id }), disabled: !cp.ok, tip: 'Play (↩)', contract: sel.format === 'exe' ? 'C19 C49' : sel.console === 'ps2' ? 'C36' : 'C30' };
+    I.reason = sel.access === 'missing' ? '' : cp.why;
+  } else {
+    I.name = ''; I.initials = ''; I.art = ''; I.facts = []; I.banner = ''; I.bannerStyle = ''; I.primary = { label: 'Play', go: refs.noop, disabled: true, tip: '', contract: '' }; I.reason = ''; I.missing = true;
+  }
+  V.insp = I;
+
+  /* ---- BIOS pane ---- */
+  var b = s.bios || BIOS_OK;
+  V.biosPane = {
+    file: b.file, size: fmtInt(b.bytes) + ' bytes (512 KB)', sha: sha(b.sha1), folder: 'In ' + b.folder,
+    checked: today ? 'Checked ' + b.checked + ': it powered on and ran 60 frames.' : 'Checked ' + b.checked + ': it reached its shell.'
+  };
+
+  /* ---- memory cards ---- */
+  var cardSel = null; s.cards.forEach(function (c) { if (c.id === s.cardSel) cardSel = c; });
+  V.cards = {
+    rows: s.cards.map(function (c) { var on = c.id === s.cardSel; return { name: c.name, blocks: c.blocks + ' of 15', select: go({ type: 'cardSelect', id: c.id }), current: on ? 'true' : 'false', bg: on ? 'background:var(--bg-selected)' : '' }; }),
+    sel: cardSel ? { name: cardSel.name, facts: [
+      { k: 'Used by', v: cardSel.game || 'Any game (shared)', style: '' },
+      { k: 'Blocks used', v: cardSel.blocks + ' of 15', style: '' },
+      { k: 'Size', v: fmtInt(cardSel.bytes) + ' bytes (128 KB)', style: '' },
+      { k: 'Last written', v: cardSel.written, style: '' },
+      { k: 'File', v: cardSel.file, style: 'font-family:var(--font-mono)' }
+    ] } : null,
+    policy: s.prefs.cardPolicy === 'per-game' ? 'Each game gets its own card, made the first time it saves. Change this in Settings › Memory Cards.' : 'All games share cards 1 and 2. Change this in Settings › Memory Cards.',
+    none: s.cards.length === 0, some: s.cards.length > 0
+  };
+
+  /* ---- tools (personal) ---- */
+  var T = {};
+  var tabs = today ? [['console', 'From Terminal']] : [['console', 'Console'], ['tty', 'TTY'], ['trace', 'Trace'], ['compare', 'Compare'], ['vram', 'VRAM']];
+  T.tabs = tabs.map(function (t) { return { label: t[1], pressed: s.toolsTab === t[0] ? 'true' : 'false', go: go({ type: 'toolsTab', tab: t[0] }) }; });
+  T.today = today && s.toolsTab === 'console';
+  T.commands = [
+    { title: 'Run the BIOS for 60 frames, recording a trace', text: 'swift build -c release\n.build/release/istation-run run --bios "~/Documents/Console/my-console-bios.bin" --frames 60 --instructions ~/Traces/cpu.trace --frame-trace ~/Traces/frames.trace --tty ~/Traces/tty.txt' },
+    { title: 'Compare two traces', text: '.build/release/istation-run diff ~/Traces/cpu.trace ~/Traces/projectpsx.trace' },
+    { title: 'Frame traces side by side', text: '.build/release/istation-run frames ~/Traces/frames.trace ~/Traces/swanstation-frames.trace' }
+  ].map(function (c) { return { title: c.title, text: c.text, copy: go({ type: 'toast', text: 'Copied the command.' }) }; });
+  T.console = !today && s.toolsTab === 'console';
+  T.consoleNote = 'Paused at cycle ' + fmtInt(RECORDED.cycles) + '. Values recorded from istation-run’s CPU-check image, record 1,000.';
+  T.special = [['pc', hex(RECORDED.pc)], ['epc', hex(RECORDED.epc)], ['hi', hex(RECORDED.hi)], ['lo', hex(RECORDED.lo)], ['sr', hex(RECORDED.sr)], ['cause', hex(RECORDED.cause)], ['cycles', fmtInt(RECORDED.cycles)], ['speed', RECORDED.rate]].map(function (r) { return { name: r[0], value: r[1] }; });
+  T.regs = RECORDED.gpr.map(function (v, i) { return { name: 'r' + i + ' ' + REG_NAMES[i], value: hex(v), style: v === 0 ? 'color:var(--fg-muted)' : '' }; });
+  T.tty = !today && s.toolsTab === 'tty';
+  T.trace = !today && s.toolsTab === 'trace';
+  T.form = s.trace;
+  T.folder = '~/Traces';
+  T.busy = !!(s.job && s.job.kind === 'trace' && s.job.status === 'running');
+  T.command = '.build/release/istation-run run --bios "~/Documents/Console/my-console-bios.bin" --frames ' + s.trace.frames + (s.trace.instructions ? ' --instructions ~/Traces/cpu.trace' + (s.trace.interval > 0 ? ' --full-state-interval ' + s.trace.interval : '') : '') + (s.trace.frameTrace ? ' --frame-trace ~/Traces/frames.trace' : '') + (s.trace.from > 0 ? ' --trace-from ' + s.trace.from : '');
+  T.result = s.traceResult;
+  function field(key) { return function (e) { d({ type: 'traceField', key: key, value: Math.max(0, parseInt(e.target.value, 10) || 0) }); }; }
+  T.setFrames = field('frames'); T.setInterval = field('interval'); T.setFrom = field('from');
+  T.toggleIns = go({ type: 'traceField', key: 'instructions', value: !s.trace.instructions });
+  T.toggleFrames = go({ type: 'traceField', key: 'frameTrace', value: !s.trace.frameTrace });
+  T.submit = function (e) { e.preventDefault(); };
+  T.compare = !today && s.toolsTab === 'compare';
+  T.left = 'cpu-check.trace'; T.right = 'zero-image.trace';
+  T.diff = s.diff ? { headline: 'They differ at the first record', text: RECORDED.diffWord, icon: ICON.warn, box: 'display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:var(--radius-card);background:var(--warn-bg);color:var(--warn)' } : null;
+  T.vram = !today && s.toolsTab === 'vram';
+  V.tools = T;
+
+  /* ---- player ---- */
+  var P = { picture: false, noPicture: false, paused: false, debug: false, fullscreen: false, name: '', statusText: '', statusStyle: '', hudFrame: '', fpsText: '', frameText: '', ports: '', pictureStyle: '', pictureText: '', pictureLabel: '', hudButtons: [] };
+  if (player) {
+    var pgame = gameById(s, player.gameId);
+    P.name = pgame ? pgame.name : 'BIOS';
+    var running = player.status === 'running';
+    P.statusText = running ? 'Running' : 'Paused';
+    P.statusStyle = running ? 'background:var(--ok-bg);color:var(--ok)' : 'background:var(--warn-bg);color:var(--warn)';
+    P.hudFrame = s.prefs.hudFrames ? 'Frame ' + fmtInt(player.frame) : '';
+    P.frameText = fmtInt(player.frame);
+    P.fpsText = running ? player.fps + ' per second' : 'paused';
+    if (!today) P.fpsText = running ? player.fps + ' fps' : '';
+    P.ports = today ? '' : (s.pads > 1 ? 'Port 1: Wireless Controller · Port 2: Keyboard' : 'Port 1: Keyboard');
+    P.paused = !running && !s.dialog && mac;
+    P.debug = mac && player.debug && personal && !today;
+    P.fullscreen = mac && player.fullscreen;
+    P.picture = !today;
+    P.noPicture = today;
+    var areaW = (ios ? s.w : s.w - (P.debug ? 300 : 0)) - (ios ? 0 : 48);
+    var areaH = (ios ? s.h : s.h - (M.toolbarOn ? size.toolbar : 0) - 72) - (ios ? 0 : 24);
+    var pw, ph;
+    if (s.prefs.scale === 'integer' && mac) { var k = Math.max(1, Math.floor(Math.min(areaW / 320, areaH / 240))); pw = 320 * k; ph = 240 * k; }
+    else { pw = areaW; ph = Math.round(areaW * 3 / 4); if (ph > areaH) { ph = areaH; pw = Math.round(areaH * 4 / 3); } }
+    var center = ios ? 'position:absolute;left:' + Math.round((s.w - pw) / 2) + 'px;top:' + Math.round((s.h - ph) / 2) + 'px;' : 'margin-bottom:' + (mac ? 60 : 0) + 'px;';
+    P.pictureStyle = center + 'width:' + pw + 'px;height:' + ph + 'px;display:flex;align-items:center;justify-content:center;background:var(--bg-picture);border:1px solid var(--line)';
+    P.pictureText = 'Picture from the console · 320 × 240' + (s.prefs.scale === 'integer' ? ' · ' + Math.round(pw / 320) + '×' : '');
+    P.pictureLabel = 'The game’s picture, 320 by 240 pixels, shown ' + pw + ' by ' + ph;
+    P.hudButtons = [tb(running ? 'Pause' : 'Resume', running ? 'pause' : 'play', '⌘P', { type: 'togglePause' }), tb('Exit full screen', 'fullscreen', 'Esc', { type: 'fullscreen' })];
+  }
+  V.player = P;
+
+  /* ---- iOS ---- */
+  var O = { on: ios };
+  O.welcome = ios && (s.screen === 'welcome' || !s.bios);
+  O.library = ios && !!s.bios && s.screen !== 'welcome' && !inPlayer && s.win !== 'settings';
+  O.player = ios && inPlayer;
+  O.settings = ios && s.win === 'settings';
+  O.controlsStyle = 'position:absolute;inset:0;opacity:' + (s.sheet ? 0 : 0.85);
+  var padBtn = 'position:absolute;display:flex;align-items:center;justify-content:center;border:1px solid var(--fg-on-screen-muted);background:var(--bg-overlay);color:var(--fg-on-screen);font-weight:600;font-size:13px;cursor:pointer;';
+  function pad(label, x, y, w, h, radius, text, path, glyph) { return { label: label, text: text, path: path, glyph: glyph || 18, style: padBtn + 'left:' + x + 'px;top:' + y + 'px;width:' + w + 'px;height:' + h + 'px;border-radius:' + radius + 'px' }; }
+  O.pad = ios && inPlayer ? [
+    pad('L2', 16, 14, 64, 34, 10, 'L2', '', 0), pad('L1', 16, 56, 64, 34, 10, 'L1', '', 0),
+    pad('R2', s.w - 80, 14, 64, 34, 10, 'R2', '', 0), pad('R1', s.w - 80, 56, 64, 34, 10, 'R1', '', 0),
+    pad('Up', 74, 196, 48, 48, 10, '', ICON.up), pad('Down', 74, 292, 48, 48, 10, '', ICON.down), pad('Left', 26, 244, 48, 48, 10, '', ICON.left), pad('Right', 122, 244, 48, 48, 10, '', ICON.right),
+    pad('Triangle', s.w - 122, 190, 50, 50, 25, '', ICON.shapeTriangle), pad('Circle', s.w - 72, 240, 50, 50, 25, '', ICON.shapeCircle), pad('Cross', s.w - 122, 290, 50, 50, 25, '', ICON.shapeCross), pad('Square', s.w - 172, 240, 50, 50, 25, '', ICON.shapeSquare),
+    pad('Select', Math.round(s.w / 2) - 92, s.h - 46, 80, 30, 15, 'Select', '', 0), pad('Start', Math.round(s.w / 2) + 12, s.h - 46, 80, 30, 15, 'Start', '', 0)
+  ] : [];
+  O.groups = [
+    { title: 'Console', rows: [{ k: 'BIOS', v: b.file, go: refs.noop }, { k: 'Controllers', v: s.pads > 1 ? 'Wireless Controller' : 'On-screen', go: refs.noop }, { k: 'Memory cards', v: 'Each game its own', go: refs.noop }], foot: '' },
+    { title: 'Display', rows: [{ k: 'Scale', v: s.prefs.scale === 'fit' ? 'Fit the screen' : 'Whole multiples', go: refs.noop }, { k: 'On-screen controls', v: 'Shown', go: refs.noop }], foot: '' },
+    { title: 'Appearance', rows: [{ k: 'Theme', v: s.theme === 'dark' ? 'Dark' : s.theme === 'light' ? 'Light' : 'High contrast', go: refs.noop }, { k: 'Text size', v: 'Follows your iPhone', go: refs.noop }], foot: '' },
+    { title: 'About', rows: [{ k: 'Version', v: '0.1.0 (2)', go: refs.noop }, { k: 'Acknowledgements', v: '2', go: go({ type: 'openWin', win: 'acks' }) }], foot: 'iStation never sends anything off your iPhone.' }
+  ];
+  V.ios = O;
+
+  /* ---- windows ---- */
+  V.win = { settings: mac && s.win === 'settings', acks: s.win === 'acks', about: mac && s.win === 'about' };
+  V.winStyle = { acks: mac ? 'position:absolute;left:50%;top:80px;width:560px;height:calc(100% - 140px);margin-left:-280px;display:flex;flex-direction:column;border-radius:var(--radius-window);border:1px solid var(--line);background:var(--bg-window);box-shadow:0 20px 60px var(--shadow);overflow:hidden' : 'position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg-window);padding-top:40px' };
+  var stabs = today ? [['appearance', 'Appearance', 'palette']] : [['controllers', 'Controllers', 'gamepad'], ['video', 'Video', 'display'], ['audio', 'Audio', 'sound'], ['cards', 'Memory Cards', 'card'], ['appearance', 'Appearance', 'palette']];
+  if (personal) stabs.push(['personal', 'Personal', 'person']);
+  var tabOk = stabs.some(function (t) { return t[0] === s.settingsTab; });
+  var curTab = tabOk ? s.settingsTab : stabs[0][0];
+  var SG = { tabs: stabs.map(function (t) { return { label: t[1], icon: ICON[t[2]], pressed: curTab === t[0] ? 'true' : 'false', go: go({ type: 'settingsTab', tab: t[0] }) }; }) };
+  stabs.forEach(function (t) { if (t[0] === curTab) SG.title = t[1]; });
+  SG.controllers = curTab === 'controllers'; SG.video = curTab === 'video'; SG.audio = curTab === 'audio'; SG.cards = curTab === 'cards'; SG.appearance = curTab === 'appearance'; SG.personal = curTab === 'personal';
+  SG.pads = PADS.slice(s.pads > 1 ? 0 : 1).map(function (p, i) { return { name: p.name, detail: p.detail, icon: ICON[p.icon], port: s.pads > 1 ? p.port : 'Port 1', portId: p.portId }; });
+  SG.noPads = s.pads < 2;
+  SG.mapping = MAPPING.map(function (m) { return { button: m[0], pad: s.pads > 1 ? m[1] : 'None', key: m[2] }; });
+  function opt(label, pressed, a) { return { label: label, pressed: pressed ? 'true' : 'false', go: go(a) }; }
+  SG.scaleOpts = [opt('Fit the window', s.prefs.scale === 'fit', { type: 'pref', key: 'scale', value: 'fit' }), opt('Whole multiples', s.prefs.scale === 'integer', { type: 'pref', key: 'scale', value: 'integer' })];
+  SG.aspectOpts = [opt('TV shape (4:3)', s.prefs.aspect === '4:3', { type: 'pref', key: 'aspect', value: '4:3' }), opt('Square pixels', s.prefs.aspect === 'square', { type: 'pref', key: 'aspect', value: 'square' })];
+  SG.themeOpts = [opt('Dark', s.theme === 'dark', { type: 'theme', theme: 'dark' }), opt('Light', s.theme === 'light', { type: 'theme', theme: 'light' }), opt('High contrast', s.theme === 'contrast', { type: 'theme', theme: 'contrast' })];
+  SG.sizeOpts = [opt('Small', s.textSize === 's', { type: 'textSize', size: 's' }), opt('Medium', s.textSize === 'm', { type: 'textSize', size: 'm' }), opt('Large', s.textSize === 'l', { type: 'textSize', size: 'l' }), opt('Extra large', s.textSize === 'xl', { type: 'textSize', size: 'xl' })];
+  SG.policyOpts = [
+    { label: 'Give each game its own card', detail: 'Made the first time the game saves.', checked: s.prefs.cardPolicy === 'per-game', go: go({ type: 'pref', key: 'cardPolicy', value: 'per-game' }) },
+    { label: 'Share two cards across all games', detail: 'Like a console with cards in both slots.', checked: s.prefs.cardPolicy === 'shared', go: go({ type: 'pref', key: 'cardPolicy', value: 'shared' }) }
+  ];
+  SG.volumeText = s.prefs.volume + '%';
+  V.settings = SG;
+  V.acks = ACKS[mac ? 'macOS' : 'iOS'];
+  V.about = { version: 'Version 0.1.0 (2)', routine: personal ? 'Personal build: never distributed' : 'App Store build' };
+
+  /* ---- sheets ---- */
+  var SH = { on: !!s.sheet, title: '', subtitle: '', buttons: [] };
+  var sheetW = s.sheet === 'states' ? 640 : s.sheet === 'shortcuts' ? 620 : 520;
+  SH.style = mac
+    ? 'position:absolute;left:50%;top:' + (inPlayer && player.fullscreen ? 40 : 60) + 'px;width:' + Math.min(sheetW, s.w - 40) + 'px;margin-left:-' + Math.round(Math.min(sheetW, s.w - 40) / 2) + 'px;max-height:calc(100% - 90px);overflow:auto;display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:var(--radius-sheet);border:1px solid var(--line);background:var(--bg-raised);box-shadow:0 20px 60px var(--shadow)'
+    : 'position:absolute;left:0;right:0;bottom:0;max-height:' + (s.h > s.w ? '86%' : '96%') + ';overflow:auto;display:flex;flex-direction:column;gap:14px;padding:22px 20px 34px;border-radius:16px 16px 0 0;background:var(--bg-raised);box-shadow:0 -10px 40px var(--shadow)';
+  function sbtn(label, cls, a, opts) { var o = opts || {}; return { label: label, cls: 'btn ' + cls + (ios ? ' btn-wide' : ''), go: a ? go(a) : refs.noop, disabled: !!o.disabled, tip: o.tip || '', focus: !!o.focus }; }
+  var J = { on: s.sheet === 'job' && !!s.job, steps: [], progress: null, summary: '', summaryStyle: '', results: null, raw: '', contract: '' };
+  if (J.on) jobView(s, J, SH, sbtn);
+  V.job = J;
+  var PK = { on: s.sheet === 'picker' && !!s.picker, files: [], where: '', note: '', multi: 'false' };
+  if (PK.on) pickerView(s, PK, SH, sbtn, d);
+  V.pick = PK;
+  var ST = { on: s.sheet === 'states' && !!s.states, slots: [], note: '' };
+  if (ST.on) statesView(s, ST, SH, sbtn, d, ios);
+  V.states = ST;
+  V.keys = { on: s.sheet === 'shortcuts', groups: SHORTCUTS.map(function (g) { return { title: g.title, items: g.items.map(function (k) { return { label: k[0], key: k[1] }; }) }; }) };
+  if (V.keys.on) { SH.title = 'Keyboard Shortcuts'; SH.buttons = [sbtn('Done', 'btn-primary', { type: 'closeSheet' }, { focus: true })]; }
+  V.pause = { on: s.sheet === 'pause', items: [] };
+  if (V.pause.on) {
+    SH.title = player ? (gameById(s, player.gameId) || { name: 'BIOS' }).name : '';
+    SH.subtitle = player ? 'Paused · frame ' + fmtInt(player.frame) : '';
+    V.pause.items = [
+      { label: 'Resume', cls: 'btn btn-primary btn-wide', go: go({ type: 'closeSheet' }) },
+      { label: 'Save State', cls: 'btn btn-wide', go: go({ type: 'states', mode: 'save' }) },
+      { label: 'Load State', cls: 'btn btn-wide', go: go({ type: 'states', mode: 'load' }) },
+      { label: 'Reset…', cls: 'btn btn-wide', go: go({ type: 'ask', kind: 'reset' }) },
+      { label: 'Quit Game…', cls: 'btn btn-wide', go: go({ type: 'ask', kind: 'stop' }) }
+    ];
+  }
+  V.rename = { on: s.sheet === 'rename', value: s.rename, change: function (e) { d({ type: 'renameChange', value: e.target.value }); } };
+  if (V.rename.on) { SH.title = 'Rename'; SH.buttons = [sbtn('Cancel', '', { type: 'closeSheet' }), sbtn('Rename', 'btn-primary', { type: 'renameSave' }, { disabled: !s.rename.trim() })]; }
+  V.sheet = SH;
+
+  /* ---- dialogs ---- */
+  V.dialog = dialogView(s, go, mac);
+
+  V.toast = { on: !!s.toast, text: s.toast ? s.toast.text : '' };
+  return V;
+}
+
+function statusLine(s) {
+  var p = s.player;
+  if (!p) return '';
+  var parts = [p.status === 'running' ? 'Running' : 'Paused', 'frame ' + fmtInt(p.frame)];
+  if (p.status === 'running') parts.push(s.level === 'today' ? p.fps + ' frames a second' : p.fps + ' fps');
+  return parts.join(' · ');
+}
+
+function stepRow(label, detail, state) {
+  var icon = { done: ICON.checkCircle, running: ICON.spinner, failed: ICON.error, stopped: ICON.stopCircle, pending: ICON.pending, skipped: ICON.pending }[state];
+  var color = { done: 'var(--ok)', running: 'var(--info)', failed: 'var(--danger)', stopped: 'var(--warn)', pending: 'var(--fg-faint)', skipped: 'var(--fg-faint)' }[state];
+  var words = { done: 'Done', running: 'Working', failed: 'Failed', stopped: 'Stopped', pending: '', skipped: 'Skipped' }[state];
+  return { label: label, detail: detail, icon: icon, spinClass: state === 'running' ? 'spin' : '', iconStyle: 'flex:none;margin-top:1px;color:' + color, labelStyle: state === 'pending' ? 'color:var(--fg-muted)' : '', state: words, stateStyle: 'color:' + color };
+}
+
+function jobView(s, J, SH, sbtn) {
+  var j = s.job, today = s.level === 'today';
+  function st(i) { if (i < j.step) return 'done'; if (i > j.step) return 'pending'; return j.status === 'running' ? 'running' : j.status === 'failed' ? 'failed' : j.status === 'stopped' ? 'stopped' : 'done'; }
+  if (j.kind === 'bios') {
+    var wrong = j.file !== BIOS_OK.file;
+    J.contract = 'C01 C02 C03 C09 C10';
+    SH.title = 'Checking your BIOS';
+    SH.subtitle = j.file;
+    var labels = [['Read the file', wrong ? fmtInt(BIOS_WRONG.bytes) + ' bytes' : fmtInt(BIOS_OK.bytes) + ' bytes'], ['Check its size', 'A PS1 BIOS is 524,288 bytes (512 KB)'], ['Work out its fingerprint', wrong ? '' : sha(BIOS_OK.sha1)], ['Power on and run 60 frames', j.step >= 3 ? fmtInt(Math.min(j.n, 60)) + ' of 60 frames' : '']];
+    if (!today) labels.push(['Reach the BIOS’s shell', '']);
+    J.steps = labels.map(function (l, i) { return stepRow(l[0], l[1], j.status === 'done' ? 'done' : st(i)); });
+    if (j.status === 'running' && j.step === 3) J.progress = { value: j.n, max: 60, label: 'Frames run', text: fmtInt(j.n) + ' of 60 frames' };
+    if (j.status === 'failed') {
+      J.summary = 'This file is ' + fmtInt(BIOS_WRONG.bytes) + ' bytes. A PS1 BIOS is exactly 524,288 bytes. Choose the BIOS file itself.';
+      J.summaryStyle = 'padding:10px 12px;border-radius:var(--radius-control);background:var(--danger-bg);color:var(--danger)';
+      J.raw = 'PS1Console.powerOn(bios:) threw PS1Error.biosSize(' + BIOS_WRONG.bytes + ')';
+      SH.buttons = [sbtn('Cancel', '', { type: 'closeSheet' }), sbtn('Choose Another File…', 'btn-primary', { type: 'pick', purpose: 'bios' }, { focus: true })];
+    } else if (j.status === 'done') {
+      J.summary = today ? 'Your BIOS powered on and ran 60 frames. iStation can’t yet tell whether it reaches its shell.' : 'Your BIOS works: it reached its shell.';
+      J.summaryStyle = 'padding:10px 12px;border-radius:var(--radius-control);background:var(--ok-bg);color:var(--ok)';
+      SH.buttons = [sbtn('Continue', 'btn-primary', { type: 'closeSheet' }, { focus: true })];
+    } else if (j.status === 'stopped') {
+      J.summary = 'Stopped. iStation didn’t keep this BIOS.';
+      J.summaryStyle = 'padding:10px 12px;border-radius:var(--radius-control);background:var(--warn-bg);color:var(--warn)';
+      SH.buttons = [sbtn('Close', '', { type: 'closeSheet' }), sbtn('Check Again', 'btn-primary', { type: 'pick', purpose: 'bios' })];
+    } else SH.buttons = [sbtn('Stop', '', { type: 'stopJob' }, { tip: 'Stop (⌘.)' })];
+  } else if (j.kind === 'scan') {
+    J.contract = 'C11 C14 C15 C16 C17 C18 C20';
+    SH.title = 'Adding games from ' + j.folder;
+    var found = j.step >= 1 ? j.total + ' found' : 'Looking for .cue, .iso, .m3u and .exe files';
+    var steps2 = [['Find disc images', found], ['Read each disc', j.step >= 1 ? fmtInt(Math.min(j.n, j.total)) + ' of ' + j.total : 'Its SYSTEM.CNF says which console and serial'], ['Add them to your library', '']];
+    J.steps = steps2.map(function (l, i) { return stepRow(l[0], l[1], j.status === 'done' ? 'done' : st(i)); });
+    if (j.status === 'running' && j.step === 1) J.progress = { value: j.n, max: j.total, label: 'Discs read', text: 'Reading ' + Math.min(j.n + 1, j.total) + ' of ' + j.total + ' · ' + SCAN_FILES[Math.min(j.n, j.total - 1)].file };
+    var done = SCAN_FILES.slice(0, j.n);
+    var added = done.filter(function (f) { return f.outcome === 'add'; }).length, skipped = done.filter(function (f) { return f.outcome === 'skip'; }).length, failed = done.filter(function (f) { return f.outcome === 'fail'; }).length;
+    if (j.n > 0) J.results = done.map(function (f) {
+      var c = f.outcome === 'add' ? 'var(--ok)' : f.outcome === 'skip' ? 'var(--fg-muted)' : 'var(--danger)';
+      return { file: f.file, note: f.outcome === 'add' ? 'Added · ' + f.note : f.note, code: f.code || '', icon: f.outcome === 'add' ? ICON.checkCircle : f.outcome === 'skip' ? ICON.pending : ICON.error, iconStyle: 'flex:none;margin-top:2px;color:' + c, noteStyle: f.outcome === 'fail' ? 'color:var(--danger)' : 'color:var(--fg-muted)' };
+    });
+    var tallyParts = [];
+    if (added) tallyParts.push('Added ' + added + (added === 1 ? ' game.' : ' games.'));
+    if (skipped) tallyParts.push(skipped + ' already in your library.');
+    if (failed) tallyParts.push(failed + ' couldn’t be added.');
+    var tally = tallyParts.length ? tallyParts.join(' ') : 'Nothing added yet.';
+    if (j.status === 'done') { J.summary = tally; J.summaryStyle = 'padding:10px 12px;border-radius:var(--radius-control);background:var(--ok-bg);color:var(--ok)'; SH.buttons = [sbtn('Done', 'btn-primary', { type: 'closeSheet' }, { focus: true })]; }
+    else if (j.status === 'stopped') { J.summary = (j.n ? 'Stopped after ' + j.n + ' of ' + j.total + '. ' + tally + ' Scan Again skips the games already added.' : 'Stopped before reading any disc. Scan Again starts over.'); J.summaryStyle = 'padding:10px 12px;border-radius:var(--radius-control);background:var(--warn-bg);color:var(--warn)'; SH.buttons = [sbtn('Done', '', { type: 'closeSheet' }), sbtn('Scan Again', 'btn-primary', { type: 'rescan' }, { focus: true })]; }
+    else SH.buttons = [sbtn('Stop', '', { type: 'stopJob' }, { tip: 'Stop (⌘.)' })];
+  } else if (j.kind === 'open') {
+    var og = gameById(s, j.id);
+    J.contract = 'C11 C14 C01 C30';
+    SH.title = 'Opening ' + (og ? og.name : '');
+    var steps3 = [['Open the file', og ? og.file : ''], ['Read its SYSTEM.CNF', og ? og.console.toUpperCase() + ' · ' + (og.serial || 'no serial') : ''], ['Power on with your BIOS', BIOS_OK.file], ['Insert the disc', og && og.discs > 1 ? 'Disc 1 of ' + og.discs : '']];
+    J.steps = steps3.map(function (l, i) { return stepRow(l[0], l[1], st(i)); });
+    SH.buttons = [sbtn('Cancel', '', { type: 'stopJob' }, { tip: 'Cancel (⌘.)' })];
+  } else if (j.kind === 'trace') {
+    J.contract = 'C42';
+    SH.title = 'Recording a trace';
+    SH.subtitle = 'To ~/Traces · personal build';
+    var steps4 = [['Power on with your BIOS', BIOS_OK.file], ['Run ' + j.total + ' frames', j.step >= 1 ? fmtInt(Math.min(j.n, j.total)) + ' of ' + j.total : ''], ['Finish the trace files', 'cpu.trace, frames.trace']];
+    J.steps = steps4.map(function (l, i) { return stepRow(l[0], l[1], j.status === 'done' ? 'done' : st(i)); });
+    if (j.status === 'running' && j.step === 1) J.progress = { value: j.n, max: j.total, label: 'Frames recorded', text: 'Frame ' + j.n + ' of ' + j.total };
+    if (j.status === 'done') { J.raw = RECORDED.run60; SH.buttons = [sbtn('Done', 'btn-primary', { type: 'closeSheet' }, { focus: true })]; }
+    else if (j.status === 'stopped') { J.summary = 'Stopped at frame ' + j.n + '. A trace can’t be resumed, so iStation deleted the unfinished files.'; J.summaryStyle = 'padding:10px 12px;border-radius:var(--radius-control);background:var(--warn-bg);color:var(--warn)'; SH.buttons = [sbtn('Close', '', { type: 'closeSheet' }), sbtn('Record Again', 'btn-primary', { type: 'traceStart' })]; }
+    else SH.buttons = [sbtn('Stop', '', { type: 'stopJob' }, { tip: 'Stop (⌘.)' })];
+  }
+}
+
+function pickerView(s, PK, SH, sbtn, d) {
+  var p = s.picker;
+  var sets = {
+    bios: { title: 'Choose your BIOS file', where: '~/Documents/Console', note: 'iStation reads this file where it is and keeps a bookmark to it. It never copies it.', ok: 'Choose', files: [['my-console-bios.bin', 524288, 'chip'], ['bios-backup.zip', 271384, 'doc']] },
+    games: { title: 'Add Games', where: '~/Games/PS1', note: 'Choose a .cue (its .bin tracks come with it), an .iso, an .m3u or a PS-EXE. iStation reads them where they are.', ok: 'Add', files: [['Glass Orchard (Europe).cue', 398458880, 'disc'], ['Tidepool.m3u', 1953021952, 'disc'], ['gpu-test.exe', 34816, 'exe']] },
+    folder: { title: 'Add a Folder', where: '~', note: 'iStation looks inside this folder and its subfolders for disc images.', ok: 'Add Folder', files: [['Games', -1, 'folder'], ['Documents', -1, 'folder'], ['Downloads', -1, 'folder']] },
+    locate: { title: 'Locate “Lantern Street.cue”', where: '~/Games/PS1/Moved', note: 'iStation updates its bookmark to the file you choose.', ok: 'Choose', files: [['Lantern Street.cue', 402653184, 'disc']] },
+    traceLeft: { title: 'Choose the left trace', where: '~/Traces', note: 'TraceKit trace files.', ok: 'Choose', files: [['cpu-check.trace', 1424857, 'doc'], ['zero-image.trace', 1415641, 'doc']] },
+    traceRight: { title: 'Choose the right trace', where: '~/Traces', note: 'TraceKit trace files.', ok: 'Choose', files: [['cpu-check.trace', 1424857, 'doc'], ['zero-image.trace', 1415641, 'doc']] }
+  };
+  var c = sets[p.purpose];
+  SH.title = c.title; PK.where = c.where; PK.note = c.note; PK.multi = p.purpose === 'games' ? 'true' : 'false';
+  PK.files = c.files.map(function (f) {
+    var on = p.sel.indexOf(f[0]) >= 0;
+    return { name: f[0], aria: f[0] + ', ' + (f[1] < 0 ? 'folder' : fmtBytes(f[1])), size: f[1] < 0 ? 'Folder' : fmtBytes(f[1]), icon: ICON[f[2]] || ICON.doc, selected: on ? 'true' : 'false', bg: on ? 'background:var(--bg-selected)' : '', toggle: function () { d({ type: 'pickToggle', name: f[0] }); }, open: function () { d({ type: 'pickOpenFile', name: f[0] }); } };
+  });
+  SH.buttons = [sbtn('Cancel', '', { type: 'closeSheet' }), sbtn(c.ok, 'btn-primary', { type: 'pickOpen' }, { disabled: p.sel.length === 0, focus: true })];
+}
+
+function statesView(s, ST, SH, sbtn, d, ios) {
+  var st = s.states, save = st.mode === 'save';
+  var g = s.player ? gameById(s, s.player.gameId) : null;
+  SH.title = save ? 'Save State' : 'Load State';
+  SH.subtitle = g ? g.name : '';
+  ST.slots = s.slots.map(function (sl) {
+    var on = sl.n === st.sel;
+    return {
+      title: 'Slot ' + sl.n, when: sl.saved || 'Empty', frame: sl.saved ? 'frame ' + fmtInt(sl.frame) + ' · format ' + sl.format : ' ', old: !!sl.saved && sl.format !== 2,
+      ring: on ? 'border:2px solid var(--accent);padding:7px' : '', pressed: on ? 'true' : 'false',
+      aria: 'Slot ' + sl.n + ', ' + (sl.saved ? 'saved ' + sl.saved : 'empty'),
+      thumb: 'height:64px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:var(--bg-screen);border:1px solid var(--line)',
+      thumbText: sl.saved ? 'picture' : '',
+      select: function () { d({ type: 'slotSelect', n: sl.n }); }, commit: function () { d({ type: 'slotCommitAt', n: sl.n }); }
+    };
+  });
+  var cur = s.slots[st.sel - 1];
+  ST.note = save ? 'A save state holds the whole console at this moment. This version writes format 2.' : 'Loading replaces what’s happening now. This version reads format 2.';
+  SH.buttons = [sbtn('Cancel', '', { type: 'closeSheet' }), sbtn(save ? (cur.saved ? 'Replace Slot ' + cur.n + '…' : 'Save to Slot ' + cur.n) : 'Load Slot ' + cur.n, 'btn-primary', { type: 'slotCommit' }, { disabled: !save && !cur.saved, focus: true })];
+}
+
+function dialogView(s, go, mac) {
+  var D = { on: !!s.dialog, title: '', message: '', details: '', icon: ICON.warn, iconStyle: 'color:var(--warn)', buttons: [], contract: '' };
+  D.style = 'position:absolute;left:50%;top:' + (mac ? 140 : Math.round(s.h * 0.3)) + 'px;width:' + (mac ? 320 : 290) + 'px;margin-left:-' + (mac ? 160 : 145) + 'px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:20px;border-radius:var(--radius-sheet);border:1px solid var(--line);background:var(--bg-raised);box-shadow:0 20px 60px var(--shadow)';
+  D.buttonRow = 'display:flex;gap:8px;align-self:stretch;margin-top:6px;' + (mac ? '' : 'flex-direction:column');
+  if (!D.on) return D;
+  var dl = s.dialog, g = gameById(s, dl.id) || (s.player ? gameById(s, s.player.gameId) : null);
+  function btn(label, cls, choice, focus) { return { label: label, cls: 'btn ' + cls, go: go(choice === 'cancel' ? { type: 'cancelDialog' } : { type: 'confirm', choice: choice }), focus: !!focus }; }
+  var today = s.level === 'today';
+  switch (dl.kind) {
+    case 'reset':
+      D.contract = 'C06'; D.title = 'Reset the console?'; D.message = 'The game starts again from the beginning. Anything you haven’t saved is lost.';
+      D.details = 'PS1Console.powerOn(bios:) with my-console-bios.bin (524,288 bytes)' + (g ? '\nthen insertDisc(_:) with ' + g.file + '   (gap G9)' : '');
+      D.buttons = [btn('Cancel', '', 'cancel', true), btn('Reset', 'btn-danger', 'ok')]; break;
+    case 'stop':
+      D.contract = 'C50'; D.title = g ? 'Stop playing ' + g.name + '?' : 'Stop the BIOS?'; D.message = 'Anything you haven’t saved is lost.';
+      D.details = 'Ends the console’s run loop and releases it. The disc image and your BIOS aren’t changed.';
+      D.buttons = [btn('Cancel', '', 'cancel', true)];
+      if (g && !today) D.buttons.push(btn('Save First…', '', 'save'));
+      D.buttons.push(btn('Stop', 'btn-danger', 'ok')); break;
+    case 'remove':
+      D.contract = 'C51'; D.icon = ICON.info; D.iconStyle = 'color:var(--info)';
+      D.title = 'Remove “' + (g ? g.name : '') + '” from your library?'; D.message = 'The disc image stays on your Mac, and so do its save states and memory card. You can add it again any time.';
+      D.details = 'Deletes its entry and bookmark from library.json in iStation’s container.\nLeaves ' + (g ? g.folder + '/' + g.file : '') + ' untouched.';
+      D.buttons = [btn('Cancel', '', 'cancel', true), btn('Remove', 'btn-primary', 'ok')]; break;
+    case 'card-delete':
+      var c = null; s.cards.forEach(function (x) { if (x.id === dl.id) c = x; });
+      D.contract = 'C34'; D.title = 'Move “' + (c ? c.name : '') + '” to the Trash?'; D.message = 'The saves on this card go with it. You can put it back from the Trash in the Finder.';
+      D.details = 'FileManager.trashItem(at: …/Memory Cards/' + (c ? c.file : '') + ')';
+      D.buttons = [btn('Cancel', '', 'cancel', true), btn('Move to Trash', 'btn-danger', 'ok')]; break;
+    case 'overwrite':
+      var o = s.slots[dl.slot - 1];
+      D.contract = 'C31'; D.title = 'Replace the save in slot ' + dl.slot + '?'; D.message = 'Slot ' + dl.slot + ' holds a save from ' + o.saved + '. Replacing it can’t be undone.';
+      D.details = 'PS1Console.saveState() → slot-' + dl.slot + '.state, format 2   (gap G7)';
+      D.buttons = [btn('Cancel', '', 'cancel', true), btn('Replace', 'btn-danger', 'ok')]; break;
+    case 'load':
+      D.contract = 'C31'; D.icon = ICON.info; D.iconStyle = 'color:var(--info)';
+      D.title = 'Load slot ' + dl.slot + '?'; D.message = 'What’s happening now is replaced by the save from ' + s.slots[dl.slot - 1].saved + '. Save first if you want to keep it.';
+      D.details = 'PS1Console.loadState(_:) from slot-' + dl.slot + '.state   (gap G7)';
+      D.buttons = [btn('Cancel', '', 'cancel', true), btn('Load', 'btn-primary', 'ok')]; break;
+    case 'version':
+      D.contract = 'C32'; D.icon = ICON.error; D.iconStyle = 'color:var(--danger)';
+      D.title = 'This save can’t be loaded'; D.message = 'Slot ' + dl.slot + ' was saved by an earlier iStation in format 1. This version reads format 2.';
+      D.details = 'loadState(_:) threw SaveStateError.unsupportedVersion(found: 1, supported: 2...2)   (gap G7)';
+      D.buttons = [btn('OK', 'btn-primary', 'cancel', true)]; break;
+    case 'ps2':
+      D.contract = 'C35 C36'; D.icon = ICON.info; D.iconStyle = 'color:var(--info)';
+      D.title = (g ? g.name : 'This game') + ' is a PS2 game'; D.message = 'Its disc says it boots on a PS2. This version of iStation plays PS1 games; PS2 games come in a later version.';
+      D.details = 'SystemCNF(text:) → console: .ps2, serial: "' + (g ? g.serial : '') + '"   (from BOOT2 in SYSTEM.CNF)';
+      D.buttons = [btn('OK', 'btn-primary', 'cancel', true)]; break;
+    case 'missing':
+      D.contract = 'C12'; D.title = 'iStation can’t find “' + (g ? g.file : '') + '”'; D.message = 'It was in ' + (g ? g.folder : '') + '. It may have been moved, renamed or deleted.';
+      D.details = 'URL(resolvingBookmarkData:bookmarkDataIsStale:) → the file doesn’t exist';
+      D.buttons = [btn('Remove from Library', '', 'remove'), btn('Locate…', 'btn-primary', 'ok', true)]; break;
+  }
+  return D;
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = initialState(props);
+    this.cur = this.state;
+    var self = this;
+    this.refsBag = {
+      root: function (el) { self.rootEl = el; },
+      search: function (el) { self.searchEl = el; },
+      noop: function () {},
+      onKey: function (e) { self.onKey(e); }
+    };
+  }
+  componentDidMount() {
+    var still = this.props.still === true || this.props.still === 'true';
+    var self = this;
+    if (!still) this.timer = setInterval(function () { self.commit(advance(self.cur)); }, 100);
+  }
+  componentWillUnmount() { if (this.timer) clearInterval(this.timer); }
+  componentDidUpdate(prevProps, prevState) {
+    var hadOverlay = prevState && (prevState.dialog || prevState.sheet || prevState.win);
+    var hasOverlay = this.state.dialog || this.state.sheet || this.state.win;
+    if (hadOverlay && !hasOverlay && this.rootEl && typeof document !== 'undefined' && (document.activeElement === document.body || !document.activeElement)) this.rootEl.focus({ preventScroll: true });
+  }
+  commit(next) { this.cur = next; this.setState(next); }
+  dispatch(a) {
+    if (a.type === 'focusSearch') { if (this.searchEl) this.searchEl.focus(); return; }
+    this.commit(reduce(this.cur, a));
+  }
+  onKey(e) {
+    var a = keyAction(this.state, e);
+    if (!a) return;
+    var tag = e.target && e.target.tagName;
+    if ((tag === 'INPUT' || tag === 'SELECT') && (a.type === 'move' || a.type === 'play' || a.type === 'ask')) return;
+    if (tag === 'BUTTON' && a.type === 'play') return;
+    e.preventDefault();
+    this.dispatch(a);
+  }
+  renderVals() {
+    var self = this;
+    return view(this.state, function (a) { self.dispatch(a); }, this.refsBag);
+  }
+}
+</script>
+</body>
+</html>

@@ -12,11 +12,12 @@ How we work: features are discussed in chat, written up here (and in [SPEC.md](S
 
 ### v0.1.0 — The first picture
 
-- [ ] The GPU and its software rasterizer, ported from ProjectPSX
+- [ ] The GPU and its software rasterizer, ported from ProjectPSX (its document is [6b](../../backlog/darwin/v0.1.0/interface-picture.md)'s split)
 - [ ] DMA and timers in full
-- [ ] The narrow core interface ([ADR 0015](../../adrs/darwin/a-core-is-a-cpu-module-and-a-console-module.md) §5) and EmuKit's Metal presentation of frames
+- [ ] The narrow core interface ([ADR 0015](../../adrs/darwin/a-core-is-a-cpu-module-and-a-console-module.md) §5) and EmuKit's Metal presentation of frames: booting a PS-EXE, the BIOS's shell and personal-build debug values ([6a](../../backlog/darwin/v0.1.0/interface-boot-shell-and-debug.md)), the picture and VRAM ([6b](../../backlog/darwin/v0.1.0/interface-picture.md))
 - [ ] Per-frame VRAM recorded from SwanStation and compared
 - [ ] The boot's guest RAM matching SwanStation's frame by frame, moved from v0.0.1's gate (the user's call, 2026-11-14): the shell waits on the GPU's VRAM transfers, and the boot's pace needs closer timing — the instruction cache, timer reads within a slice ([Milestone L](MILESTONES.md#milestone-l--the-bios-boots))
+- [ ] The app's design, its Today parts ([`design/darwin/`](../../design/darwin/README.md), 2026-11-21; BIOS and game import moved here from v0.2.0, the user's call, 2026-11-21): the design's tokens in `styles` ([5a](../../backlog/darwin/v0.1.0/design-tokens-in-styles.md)), the console session and the player ([5b](../../backlog/darwin/v0.1.0/console-session-and-player.md)), first run and the BIOS ([5c](../../backlog/darwin/v0.1.0/first-run-and-the-bios.md)), the library of files with PS-EXEs that play ([5d](../../backlog/darwin/v0.1.0/library-of-files.md)), Settings and the other windows ([5e](../../backlog/darwin/v0.1.0/windows-settings-and-shortcuts.md)), the personal build's Tools ([5f](../../backlog/darwin/v0.1.0/personal-tools.md)), the picture on screen ([5g](../../backlog/darwin/v0.1.0/the-picture-on-screen.md))
 - [ ] Gate: the BIOS's shell and a homebrew PS-EXE draw in the macOS app, VRAM matching SwanStation's frame by frame
 
 ## Shipped
@@ -48,22 +49,23 @@ Then the repository takes the layout and procedure of the user's Apogee reposito
 
 ### v0.2.0 — PS1 games boot
 
-- [ ] The CD-ROM drive and disc images, its timing fixed against psx-spx, test suites and SwanStation's recorded behaviour (ProjectPSX's known weak spot)
-- [ ] The GTE, SPU and MDEC (MDEC timing fixed the same way)
-- [ ] Pads and memory cards, through the GameController framework
-- [ ] BIOS and game import through the file picker, access kept across launches under the App Sandbox
-- [ ] Save states, versioned ([ADR 0016](../../adrs/darwin/two-build-routines-and-a-fresh-start.md) §5)
+- [ ] The CD-ROM drive and disc images, its timing fixed against psx-spx, test suites and SwanStation's recorded behaviour (ProjectPSX's known weak spot): its document is [6d](../../backlog/darwin/v0.2.0/interface-discs.md)'s split; playing discs ([5i](../../backlog/darwin/v0.2.0/playing-discs.md))
+- [ ] The GTE, SPU and MDEC (MDEC timing fixed the same way); the SPU's document is [6i](../../backlog/darwin/v0.3.0/interface-sound.md)'s split
+- [ ] Pads and memory cards, through the GameController framework: pads ([6e](../../backlog/darwin/v0.2.0/interface-pads.md)), Controllers ([5j](../../backlog/darwin/v0.2.0/controllers-settings.md)), memory cards ([6f](../../backlog/darwin/v0.2.0/interface-memory-cards.md), [5k](../../backlog/darwin/v0.2.0/memory-cards-pane.md))
+- [ ] Discs read in the library: the readers in a product ([6c](../../backlog/darwin/v0.2.0/interface-disc-readers.md)), console, serial and PS2 refused ([5h](../../backlog/darwin/v0.2.0/library-reads-discs.md)). BIOS and game import through the file picker moved to v0.1.0 (5c, 5d; the user's call, 2026-11-21)
+- [ ] Save states, versioned ([ADR 0016](../../adrs/darwin/two-build-routines-and-a-fresh-start.md) §5): [6g](../../backlog/darwin/v0.2.0/interface-save-states.md), [5l](../../backlog/darwin/v0.2.0/save-states-sheet.md)
+- [ ] The video standard, PAL or NTSC, paced and shown ([6h](../../backlog/darwin/v0.2.0/interface-video-standard.md))
 - [ ] Gate: a PS1 game the user owns boots and plays in the macOS app (the user's run)
 
 ### v0.3.0 — Metal, audio and input
 
-- [ ] A Metal renderer, checked against the software rasterizer
-- [ ] Audio through Core Audio / AVAudioEngine
+- [ ] A Metal renderer, checked against the software rasterizer; choosing it ([6j](../../backlog/darwin/v0.3.0/interface-renderer-choice.md))
+- [ ] Audio through Core Audio / AVAudioEngine ([6i](../../backlog/darwin/v0.3.0/interface-sound.md)), Settings › Audio ([5m](../../backlog/darwin/v0.3.0/audio-settings.md))
 - [ ] Gate: PS1 games run at full speed on Apple Silicon with Metal, sound and a controller
 
 ### v0.4.0 — The iOS app
 
-- [ ] The iOS app target playing PS1, interpreter only
+- [ ] The iOS app target playing PS1, interpreter only: first run, library and settings ([5n](../../backlog/darwin/ios/v0.4.0/iphone-library-and-settings.md)), the player ([5o](../../backlog/darwin/ios/v0.4.0/iphone-player.md))
 - [ ] Gate: a PS1 game plays on an iPhone or iPad
 
 ### v1.0.0 — Release: PS1 on the App Stores

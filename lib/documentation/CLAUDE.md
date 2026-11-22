@@ -8,6 +8,7 @@ The documentation is split **by kind, then by platform**, so each kind of docume
 | [`backlog/`](backlog/README.md) | The work queue: each application's index (its `README.md`) and one document per pending item |
 | [`adrs/`](adrs/README.md) | The architecture decision records, dated and append-only |
 | [`reference/`](reference/README.md) | The contracts iStation builds against and writes |
+| [`design/`](design/README.md) | Each app's design: the prototype, a board per screen and state, its contract with the code, and its tokens, mirrored from a Claude Design canvas |
 
 Inside each kind, one folder per platform:
 

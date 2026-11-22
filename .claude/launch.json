@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "design",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8791", "--bind", "127.0.0.1", "--directory", "lib/documentation/design/darwin"],
+      "port": 8791
+    }
+  ]
+}

@@ -1,0 +1,819 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-22T01:30:25Z"
+  },
+  "title": "iStation App Design",
+  "launch": {
+    "view": "canvas",
+    "page": "build"
+  },
+  "pages": [
+    {
+      "id": "build",
+      "name": "Build"
+    },
+    {
+      "id": "foundations",
+      "name": "Foundations"
+    },
+    {
+      "id": "exploration",
+      "name": "Exploration"
+    }
+  ],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 800,
+      "title": "App: the whole prototype, clock running",
+      "page": "build",
+      "is_interactive": true
+    },
+    "Mac-Welcome.dc.html": {
+      "x": 0,
+      "y": 1220,
+      "w": 1280,
+      "h": 800,
+      "title": "Welcome, no BIOS yet",
+      "page": "build"
+    },
+    "Mac-BiosPicker.dc.html": {
+      "x": 1360,
+      "y": 1220,
+      "w": 1280,
+      "h": 800,
+      "title": "Choosing the BIOS file",
+      "page": "build"
+    },
+    "Mac-BiosChecking.dc.html": {
+      "x": 2720,
+      "y": 1220,
+      "w": 1280,
+      "h": 800,
+      "title": "Checking the BIOS (running)",
+      "page": "build"
+    },
+    "Mac-BiosWrongSize.dc.html": {
+      "x": 4080,
+      "y": 1220,
+      "w": 1280,
+      "h": 800,
+      "title": "A file of the wrong size (refused)",
+      "page": "build"
+    },
+    "Mac-BiosDone.dc.html": {
+      "x": 5440,
+      "y": 1220,
+      "w": 1280,
+      "h": 800,
+      "title": "The BIOS checks out (done)",
+      "page": "build"
+    },
+    "Mac-LibraryEmpty.dc.html": {
+      "x": 6800,
+      "y": 1220,
+      "w": 1280,
+      "h": 800,
+      "title": "An empty library",
+      "page": "build"
+    },
+    "Mac-Library.dc.html": {
+      "x": 0,
+      "y": 2440,
+      "w": 1280,
+      "h": 800,
+      "title": "Library as a list",
+      "page": "build"
+    },
+    "Mac-LibraryGrid.dc.html": {
+      "x": 1360,
+      "y": 2440,
+      "w": 1280,
+      "h": 800,
+      "title": "Library as a grid",
+      "page": "build"
+    },
+    "Mac-LibraryInspector.dc.html": {
+      "x": 2720,
+      "y": 2440,
+      "w": 1280,
+      "h": 800,
+      "title": "Game info",
+      "page": "build"
+    },
+    "Mac-LibrarySearchEmpty.dc.html": {
+      "x": 4080,
+      "y": 2440,
+      "w": 1280,
+      "h": 800,
+      "title": "Search with no results",
+      "page": "build"
+    },
+    "Mac-LibraryMissing.dc.html": {
+      "x": 5440,
+      "y": 2440,
+      "w": 1280,
+      "h": 800,
+      "title": "A game whose file moved",
+      "page": "build"
+    },
+    "Mac-LibraryPs2.dc.html": {
+      "x": 6800,
+      "y": 2440,
+      "w": 1280,
+      "h": 800,
+      "title": "A PS2 game, before PS2 plays",
+      "page": "build"
+    },
+    "Mac-Ps2Refused.dc.html": {
+      "x": 0,
+      "y": 3360,
+      "w": 1280,
+      "h": 800,
+      "title": "Playing a PS2 game (refused)",
+      "page": "build"
+    },
+    "Mac-RemoveConfirm.dc.html": {
+      "x": 1360,
+      "y": 3360,
+      "w": 1280,
+      "h": 800,
+      "title": "Remove from Library (confirm)",
+      "page": "build"
+    },
+    "Mac-Rename.dc.html": {
+      "x": 2720,
+      "y": 3360,
+      "w": 1280,
+      "h": 800,
+      "title": "Rename a game",
+      "page": "build"
+    },
+    "Mac-LibraryMin.dc.html": {
+      "x": 4080,
+      "y": 3360,
+      "w": 800,
+      "h": 560,
+      "title": "Library at the minimum window size",
+      "page": "build"
+    },
+    "Mac-LibraryLight.dc.html": {
+      "x": 4960,
+      "y": 3360,
+      "w": 1280,
+      "h": 800,
+      "title": "Library, light theme",
+      "page": "build"
+    },
+    "Mac-LibraryContrast.dc.html": {
+      "x": 6320,
+      "y": 3360,
+      "w": 1280,
+      "h": 800,
+      "title": "Library, high-contrast theme",
+      "page": "build"
+    },
+    "Mac-ScanPicker.dc.html": {
+      "x": 0,
+      "y": 4580,
+      "w": 1280,
+      "h": 800,
+      "title": "Choosing a folder",
+      "page": "build"
+    },
+    "Mac-ScanRunning.dc.html": {
+      "x": 1360,
+      "y": 4580,
+      "w": 1280,
+      "h": 800,
+      "title": "Scanning (running)",
+      "page": "build"
+    },
+    "Mac-ScanStopped.dc.html": {
+      "x": 2720,
+      "y": 4580,
+      "w": 1280,
+      "h": 800,
+      "title": "Scan stopped",
+      "page": "build"
+    },
+    "Mac-ScanDone.dc.html": {
+      "x": 4080,
+      "y": 4580,
+      "w": 1280,
+      "h": 800,
+      "title": "Scan done",
+      "page": "build"
+    },
+    "Mac-PlayerOpening.dc.html": {
+      "x": 0,
+      "y": 5800,
+      "w": 1280,
+      "h": 800,
+      "title": "Opening a game (loading)",
+      "page": "build"
+    },
+    "Mac-PlayerRunning.dc.html": {
+      "x": 1360,
+      "y": 5800,
+      "w": 1280,
+      "h": 800,
+      "title": "Running",
+      "page": "build"
+    },
+    "Mac-PlayerPaused.dc.html": {
+      "x": 2720,
+      "y": 5800,
+      "w": 1280,
+      "h": 800,
+      "title": "Paused (stopped)",
+      "page": "build"
+    },
+    "Mac-PlayerFullscreen.dc.html": {
+      "x": 4080,
+      "y": 5800,
+      "w": 1280,
+      "h": 800,
+      "title": "Full screen",
+      "page": "build"
+    },
+    "Mac-ResetConfirm.dc.html": {
+      "x": 5440,
+      "y": 5800,
+      "w": 1280,
+      "h": 800,
+      "title": "Reset (confirm)",
+      "page": "build"
+    },
+    "Mac-StopConfirm.dc.html": {
+      "x": 6800,
+      "y": 5800,
+      "w": 1280,
+      "h": 800,
+      "title": "Stop playing (confirm)",
+      "page": "build"
+    },
+    "Mac-PlayerDebug.dc.html": {
+      "x": 0,
+      "y": 6720,
+      "w": 1280,
+      "h": 800,
+      "title": "Debug drawer, personal build",
+      "page": "build"
+    },
+    "Mac-PlayerMin.dc.html": {
+      "x": 1360,
+      "y": 6720,
+      "w": 800,
+      "h": 560,
+      "title": "Player at the minimum window size",
+      "page": "build"
+    },
+    "Mac-StatesSave.dc.html": {
+      "x": 0,
+      "y": 7940,
+      "w": 1280,
+      "h": 800,
+      "title": "Save State",
+      "page": "build"
+    },
+    "Mac-StatesOverwrite.dc.html": {
+      "x": 1360,
+      "y": 7940,
+      "w": 1280,
+      "h": 800,
+      "title": "Replace a save (confirm)",
+      "page": "build"
+    },
+    "Mac-StatesLoad.dc.html": {
+      "x": 2720,
+      "y": 7940,
+      "w": 1280,
+      "h": 800,
+      "title": "Load State",
+      "page": "build"
+    },
+    "Mac-StatesVersionError.dc.html": {
+      "x": 4080,
+      "y": 7940,
+      "w": 1280,
+      "h": 800,
+      "title": "A save in an older format (error)",
+      "page": "build"
+    },
+    "Mac-Cards.dc.html": {
+      "x": 0,
+      "y": 9160,
+      "w": 1280,
+      "h": 800,
+      "title": "Memory cards",
+      "page": "build"
+    },
+    "Mac-CardsEmpty.dc.html": {
+      "x": 1360,
+      "y": 9160,
+      "w": 1280,
+      "h": 800,
+      "title": "No memory cards yet (empty)",
+      "page": "build"
+    },
+    "Mac-CardDelete.dc.html": {
+      "x": 2720,
+      "y": 9160,
+      "w": 1280,
+      "h": 800,
+      "title": "Move a card to the Trash (confirm)",
+      "page": "build"
+    },
+    "Mac-BiosPane.dc.html": {
+      "x": 4080,
+      "y": 9160,
+      "w": 1280,
+      "h": 800,
+      "title": "BIOS",
+      "page": "build"
+    },
+    "Mac-SettingsControllers.dc.html": {
+      "x": 0,
+      "y": 10380,
+      "w": 1280,
+      "h": 800,
+      "title": "Settings: Controllers",
+      "page": "build"
+    },
+    "Mac-SettingsNoControllers.dc.html": {
+      "x": 1360,
+      "y": 10380,
+      "w": 1280,
+      "h": 800,
+      "title": "Settings: no controller connected (empty)",
+      "page": "build"
+    },
+    "Mac-SettingsVideo.dc.html": {
+      "x": 2720,
+      "y": 10380,
+      "w": 1280,
+      "h": 800,
+      "title": "Settings: Video",
+      "page": "build"
+    },
+    "Mac-SettingsAudio.dc.html": {
+      "x": 4080,
+      "y": 10380,
+      "w": 1280,
+      "h": 800,
+      "title": "Settings: Audio",
+      "page": "build"
+    },
+    "Mac-SettingsCards.dc.html": {
+      "x": 5440,
+      "y": 10380,
+      "w": 1280,
+      "h": 800,
+      "title": "Settings: Memory Cards",
+      "page": "build"
+    },
+    "Mac-SettingsAppearance.dc.html": {
+      "x": 6800,
+      "y": 10380,
+      "w": 1280,
+      "h": 800,
+      "title": "Settings: Appearance",
+      "page": "build"
+    },
+    "Mac-SettingsPersonal.dc.html": {
+      "x": 0,
+      "y": 11300,
+      "w": 1280,
+      "h": 800,
+      "title": "Settings: Personal (personal build)",
+      "page": "build"
+    },
+    "Mac-Acknowledgements.dc.html": {
+      "x": 1360,
+      "y": 11300,
+      "w": 1280,
+      "h": 800,
+      "title": "Acknowledgements",
+      "page": "build"
+    },
+    "Mac-About.dc.html": {
+      "x": 2720,
+      "y": 11300,
+      "w": 1280,
+      "h": 800,
+      "title": "About iStation",
+      "page": "build"
+    },
+    "Mac-Shortcuts.dc.html": {
+      "x": 4080,
+      "y": 11300,
+      "w": 1280,
+      "h": 800,
+      "title": "Keyboard Shortcuts",
+      "page": "build"
+    },
+    "Mac-ToolsConsole.dc.html": {
+      "x": 0,
+      "y": 12520,
+      "w": 1280,
+      "h": 800,
+      "title": "Tools: Console",
+      "page": "build"
+    },
+    "Mac-ToolsTty.dc.html": {
+      "x": 1360,
+      "y": 12520,
+      "w": 1280,
+      "h": 800,
+      "title": "Tools: TTY (empty)",
+      "page": "build"
+    },
+    "Mac-ToolsTraceRunning.dc.html": {
+      "x": 2720,
+      "y": 12520,
+      "w": 1280,
+      "h": 800,
+      "title": "Recording a trace (running)",
+      "page": "build"
+    },
+    "Mac-ToolsTraceDone.dc.html": {
+      "x": 4080,
+      "y": 12520,
+      "w": 1280,
+      "h": 800,
+      "title": "Trace recorded (done)",
+      "page": "build"
+    },
+    "Mac-ToolsCompare.dc.html": {
+      "x": 5440,
+      "y": 12520,
+      "w": 1280,
+      "h": 800,
+      "title": "Comparing traces (a divergence)",
+      "page": "build"
+    },
+    "Mac-ToolsVram.dc.html": {
+      "x": 6800,
+      "y": 12520,
+      "w": 1280,
+      "h": 800,
+      "title": "Tools: VRAM",
+      "page": "build"
+    },
+    "Mac-TodayLibrary.dc.html": {
+      "x": 0,
+      "y": 13740,
+      "w": 1280,
+      "h": 800,
+      "title": "Library before discs can be read",
+      "page": "build"
+    },
+    "Mac-TodayBiosDone.dc.html": {
+      "x": 1360,
+      "y": 13740,
+      "w": 1280,
+      "h": 800,
+      "title": "BIOS check, today’s wording",
+      "page": "build"
+    },
+    "Mac-TodayPlayer.dc.html": {
+      "x": 2720,
+      "y": 13740,
+      "w": 1280,
+      "h": 800,
+      "title": "Running the BIOS, no picture yet",
+      "page": "build"
+    },
+    "Mac-TodayTools.dc.html": {
+      "x": 4080,
+      "y": 13740,
+      "w": 1280,
+      "h": 800,
+      "title": "Tools: the istation-run commands",
+      "page": "build"
+    },
+    "iOS-Welcome.dc.html": {
+      "x": 0,
+      "y": 14960,
+      "w": 390,
+      "h": 844,
+      "title": "iPhone: welcome",
+      "page": "build"
+    },
+    "iOS-Library.dc.html": {
+      "x": 470,
+      "y": 14960,
+      "w": 390,
+      "h": 844,
+      "title": "iPhone: library",
+      "page": "build"
+    },
+    "iOS-Opening.dc.html": {
+      "x": 940,
+      "y": 14960,
+      "w": 390,
+      "h": 844,
+      "title": "iPhone: opening a game",
+      "page": "build"
+    },
+    "iOS-Player.dc.html": {
+      "x": 1410,
+      "y": 14960,
+      "w": 844,
+      "h": 390,
+      "title": "iPhone: playing",
+      "page": "build"
+    },
+    "iOS-Pause.dc.html": {
+      "x": 2334,
+      "y": 14960,
+      "w": 844,
+      "h": 390,
+      "title": "iPhone: paused",
+      "page": "build"
+    },
+    "iOS-States.dc.html": {
+      "x": 3258,
+      "y": 14960,
+      "w": 844,
+      "h": 390,
+      "title": "iPhone: Load State",
+      "page": "build"
+    },
+    "iOS-Settings.dc.html": {
+      "x": 0,
+      "y": 15924,
+      "w": 390,
+      "h": 844,
+      "title": "iPhone: Settings",
+      "page": "build"
+    },
+    "Contract.dc.html": {
+      "x": 8400,
+      "y": 0,
+      "w": 1440,
+      "h": 6200,
+      "title": "Contract: every part mapped, the gaps, the calls",
+      "page": "build",
+      "expand": "fill"
+    },
+    "Layout.dc.html": {
+      "x": 9920,
+      "y": 0,
+      "w": 1440,
+      "h": 4300,
+      "title": "Layout: regions, keys, states, SwiftUI",
+      "page": "build",
+      "expand": "fill"
+    },
+    "Processes.dc.html": {
+      "x": 11440,
+      "y": 0,
+      "w": 1440,
+      "h": 2300,
+      "title": "Processes: the app, its thread and its files",
+      "page": "build",
+      "expand": "fill"
+    },
+    "Foundations-Color.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 5200,
+      "title": "Color tokens and contrast",
+      "page": "foundations",
+      "expand": "fill"
+    },
+    "Foundations-Type.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 1900,
+      "title": "Type, space, radii, motion",
+      "page": "foundations",
+      "expand": "fill"
+    },
+    "Foundations-Components.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 4600,
+      "title": "Components in their states",
+      "page": "foundations",
+      "expand": "fill"
+    },
+    "Exploration.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1500,
+      "title": "Three directions and three accents",
+      "page": "exploration",
+      "expand": "fill"
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Mac-Welcome.dc.html",
+    "Mac-BiosPicker.dc.html",
+    "Mac-BiosChecking.dc.html",
+    "Mac-BiosWrongSize.dc.html",
+    "Mac-BiosDone.dc.html",
+    "Mac-LibraryEmpty.dc.html",
+    "Mac-Library.dc.html",
+    "Mac-LibraryGrid.dc.html",
+    "Mac-LibraryInspector.dc.html",
+    "Mac-LibrarySearchEmpty.dc.html",
+    "Mac-LibraryMissing.dc.html",
+    "Mac-LibraryPs2.dc.html",
+    "Mac-Ps2Refused.dc.html",
+    "Mac-RemoveConfirm.dc.html",
+    "Mac-Rename.dc.html",
+    "Mac-LibraryMin.dc.html",
+    "Mac-LibraryLight.dc.html",
+    "Mac-LibraryContrast.dc.html",
+    "Mac-ScanPicker.dc.html",
+    "Mac-ScanRunning.dc.html",
+    "Mac-ScanStopped.dc.html",
+    "Mac-ScanDone.dc.html",
+    "Mac-PlayerOpening.dc.html",
+    "Mac-PlayerRunning.dc.html",
+    "Mac-PlayerPaused.dc.html",
+    "Mac-PlayerFullscreen.dc.html",
+    "Mac-ResetConfirm.dc.html",
+    "Mac-StopConfirm.dc.html",
+    "Mac-PlayerDebug.dc.html",
+    "Mac-PlayerMin.dc.html",
+    "Mac-StatesSave.dc.html",
+    "Mac-StatesOverwrite.dc.html",
+    "Mac-StatesLoad.dc.html",
+    "Mac-StatesVersionError.dc.html",
+    "Mac-Cards.dc.html",
+    "Mac-CardsEmpty.dc.html",
+    "Mac-CardDelete.dc.html",
+    "Mac-BiosPane.dc.html",
+    "Mac-SettingsControllers.dc.html",
+    "Mac-SettingsNoControllers.dc.html",
+    "Mac-SettingsVideo.dc.html",
+    "Mac-SettingsAudio.dc.html",
+    "Mac-SettingsCards.dc.html",
+    "Mac-SettingsAppearance.dc.html",
+    "Mac-SettingsPersonal.dc.html",
+    "Mac-Acknowledgements.dc.html",
+    "Mac-About.dc.html",
+    "Mac-Shortcuts.dc.html",
+    "Mac-ToolsConsole.dc.html",
+    "Mac-ToolsTty.dc.html",
+    "Mac-ToolsTraceRunning.dc.html",
+    "Mac-ToolsTraceDone.dc.html",
+    "Mac-ToolsCompare.dc.html",
+    "Mac-ToolsVram.dc.html",
+    "Mac-TodayLibrary.dc.html",
+    "Mac-TodayBiosDone.dc.html",
+    "Mac-TodayPlayer.dc.html",
+    "Mac-TodayTools.dc.html",
+    "iOS-Welcome.dc.html",
+    "iOS-Library.dc.html",
+    "iOS-Opening.dc.html",
+    "iOS-Player.dc.html",
+    "iOS-Pause.dc.html",
+    "iOS-States.dc.html",
+    "iOS-Settings.dc.html",
+    "Contract.dc.html",
+    "Layout.dc.html",
+    "Processes.dc.html",
+    "Foundations-Color.dc.html",
+    "Foundations-Type.dc.html",
+    "Foundations-Components.dc.html",
+    "Exploration.dc.html"
+  ],
+  "notes": {
+    "t-app": {
+      "x": 0,
+      "y": -300,
+      "text": "The app: one prototype that every board mounts",
+      "kind": "title1",
+      "maxW": 8080,
+      "page": "build"
+    },
+    "s-app": {
+      "x": 1360,
+      "y": 0,
+      "text": "Play the App board: it runs on a clock, so jobs progress and frames count. Its Tweaks switch the start preset, the theme, the build routine, and target versus today’s backend. Every other board on this page mounts it at a named preset with the clock stopped.",
+      "w": 420,
+      "size": "m",
+      "fill": "teal",
+      "page": "build"
+    },
+    "t-onboarding": {
+      "x": 0,
+      "y": 920,
+      "text": "First run",
+      "kind": "title1",
+      "maxW": 8080,
+      "page": "build"
+    },
+    "t-library": {
+      "x": 0,
+      "y": 2140,
+      "text": "Library",
+      "kind": "title1",
+      "maxW": 8080,
+      "page": "build"
+    },
+    "t-scan": {
+      "x": 0,
+      "y": 4280,
+      "text": "Add a folder: a job",
+      "kind": "title1",
+      "maxW": 8080,
+      "page": "build"
+    },
+    "t-player": {
+      "x": 0,
+      "y": 5500,
+      "text": "Playing",
+      "kind": "title1",
+      "maxW": 8080,
+      "page": "build"
+    },
+    "t-states": {
+      "x": 0,
+      "y": 7640,
+      "text": "Save states",
+      "kind": "title1",
+      "maxW": 8080,
+      "page": "build"
+    },
+    "t-cards": {
+      "x": 0,
+      "y": 8860,
+      "text": "Memory cards and BIOS",
+      "kind": "title1",
+      "maxW": 8080,
+      "page": "build"
+    },
+    "t-settings": {
+      "x": 0,
+      "y": 10080,
+      "text": "Settings and other windows",
+      "kind": "title1",
+      "maxW": 8080,
+      "page": "build"
+    },
+    "t-tools": {
+      "x": 0,
+      "y": 12220,
+      "text": "Personal build: Tools",
+      "kind": "title1",
+      "maxW": 8080,
+      "page": "build"
+    },
+    "t-today": {
+      "x": 0,
+      "y": 13440,
+      "text": "Today: what v0.1.0’s backend supports",
+      "kind": "title1",
+      "maxW": 8080,
+      "page": "build"
+    },
+    "t-ios": {
+      "x": 0,
+      "y": 14660,
+      "text": "iPhone (v0.4.0)",
+      "kind": "title1",
+      "maxW": 8080,
+      "page": "build"
+    },
+    "t-docs": {
+      "x": 8400,
+      "y": -300,
+      "text": "Contract, layout and processes",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "build"
+    },
+    "t-found": {
+      "x": 0,
+      "y": -300,
+      "text": "Foundations: tokens, type and components",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "foundations"
+    },
+    "t-expl": {
+      "x": 0,
+      "y": -300,
+      "text": "Early directions, superseded",
+      "kind": "title1",
+      "maxW": 1440,
+      "page": "exploration"
+    }
+  },
+  "designSystems": []
+}

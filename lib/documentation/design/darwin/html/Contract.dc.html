@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Contract</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="{{ rootStyle }}">
+  <div style="max-width:1360px;margin:0 auto;padding:48px 40px 64px;display:flex;flex-direction:column;gap:28px">
+    <header style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:13px;font-weight:600;color:var(--accent-text);letter-spacing:0.04em;text-transform:uppercase">Build · Contract</div>
+      <h1 style="margin:0;font-size:36px;line-height:1.15;font-family:var(--font-display)">What the app drives, and what backs each part</h1>
+      <p style="margin:0;max-width:900px;color:var(--fg-muted);font-size:16px;line-height:1.5">The GUI drives <span style="font-family:var(--font-mono)">PS1Console</span>, the core’s narrow interface (ADR 0015 §5, designed with v0.1.0’s first picture), the package’s disc readers, the system frameworks, and, in personal builds, TraceKit. Each part of the design below is tagged by what backs it today. A gap is drawn as its fallback in the Today boards and records the additive change that closes it.</p>
+    </header>
+
+    <section aria-label="Counts" style="display:grid;grid-template-columns:repeat(6, minmax(0, 1fr));gap:12px">
+      <sc-for list="{{ stats }}" as="st" hint-placeholder-count="6">
+        <div style="{{ st.style }}">
+          <div style="font-size:34px;font-weight:700;font-variant-numeric:tabular-nums">{{ st.n }}</div>
+          <div style="font-weight:600">{{ st.label }}</div>
+          <div style="font-size:12px;opacity:0.9">{{ st.help }}</div>
+        </div>
+      </sc-for>
+    </section>
+
+    <section aria-label="Rows" style="display:flex;flex-direction:column;gap:18px">
+      <h2 style="margin:0;font-size:22px">Every part, mapped</h2>
+      <div style="overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--bg-content)">
+        <div role="table" aria-label="Contract rows" style="min-width:1100px">
+          <div role="row" style="display:grid;grid-template-columns:64px 230px 1fr 92px 1fr;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--fg-muted);background:var(--bg-raised)">
+            <span role="columnheader">Row</span><span role="columnheader">Part of the design</span><span role="columnheader">Backed by</span><span role="columnheader">Tag</span><span role="columnheader">Note, and how it was checked</span>
+          </div>
+          <sc-for list="{{ areas }}" as="ar" hint-placeholder-count="6">
+            <div role="row" style="padding:10px 16px 6px;font-size:13px;font-weight:700;color:var(--accent-text);border-bottom:1px solid var(--line)"><span role="cell">{{ ar.name }}</span></div>
+            <sc-for list="{{ ar.rows }}" as="r" hint-placeholder-count="5">
+              <div role="row" style="display:grid;grid-template-columns:64px 230px 1fr 92px 1fr;gap:12px;padding:8px 16px;border-bottom:1px solid var(--line);font-size:13px;line-height:1.45;align-items:start">
+                <span role="cell" style="font-family:var(--font-mono);color:var(--fg-muted)">{{ r.id }}</span>
+                <span role="cell" style="font-weight:600">{{ r.part }}</span>
+                <span role="cell" style="font-family:var(--font-mono);font-size:12px;overflow-wrap:anywhere">{{ r.by }}</span>
+                <span role="cell"><span style="{{ r.tagStyle }}">{{ r.tagText }}</span></span>
+                <span role="cell" style="color:var(--fg-muted)">{{ r.note }}</span>
+              </div>
+            </sc-for>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section aria-label="Gaps" style="display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-size:22px">The gaps, and what closes each</h2>
+      <p style="margin:0;color:var(--fg-muted);max-width:900px">Each is an additive change to the backend. Until it lands, the app draws the fallback named here, which the Today boards show. Names are proposals for ADR 0015 §5’s interface, not code that exists.</p>
+      <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:14px">
+        <sc-for list="{{ gaps }}" as="g" hint-placeholder-count="6">
+          <article style="display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:12px;border:1px solid var(--line);background:var(--bg-content)">
+            <div style="display:flex;gap:10px;align-items:baseline">
+              <span style="font-family:var(--font-mono);font-weight:700;color:var(--warn)">{{ g.id }}</span>
+              <h3 style="margin:0;font-size:16px;flex:1">{{ g.title }}</h3>
+              <span style="font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--bg-control);color:var(--fg)">{{ g.when }}</span>
+            </div>
+            <div style="font-size:13px"><span style="font-weight:600">The change. </span><span style="font-family:var(--font-mono);font-size:12px">{{ g.change }}</span></div>
+            <div style="font-size:13px"><span style="font-weight:600">Until then. </span><span style="color:var(--fg-muted)">{{ g.until }}</span></div>
+            <div style="font-size:12px;color:var(--fg-muted)">Closes {{ g.rowList }}</div>
+          </article>
+        </sc-for>
+      </div>
+    </section>
+
+    <section aria-label="Decisions" style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <h2 style="margin:0;font-size:22px">Decisions this design makes</h2>
+        <p style="margin:0;color:var(--fg-muted)">Mine, each one yours to veto.</p>
+        <ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;line-height:1.5">
+          <sc-for list="{{ decisions }}" as="d" hint-placeholder-count="6"><li><span style="font-weight:600">{{ d.title }}. </span><span style="color:var(--fg-muted)">{{ d.text }}</span></li></sc-for>
+        </ol>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <h2 style="margin:0;font-size:22px">Calls left for you</h2>
+        <p style="margin:0;color:var(--fg-muted)">The design works either way; the answer changes what gets built first or how it reads.</p>
+        <ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;line-height:1.5">
+          <sc-for list="{{ calls }}" as="c" hint-placeholder-count="5"><li><span style="font-weight:600">{{ c.title }} </span><span style="color:var(--fg-muted)">{{ c.text }}</span></li></sc-for>
+        </ol>
+      </div>
+    </section>
+
+    <section aria-label="How the ready rows were checked" style="display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:22px">How the ready rows were checked</h2>
+      <p style="margin:0;color:var(--fg-muted);max-width:900px">On 2026-11-21, against this repository at v0.1.0, with content built in code, never a Sony file: a probe package linking PS1Core and EmuKit by path, istation-run built in release, and the disc readers’ own tests.</p>
+      <pre style="margin:0;padding:16px;border-radius:12px;background:var(--bg-content);border:1px solid var(--line);font-family:var(--font-mono);font-size:12px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere">{{ evidence }}</pre>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark","contrast"],"default":"light"},"$preview":{"width":1440,"height":6200}}'>
+/*TOKENS:BEGIN*/var TOKENS = {"name":"iStation: Graphite and Amber","version":1,"about":"Every color, font, size, space, radius and duration the iStation apps draw with, named for its role. The prototype (html/main.html) embeds this file verbatim as TOKENS; tools/check.mjs fails if the two differ. In SwiftUI each role becomes a case of the styles module (Palette, Typography, Metrics, Motion), as the swiftui map says.","themes":["dark","light","contrast"],"color":{"dark":{"bg-window":"#1E1E21","bg-sidebar":"#26262A","bg-content":"#19191B","bg-raised":"#2B2B30","bg-toolbar":"#232327","bg-control":"#3A3A40","bg-control-hover":"#45454C","bg-control-pressed":"#505058","bg-hover-row":"#2A2A2F","bg-selected":"#4A3B1F","bg-screen":"#000000","bg-picture":"#1C1C1F","bg-overlay":"#00000099","line":"#38383E","line-strong":"#7A7A82","focus":"#8AB4FF","fg":"#EDEDEF","fg-muted":"#AEAEB5","fg-faint":"#6E6E76","fg-on-screen":"#F2F2F2","fg-on-screen-muted":"#A6A6A6","fg-on-accent":"#1B1305","fg-on-danger":"#FFFFFF","accent":"#F2A93B","accent-hover":"#F6B85A","accent-pressed":"#DC9426","accent-text":"#F5B65A","ok":"#62D6AA","ok-bg":"#16382D","warn":"#F2C14E","warn-bg":"#3A2F12","danger":"#FF8177","danger-bg":"#421F1C","danger-solid":"#C2362D","info":"#8AB4FF","info-bg":"#1B2C45","verify":"#CDA8FF","verify-bg":"#32244A","shadow":"#00000080","traffic-close":"#FF5F57","traffic-minimize":"#FEBC2E","traffic-zoom":"#28C840"},"light":{"bg-window":"#F3F3F5","bg-sidebar":"#E8E8EC","bg-content":"#FFFFFF","bg-raised":"#FFFFFF","bg-toolbar":"#EFEFF2","bg-control":"#E6E6EA","bg-control-hover":"#DCDCE1","bg-control-pressed":"#D0D0D6","bg-hover-row":"#F0F0F4","bg-selected":"#F7E2BC","bg-screen":"#000000","bg-picture":"#1C1C1F","bg-overlay":"#00000059","line":"#DADADF","line-strong":"#8B8B93","focus":"#2F6FDB","fg":"#1C1C1E","fg-muted":"#5C5C64","fg-faint":"#A3A3AA","fg-on-screen":"#F2F2F2","fg-on-screen-muted":"#A6A6A6","fg-on-accent":"#FFFFFF","fg-on-danger":"#FFFFFF","accent":"#A35F00","accent-hover":"#935500","accent-pressed":"#8C5100","accent-text":"#8A5000","ok":"#0B7350","ok-bg":"#DCF2E9","warn":"#7D5800","warn-bg":"#FAEFD0","danger":"#B0261E","danger-bg":"#FBE4E2","danger-solid":"#B0261E","info":"#1E5CB8","info-bg":"#E1EBFA","verify":"#6A3DAE","verify-bg":"#EFE7FA","shadow":"#00000033","traffic-close":"#FF5F57","traffic-minimize":"#FEBC2E","traffic-zoom":"#28C840"},"contrast":{"bg-window":"#000000","bg-sidebar":"#0B0B0B","bg-content":"#000000","bg-raised":"#121212","bg-toolbar":"#0B0B0B","bg-control":"#1F1F1F","bg-control-hover":"#2C2C2C","bg-control-pressed":"#3A3A3A","bg-hover-row":"#1A1A1A","bg-selected":"#3D2D00","bg-screen":"#000000","bg-picture":"#141414","bg-overlay":"#000000CC","line":"#8F8F8F","line-strong":"#FFFFFF","focus":"#FFD60A","fg":"#FFFFFF","fg-muted":"#D9D9D9","fg-faint":"#8F8F8F","fg-on-screen":"#FFFFFF","fg-on-screen-muted":"#D0D0D0","fg-on-accent":"#000000","fg-on-danger":"#000000","accent":"#FFC24D","accent-hover":"#FFD27A","accent-pressed":"#E6AA30","accent-text":"#FFC24D","ok":"#7CF0C0","ok-bg":"#002B1D","warn":"#FFE066","warn-bg":"#2E2500","danger":"#FF9A92","danger-bg":"#3A0A07","danger-solid":"#FF9A92","info":"#A3CCFF","info-bg":"#00213F","verify":"#DEC6FF","verify-bg":"#2A0F4A","shadow":"#000000","traffic-close":"#FF5F57","traffic-minimize":"#FEBC2E","traffic-zoom":"#28C840"}},"contrastPairs":[{"fg":"fg","bg":"bg-window","min":4.5},{"fg":"fg","bg":"bg-sidebar","min":4.5},{"fg":"fg","bg":"bg-content","min":4.5},{"fg":"fg","bg":"bg-raised","min":4.5},{"fg":"fg","bg":"bg-toolbar","min":4.5},{"fg":"fg","bg":"bg-control","min":4.5},{"fg":"fg","bg":"bg-control-hover","min":4.5},{"fg":"fg","bg":"bg-control-pressed","min":4.5},{"fg":"fg","bg":"bg-hover-row","min":4.5},{"fg":"fg","bg":"bg-selected","min":4.5},{"fg":"fg-muted","bg":"bg-window","min":4.5},{"fg":"fg-muted","bg":"bg-sidebar","min":4.5},{"fg":"fg-muted","bg":"bg-content","min":4.5},{"fg":"fg-muted","bg":"bg-raised","min":4.5},{"fg":"fg-muted","bg":"bg-toolbar","min":4.5},{"fg":"fg-muted","bg":"bg-control","min":4.5},{"fg":"fg-muted","bg":"bg-hover-row","min":4.5},{"fg":"fg-muted","bg":"bg-selected","min":4.5},{"fg":"accent-text","bg":"bg-content","min":4.5},{"fg":"accent-text","bg":"bg-raised","min":4.5},{"fg":"accent-text","bg":"bg-sidebar","min":4.5},{"fg":"fg-on-accent","bg":"accent","min":4.5},{"fg":"fg-on-accent","bg":"accent-hover","min":4.5},{"fg":"fg-on-accent","bg":"accent-pressed","min":4.5},{"fg":"fg-on-danger","bg":"danger-solid","min":4.5},{"fg":"ok","bg":"ok-bg","min":4.5},{"fg":"ok","bg":"bg-content","min":4.5},{"fg":"ok","bg":"bg-raised","min":4.5},{"fg":"warn","bg":"warn-bg","min":4.5},{"fg":"warn","bg":"bg-content","min":4.5},{"fg":"warn","bg":"bg-raised","min":4.5},{"fg":"danger","bg":"danger-bg","min":4.5},{"fg":"danger","bg":"bg-content","min":4.5},{"fg":"danger","bg":"bg-raised","min":4.5},{"fg":"info","bg":"info-bg","min":4.5},{"fg":"info","bg":"bg-content","min":4.5},{"fg":"info","bg":"bg-raised","min":4.5},{"fg":"verify","bg":"verify-bg","min":4.5},{"fg":"fg-on-screen","bg":"bg-screen","min":4.5},{"fg":"fg-on-screen-muted","bg":"bg-screen","min":4.5},{"fg":"fg-on-screen-muted","bg":"bg-picture","min":4.5},{"fg":"focus","bg":"bg-content","min":3},{"fg":"focus","bg":"bg-window","min":3},{"fg":"line-strong","bg":"bg-content","min":3},{"fg":"line-strong","bg":"bg-raised","min":3},{"fg":"accent","bg":"bg-content","min":3}],"font":{"ui":"-apple-system, BlinkMacSystemFont, \"SF Pro Text\", system-ui, \"Helvetica Neue\", sans-serif","display":"-apple-system, BlinkMacSystemFont, \"SF Pro Display\", system-ui, \"Helvetica Neue\", sans-serif","mono":"ui-monospace, \"SF Mono\", Menlo, Consolas, monospace"},"type":{"mac":{"largetitle":26,"title":20,"title2":17,"title3":15,"headline":13,"body":13,"callout":12,"caption":11},"ios":{"largetitle":34,"title":28,"title2":22,"title3":20,"headline":17,"body":17,"callout":16,"caption":13}},"textScale":{"s":0.92,"m":1,"l":1.12,"xl":1.25},"weight":{"regular":400,"medium":500,"semibold":600,"bold":700},"space":{"1":4,"2":8,"3":12,"4":16,"5":20,"6":24,"8":32,"10":40},"radius":{"control":6,"card":10,"sheet":12,"window":12,"device":44,"pill":999},"motion":{"fast":120,"base":200,"slow":320,"ease":"cubic-bezier(0.2, 0, 0, 1)","reduced":0},"size":{"mac":{"control":28,"toolbar":52,"sidebar":220,"inspector":300,"row":30,"tile":168,"windowMinWidth":800,"windowMinHeight":560,"windowWidth":1280,"windowHeight":800,"pictureMinWidth":640,"pictureMinHeight":480},"ios":{"control":44,"toolbar":52,"sidebar":320,"inspector":320,"row":64,"tile":160,"windowMinWidth":320,"windowMinHeight":568,"windowWidth":390,"windowHeight":844,"pictureMinWidth":320,"pictureMinHeight":240}},"swiftui":{"bg-window":"Palette.window: Color(nsColor: .windowBackgroundColor) / Color(uiColor: .systemBackground)","bg-sidebar":"Palette.sidebar: the NavigationSplitView sidebar's own material","bg-content":"Palette.content: Color(nsColor: .controlBackgroundColor) / .secondarySystemBackground","bg-raised":"Palette.raised: sheet and popover background","bg-toolbar":"Palette.toolbar: the window toolbar's own material","bg-control":"Palette.control: bordered button fill (.buttonStyle(.bordered))","bg-selected":"Palette.selected: a List or Table row's selection, tinted by the accent","bg-screen":"Palette.screen (exists today): Color.black","bg-picture":"the frame the console draws; a placeholder in the design only","bg-overlay":"the system's sheet and alert dimming; not drawn by the app","line":"Palette.separator: Color(nsColor: .separatorColor)","line-strong":"Palette.controlBorder: a field's or bordered button's edge","focus":"the system focus ring (.focusable(), FocusState); tinted by the accent on macOS","fg":"Palette.text: .primary","fg-muted":"Palette.secondaryText (exists today): .secondary","fg-faint":"Palette.disabledText: .tertiary, disabled controls only","fg-on-screen":"Palette.onScreen (exists today): Color.white","fg-on-screen-muted":"Palette.onScreenSecondary","fg-on-accent":"Palette.onAccent","fg-on-danger":"Palette.onDestructive","accent":"Palette.accent: the app's AccentColor asset; .tint(Palette.accent)","accent-text":"Palette.accentText: links and accent-colored labels","ok":"Palette.ok","warn":"Palette.warning","danger":"Palette.danger","info":"Palette.info","verify":"Palette.verify (design pages only)","font.ui":"Typography: Font.body and the system text styles","font.mono":"Typography.mono: Font.system(.body, design: .monospaced)","type.*":"Typography: .largeTitle, .title, .title2, .title3, .headline, .body, .callout, .caption; scaled by DynamicTypeSize","space.*":"Metrics.space1 to space10","radius.*":"Metrics.radiusControl, radiusCard, radiusSheet","motion.*":"Motion.fast, base, slow: Animation.snappy(duration:); none when accessibilityReduceMotion"}};/*TOKENS:END*/
+
+var ROWS = [
+  { area: 'Console', id: 'C01', part: 'Power on with the user’s BIOS', by: 'PS1Console.powerOn(bios: [UInt8]) throws(PS1Error)', tag: 'ready', gap: '', note: 'Probe: a 524,288-byte image built in code powers on; isPoweredOn becomes true, frame stays 0.' },
+  { area: 'Console', id: 'C02', part: 'Refuse a BIOS of the wrong size', by: 'PS1Error.biosSize(Int)', tag: 'ready', gap: '', note: 'Probe: powerOn with 1,000 bytes threw biosSize(1000). The app shows the count in plain words and the case in Details.' },
+  { area: 'Console', id: 'C03', part: 'Run the console a frame at a time', by: 'PS1Console.runFrame()', tag: 'ready', gap: '', note: 'Probe: 60 calls in 0.014 s on the CPU-check image. Does nothing while powered off (checked).' },
+  { area: 'Console', id: 'C04', part: 'Frame counter in the HUD and title', by: 'PS1Console.frame', tag: 'ready', gap: '', note: 'Probe: 60 after 60 runFrame calls; 0 after powering on again.' },
+  { area: 'Console', id: 'C05', part: 'Whether the console is on', by: 'PS1Console.isPoweredOn', tag: 'ready', gap: '', note: 'Probe: false before powerOn, true after.' },
+  { area: 'Console', id: 'C06', part: 'Reset', by: 'powerOn(bios:) again', tag: 'app', gap: '', note: 'Powering on again makes a new machine at frame 0 (probe). With discs it also needs insertDisc (G9).' },
+  { area: 'Console', id: 'C07', part: 'Pause and resume', by: 'the app’s own runFrame loop', tag: 'app', gap: '', note: 'The app stops and restarts calling runFrame; the core keeps no paused state.' },
+  { area: 'Console', id: 'C08', part: 'Frames per second', by: 'frame deltas over ContinuousClock time', tag: 'app', gap: '', note: 'Measured by the app. Shown without a target until the video standard is known (G12).' },
+  { area: 'BIOS', id: 'C09', part: 'BIOS size and fingerprint', by: 'the file’s bytes; CryptoKit Insecure.SHA1', tag: 'app', gap: '', note: 'The docs name BIOS files only by size and hash; the design does the same and never claims a model or region.' },
+  { area: 'BIOS', id: 'C10', part: '“It reached its shell”', by: 'nothing yet', tag: 'gap', gap: 'G10', note: 'PS1Machine.boot already watches for 0x80030000; PS1Console doesn’t say so. Until then: “it powered on and ran 60 frames”.' },
+  { area: 'BIOS', id: 'C11', part: 'Keep access to the BIOS and games across launches', by: '.fileImporter, security-scoped bookmarks, the App Sandbox’s read-only user-selected files', tag: 'verify', gap: '', note: 'Assumed on both OSes. The macOS App Store entitlements hold files.user-selected.read-only but not files.bookmarks.app-scope, which Apple documents for app-scoped bookmarks: item 5c probes a bookmark across relaunches under the App Store routine and adds it if needed.' },
+  { area: 'Library', id: 'C12', part: 'A game whose file moved', by: 'URL(resolvingBookmarkData:bookmarkDataIsStale:)', tag: 'app', gap: '', note: 'The file-missing row, its inspector, and Locate… which renews the bookmark.' },
+  { area: 'Library', id: 'C13', part: 'The library: names, added, last played', by: 'library.json in the app’s container', tag: 'app', gap: '', note: 'A new persisted format: every field decodes with a default (ADR 0016 §5).' },
+  { area: 'Library', id: 'C14', part: 'Console and serial of a disc', by: 'SystemCNF(text:) over ISO9660(url:).find("SYSTEM.CNF")', tag: 'gap', gap: 'G2', note: 'Both exist and their tests pass (run 2026-11-21), but they’re in no product the apps link.' },
+  { area: 'Library', id: 'C15', part: 'Why a disc couldn’t be read', by: 'DiscError.unreadable, .notISO9660, .truncated', tag: 'gap', gap: 'G2', note: 'Shown in plain words, with the case beside it in the scan results.' },
+  { area: 'Library', id: 'C16', part: 'A .cue’s tracks', by: 'Playlists.cueTracks(_:)', tag: 'gap', gap: 'G2', note: 'The Format column’s “2 tracks”.' },
+  { area: 'Library', id: 'C17', part: 'An .m3u’s discs', by: 'Playlists.m3uEntries(_:)', tag: 'gap', gap: 'G2', note: 'The Format column’s “3 discs”; the scan groups a playlist’s .cue files under it.' },
+  { area: 'Library', id: 'C18', part: 'Recognize a PS-EXE', by: 'PSEXE(bytes:), PSEXEError.tooShort, .notAnEXE', tag: 'ready', gap: '', note: 'Probe: 10 bytes threw tooShort; 4,096 zero bytes threw notAnEXE. In PS1Core today.' },
+  { area: 'Library', id: 'C20', part: 'Add a folder: the scan job', by: 'FileManager enumeration, then C14 per disc', tag: 'app', gap: '', note: 'Steps, Stop, and Scan Again, which skips games already added. Console and serial need G2.' },
+  { area: 'Library', id: 'C51', part: 'Remove from Library', by: 'library.json entry and its bookmark', tag: 'app', gap: '', note: 'Never touches the disc image; the dialog says so and shows what it deletes.' },
+  { area: 'Library', id: 'C52', part: 'Rename a game', by: 'library.json', tag: 'app', gap: '', note: 'The file keeps its own name.' },
+  { area: 'Library', id: 'C53', part: 'Search and the sidebar’s filters', by: 'the app over library.json and C14', tag: 'app', gap: '', note: 'PS1 and PS2 filters need the console from C14; they’re absent until G2.' },
+  { area: 'Playing', id: 'C19', part: 'Play a PS-EXE (homebrew)', by: 'PS1Machine.boot(_:) exists; PS1Console doesn’t offer it', tag: 'gap', gap: 'G5', note: 'v0.1.0’s gate draws a homebrew PS-EXE in the macOS app, so this lands with it.' },
+  { area: 'Playing', id: 'C49', part: '“The program never started”', by: 'PS1Machine.bootIsPending; istation-run exit 3', tag: 'gap', gap: 'G5', note: 'Recorded: “the EXE never started: the BIOS didn’t reach its shell in 30 frames” (exit 3) on a code-built image.' },
+  { area: 'Playing', id: 'C21', part: 'The picture', by: 'nothing yet', tag: 'gap', gap: 'G1', note: 'v0.1.0’s GPU and software rasterizer. The design never draws a real game’s picture: a labelled placeholder stands in.' },
+  { area: 'Playing', id: 'C22', part: 'Save Screenshot', by: 'nothing yet', tag: 'gap', gap: 'G1', note: 'Absent until frames exist. Saved into the container’s Screenshots folder: the App Store routine may only read the files you choose, so Pictures would need a new entitlement.' },
+  { area: 'Playing', id: 'C23', part: 'Scale and shape of the picture', by: 'the app scales the frames it’s given', tag: 'app', gap: '', note: 'Fit or whole multiples; 4:3 or square pixels. Needs G1 for something to scale.' },
+  { area: 'Playing', id: 'C24', part: 'Renderer choice', by: 'nothing yet', tag: 'gap', gap: 'G11', note: 'Software only until v0.3.0’s Metal renderer; the setting shows “Software” as text.' },
+  { area: 'Playing', id: 'C25', part: '50 or 60 frames a second', by: 'nothing yet', tag: 'gap', gap: 'G12', note: 'The GPU’s status has the bit; PS1Console doesn’t report it.' },
+  { area: 'Playing', id: 'C30', part: 'Insert and swap discs', by: 'nothing yet', tag: 'gap', gap: 'G9', note: 'v0.2.0’s CD-ROM. Until then Play is off for discs and says why; only the BIOS runs.' },
+  { area: 'Playing', id: 'C50', part: 'Stop playing', by: 'the app ends its loop and releases the console', tag: 'app', gap: '', note: 'Confirms first, with Save First… once save states exist.' },
+  { area: 'Playing', id: 'C35', part: 'Tell PS2 discs apart', by: 'SystemCNF.Console.ps2 (BOOT2)', tag: 'gap', gap: 'G2', note: 'The reader exists; linking it is G2.' },
+  { area: 'Playing', id: 'C36', part: 'Play PS2 games', by: 'nothing yet', tag: 'gap', gap: 'G13', note: 'v2.x. PS2 discs are listed, say “plays later”, and Play refuses with the reason.' },
+  { area: 'Save states and cards', id: 'C31', part: 'Save and load states', by: 'nothing yet', tag: 'gap', gap: 'G7', note: 'v0.2.0, versioned (ADR 0016 §5). Replacing a slot confirms; loading confirms.' },
+  { area: 'Save states and cards', id: 'C32', part: 'A save in another format', by: 'nothing yet', tag: 'gap', gap: 'G7', note: 'Refused with both formats named, never loaded and guessed at.' },
+  { area: 'Save states and cards', id: 'C33', part: 'Memory cards and their blocks', by: 'nothing yet', tag: 'gap', gap: 'G8', note: 'v0.2.0. “3 of 15 blocks” needs a reader for the card’s directory.' },
+  { area: 'Save states and cards', id: 'C34', part: 'Card files: Show in Finder, Duplicate, Move to Trash', by: 'FileManager in the app’s container (trashItem)', tag: 'app', gap: '', note: 'Trash, not delete, so it can be undone on the Mac. Needs G8 for there to be cards.' },
+  { area: 'Input and sound', id: 'C27', part: 'Controllers, their battery and port', by: 'GameController: GCController.controllers(), .battery', tag: 'verify', gap: '', note: 'Listing works without the core; whether each controller reports its battery varies.' },
+  { area: 'Input and sound', id: 'C28', part: 'Buttons reach the console', by: 'nothing yet', tag: 'gap', gap: 'G4', note: 'v0.2.0 pads. Until then Settings has no Controllers tab and the iPhone has no on-screen pad.' },
+  { area: 'Input and sound', id: 'C29', part: 'The keyboard as a controller', by: 'GCKeyboard, then G4', tag: 'gap', gap: 'G4', note: 'Default keys in the mapping table; ⌘ shortcuts never reach the game.' },
+  { area: 'Input and sound', id: 'C54', part: 'Digital or analog pad', by: 'nothing yet', tag: 'gap', gap: 'G4', note: 'The design shows “Digital pad” until the core has a pad type.' },
+  { area: 'Input and sound', id: 'C26', part: 'Sound and volume', by: 'nothing yet', tag: 'gap', gap: 'G3', note: 'v0.3.0. No Audio tab until then.' },
+  { area: 'App', id: 'C37', part: 'Acknowledgements', by: 'Acknowledgement.bundled(for:), AcknowledgementsViewModel', tag: 'ready', gap: '', note: 'Probe: macOS lists 6 (iStation, ProjectPSX, Play!, Play! Framework, Play! CodeGen, Nuanceur), iOS 2. The design shows them as the list says.' },
+  { area: 'App', id: 'C38', part: 'Version and build routine', by: 'MARKETING_VERSION 0.1.0 from lib/release/VERSION; CURRENT_PROJECT_VERSION 2; PERSONAL_BUILD', tag: 'ready', gap: '', note: 'Read from Version.xcconfig and VERSION. The window title already says “Personal build” in personal builds.' },
+  { area: 'App', id: 'C39', part: 'Theme and text size', by: 'preferredColorScheme, dynamicTypeSize, the styles module', tag: 'app', gap: '', note: 'Every color, size and font in the design is a token (json/tokens.json).' },
+  { area: 'App', id: 'C47', part: '“Never sends anything off your Mac”', by: 'no networking code in the package or the apps today', tag: 'verify', gap: '', note: 'A grep for URLSession, URLRequest and NWConnection found none (2026-11-21), but no check enforces it. Worth a ProjectRulesTests rule before the copy ships.' },
+  { area: 'App', id: 'C48', part: 'The player with nothing loaded', by: 'PlayerViewModel.message', tag: 'ready', gap: '', note: 'Probe: “Nothing to play yet.” The redesign reaches the player only from a game or the BIOS, so this state stays as the view-model’s fallback.' },
+  { area: 'Personal build', id: 'C40', part: 'Registers, PC, cycles', by: 'PS1Machine.cpu exists; PS1Console doesn’t offer it', tag: 'gap', gap: 'G6', note: 'The design’s values are recorded from istation-run’s CPU-check trace, record 1,000.' },
+  { area: 'Personal build', id: 'C41', part: 'TTY output', by: 'PS1Machine.tty, ttySinceEXE', tag: 'gap', gap: 'G6', note: 'Recorded: the CPU-check image prints nothing (0 bytes), so the design shows “Nothing printed yet.”' },
+  { area: 'Personal build', id: 'C42', part: 'Record a trace in the app', by: 'TraceKit’s TraceWriter, as istation-run run uses it', tag: 'gap', gap: 'G6', note: 'PS1Console is fixed to NoTracer. A stopped recording deletes its files: TraceKit has no resume.' },
+  { area: 'Personal build', id: 'C43', part: 'Compare two traces', by: 'TraceDiff.firstDivergence (TraceKit)', tag: 'ready', gap: '', note: 'Recorded: “first divergence at record 0 of 56689 and 56625: word”, exit 1; “identical: 60 records”, exit 0.' },
+  { area: 'Personal build', id: 'C44', part: 'Frame traces side by side', by: 'istation-run frames', tag: 'ready', gap: '', note: 'Recorded: one line per frame with each trace’s RAM checksum.' },
+  { area: 'Personal build', id: 'C45', part: 'VRAM viewer', by: 'nothing yet', tag: 'gap', gap: 'G1', note: '1024 × 512 at 16 bits, from the GPU port.' },
+  { area: 'Personal build', id: 'C46', part: 'The istation-run commands, to copy', by: 'istation-run’s usage', tag: 'ready', gap: '', note: 'Recorded: the usage line, exit 2 on an unknown option. The app never starts it (ADR 0022): Copy only.' }
+];
+
+var GAPS = [
+  { id: 'G1', item: '6b', title: 'Video frames and VRAM', when: 'v0.1.0', change: 'PS1Console.picture: Picture? (width, height, 15- or 24-bit pixels, the display area), refreshed by runFrame; under PERSONAL_BUILD, a VRAM snapshot (1024 × 512, 16-bit).', until: 'The player shows “No picture yet” with the frame counter. No Save Screenshot, no Video tab, no VRAM tab.' },
+  { id: 'G2', item: '6c', title: 'The disc readers in a product', when: 'v0.2.0', change: 'Add ISO9660, SystemCNF and Playlists to a library product the apps link (EmuKit, or a new DiscKit).', until: 'The library lists files by name, extension and size; Console and Serial say “Unknown”; no PS1 and PS2 filters. A PS-EXE is still recognized (C18).' },
+  { id: 'G3', item: '6i', title: 'Audio buffers', when: 'v0.3.0', change: 'PS1Console.drainAudio(_:): 44.1 kHz stereo samples since the last call.', until: 'No volume and no Audio tab.' },
+  { id: 'G4', item: '6e', title: 'Input state', when: 'v0.2.0', change: 'PS1Console.setPad(port:state:) with the digital buttons; a pad type (digital, analog) and sticks later.', until: 'No Controllers tab and no on-screen pad. Keys do nothing in the player.' },
+  { id: 'G5', item: '6a', title: 'Boot a PS-EXE through the console', when: 'v0.1.0', change: 'PS1Console.boot(exe: PSEXE) and bootIsPending, forwarding to PS1Machine.', until: 'A PS-EXE in the library can’t play; Play says why.' },
+  { id: 'G6', item: '6a', title: 'A debug surface for personal builds', when: 'v0.1.0', change: 'Under PERSONAL_BUILD: PS1Console.debug with pc, registers, hi, lo, sr, cause, epc, cycles and tty; and a console generic over its tracer, so the app records traces itself.', until: 'Tools shows the istation-run commands to copy and run from Terminal.' },
+  { id: 'G7', item: '6g', title: 'Save states', when: 'v0.2.0', change: 'PS1Console.saveState() -> SaveState (version, bytes); loadState(_:) throws(SaveStateError) with .unsupportedVersion(found:supported:).', until: 'No Save State or Load State, in menus, toolbar or the iPhone’s pause menu.' },
+  { id: 'G8', item: '6f', title: 'Memory cards', when: 'v0.2.0', change: 'PS1Console.memoryCard(slot:) and insertMemoryCard(slot:bytes:), a changed flag; a Data reader for a card’s directory (blocks used of 15).', until: 'No Memory Cards in the sidebar or Settings.' },
+  { id: 'G9', item: '6d', title: 'Discs', when: 'v0.2.0', change: 'PS1Console.insertDisc(_:) and ejectDisc() over the CD-ROM drive, a disc built from a .cue, .iso or one entry of an .m3u.', until: 'Play is off for discs (“Discs play from v0.2.0”). BIOS › Run the BIOS is what runs.' },
+  { id: 'G10', item: '6a', title: 'The BIOS reached its shell', when: 'v0.1.0', change: 'PS1Console.reachedShell: true once the PC has reached 0x80030000, as PS1Machine.boot already watches.', until: 'The BIOS check says it powered on and ran 60 frames, never that it works.' },
+  { id: 'G11', item: '6j', title: 'Renderer choice', when: 'v0.3.0', change: 'A renderer setting (software, Metal) among the console’s settings.', until: '“Software” shown as text, with nothing to choose.' },
+  { id: 'G12', item: '6h', title: 'Video standard', when: 'v0.2.0', change: 'PS1Console.videoStandard (.ntsc at 60, .pal at 50), from the GPU’s status.', until: 'Frames per second is shown without a target, so nothing claims full speed.' },
+  { id: 'G13', item: '', title: 'The PS2 core', when: 'v2.x', change: 'PS2Console behind the same narrow interface, with Play!’s HLE BIOS.', until: 'PS2 discs are listed and say “plays later”; Play refuses with the reason.' }
+];
+
+var DECISIONS = [
+  { title: 'macOS first, then iOS, both SwiftUI', text: 'The roadmap’s order: the Mac app reaches games at v0.2.0, the iPhone app at v0.4.0. The iPhone boards are the same screens, recomposed.' },
+  { title: 'One window; the player takes it over', text: 'One console runs at a time, so playing replaces the library in the main window instead of opening a second one. Settings, Acknowledgements and About are their own windows.' },
+  { title: 'No artwork, no titles from a database', text: 'A game is named by its file, renamable, and identified by the serial its disc reports. Tiles show initials, never cover art, and nothing is fetched.' },
+  { title: 'No Sony marks', text: 'The UI says PS1 and PS2, never the console’s full name; pad buttons are named in words, and the iPhone’s on-screen buttons are plain outlines in one color.' },
+  { title: 'Absent beats teased', text: 'A part with no backend is left out, not shown disabled, except Play (disabled, with the reason) and PS2 discs (listed, refused with the reason), because people will look for those.' },
+  { title: 'Confirm with the real call', text: 'Reset, Stop, Replace, Load, Remove and Move to Trash confirm in plain words, with the exact call or file operation under Details.' },
+  { title: 'Long work is a job sheet', text: 'BIOS check, adding a folder, opening a game and recording a trace each show steps, a Stop, and what resuming means: Scan Again skips what was added; a trace can’t resume.' },
+  { title: 'Graphite and amber', text: 'A dark-first look with one warm accent, system fonts, and three themes: dark, light and high contrast (dark-based). Every pair meets 4.5:1.' },
+  { title: 'Personal tools live in the app', text: 'Tools in the sidebar and a debug drawer in the player, compiled only into personal builds, mirroring istation-run’s options so a run in the app and in Terminal match.' },
+  { title: 'Memory cards: one per game by default', text: 'Made the first time a game saves; shared cards are a setting.' },
+  { title: 'Eight save-state slots per game', text: 'No automatic save on Stop: Stop asks, and offers Save First….' }
+];
+
+var CALLS = [
+  { title: 'Audience.', text: 'Is v1.0.0’s first-run copy for App Store strangers, who need to learn what a BIOS is and where theirs comes from, or for you first? The welcome screen assumes strangers, briefly.' },
+  { title: 'Scope before discs play.', text: 'Build the Today parts now (BIOS check, Run the BIOS without a picture, Acknowledgements, Tools as commands), or wait for v0.2.0 and build the library with its readers?' },
+  { title: 'Branding.', text: 'The amber accent and “Graphite and amber” look; whether the core keeps PS1Console.name = “PlayStation” (the design never shows it); and the on-screen pad’s outline shapes before the trademark check.' },
+  { title: 'PS2 before v2.x.', text: 'List PS2 discs and refuse them with the reason (designed), or hide them until PS2 plays?' },
+  { title: 'BIOS guidance.', text: 'How much to say about copying a BIOS from your own console, given iStation can never link to or host one.' }
+];
+
+var EVIDENCE = [
+  '$ probe (PS1Core and EmuKit by path, release)',
+  'name: PlayStation | isPoweredOn: false | frame: 0',
+  'runFrame while off -> frame: 0',
+  'powerOn(1000 bytes) throws: biosSize(1000)',
+  'powerOn(524288 bytes) -> isPoweredOn: true frame: 0',
+  '60 x runFrame -> frame: 60 in 0.01398925 seconds',
+  'powerOn again -> frame: 0',
+  'PlayerViewModel.state: nothingLoaded | consoleName: PlayStation | message: Nothing to play yet.',
+  'acks macOS: iStation (MIT), ProjectPSX (MIT), Play! (BSD-2-Clause), Play! Framework (BSD-2-Clause), Play! CodeGen (BSD-2-Clause), Nuanceur (BSD-2-Clause)',
+  'acks iOS: iStation (MIT), ProjectPSX (MIT)',
+  'acks empty state: empty | iStation includes no third-party code yet.',
+  'PSEXE(10 bytes): tooShort',
+  'PSEXE(4096 zero bytes): notAnEXE',
+  '',
+  '$ istation-run (release)',
+  'no arguments            exit 2  usage: istation-run cpu-check-image <out> | run --bios <image> … | diff <left> <right> [--ignore-cycles] [--min-records <n>] | frames <trace>…',
+  'run … --speed 2         exit 2  unknown option: --speed',
+  'run --frames 60         exit 0  [istation-run] 60 frames, 1698623 instructions, 33972213 CPU cycles, 33972249 system cycles, 0.012 s emulating, 136 M instructions/s',
+  'run, 1,000-byte BIOS    exit 2  biosSize(1000)',
+  'run --exe, code image   exit 3  the EXE never started: the BIOS didn’t reach its shell in 30 frames',
+  'diff, two images        exit 1  first divergence at record 0 of 56689 and 56625: word',
+  'diff, same trace        exit 0  identical: 60 records',
+  '',
+  '$ swift test --filter SystemCNF|Playlists|ISO9660   passed',
+  '$ grep URLSession|URLRequest|NWConnection in source/ and apps/   no matches'
+].join('\n');
+
+var TAGS = {
+  ready: { text: 'ready', help: 'exists today', fg: 'ok', bg: 'ok-bg' },
+  app: { text: 'app', help: 'the app does it from what exists', fg: 'info', bg: 'info-bg' },
+  gap: { text: 'gap', help: 'needs a backend change', fg: 'warn', bg: 'warn-bg' },
+  verify: { text: 'verify', help: 'assumed; still to probe', fg: 'verify', bg: 'verify-bg' }
+};
+
+function rootVars(theme) {
+  var c = TOKENS.color[theme], out = [];
+  Object.keys(c).forEach(function (k) { out.push('--' + k + ':' + c[k]); });
+  Object.keys(TOKENS.font).forEach(function (k) { out.push('--font-' + k + ':' + TOKENS.font[k]); });
+  return out.join(';');
+}
+
+class Component extends DCLogic {
+  renderVals() {
+    var theme = this.props.theme === 'dark' || this.props.theme === 'contrast' ? this.props.theme : 'light';
+    var areas = [];
+    ROWS.forEach(function (r) {
+      var a = areas.filter(function (x) { return x.name === r.area; })[0];
+      if (!a) { a = { name: r.area, rows: [] }; areas.push(a); }
+      var t = TAGS[r.tag];
+      a.rows.push({ id: r.id, part: r.part, by: r.by, note: r.note + (r.gap ? ' (' + r.gap + ')' : ''), tagText: t.text, tagStyle: 'display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;color:var(--' + t.fg + ');background:var(--' + t.bg + ')' });
+    });
+    var count = function (tag) { return ROWS.filter(function (r) { return r.tag === tag; }).length; };
+    var stats = ['ready', 'app', 'gap', 'verify'].map(function (k) {
+      var t = TAGS[k];
+      return { n: count(k), label: t.text, help: t.help, style: 'display:flex;flex-direction:column;gap:2px;padding:16px;border-radius:12px;background:var(--' + t.bg + ');color:var(--' + t.fg + ')' };
+    });
+    stats.push({ n: ROWS.length, label: 'rows', help: 'every part of the design', style: 'display:flex;flex-direction:column;gap:2px;padding:16px;border-radius:12px;background:var(--bg-content);border:1px solid var(--line);color:var(--fg)' });
+    stats.push({ n: GAPS.length, label: 'gaps', help: 'each with its change and fallback', style: 'display:flex;flex-direction:column;gap:2px;padding:16px;border-radius:12px;background:var(--bg-content);border:1px solid var(--line);color:var(--fg)' });
+    var gaps = GAPS.map(function (g) {
+      var rows = ROWS.filter(function (r) { return r.gap === g.id; }).map(function (r) { return r.id; });
+      return { id: g.id, title: g.title, when: 'needed by ' + g.when, change: g.change, until: g.until, rowList: rows.join(', ') + (g.item ? '. Backlog item ' + g.item : '. No backlog item yet: v2.x starts with a spike') };
+    });
+    return {
+      rootStyle: rootVars(theme) + ';background:var(--bg-window);color:var(--fg);font-family:var(--font-ui);font-size:14px;line-height:1.4;min-height:100%',
+      stats: stats, areas: areas, gaps: gaps, decisions: DECISIONS, calls: CALLS, evidence: EVIDENCE
+    };
+  }
+}
+</script>
+</body>
+</html>

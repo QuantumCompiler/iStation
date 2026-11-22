@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Layout</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="{{ rootStyle }}">
+  <div style="max-width:1360px;margin:0 auto;padding:48px 40px 64px;display:flex;flex-direction:column;gap:32px">
+    <header style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:13px;font-weight:600;color:var(--accent-text);letter-spacing:0.04em;text-transform:uppercase">Build · Layout</div>
+      <h1 style="margin:0;font-size:36px;line-height:1.15;font-family:var(--font-display)">Regions, sizes, navigation, keys, states and SwiftUI</h1>
+      <p style="margin:0;max-width:900px;color:var(--fg-muted);font-size:16px;line-height:1.5">Sizes are points. Every size here is a token in json/tokens.json (size.mac, size.ios), so the styles module’s Metrics carries them.</p>
+    </header>
+
+    <section aria-label="The Mac window" style="display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-size:22px">The Mac window, to scale at 1280 × 800</h2>
+      <div style="position:relative;width:1024px;height:640px;border:1px solid var(--line-strong);border-radius:10px;background:var(--bg-content);overflow:hidden">
+        <div style="position:absolute;left:0;top:0;width:176px;height:640px;background:var(--bg-sidebar);border-right:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:6px">
+          <span style="font-weight:700">Sidebar</span><span style="font-size:12px;color:var(--fg-muted)">220 wide; drag 180 to 280. Library, Console, Personal build. Hidden while playing, and when Game info opens in a window under 1100 wide.</span>
+        </div>
+        <div style="position:absolute;left:176px;top:0;right:0;height:42px;background:var(--bg-toolbar);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 12px;gap:8px">
+          <span style="font-weight:700">Toolbar</span><span style="font-size:12px;color:var(--fg-muted)">52 tall: title and subtitle, then the screen’s buttons, then Search (200 wide)</span>
+        </div>
+        <div style="position:absolute;left:176px;top:42px;right:240px;bottom:0;padding:14px;display:flex;flex-direction:column;gap:6px">
+          <span style="font-weight:700">Content</span><span style="font-size:12px;color:var(--fg-muted)">Fluid. Rows 30 tall. Under 880 wide the Format column goes; under 700, Last played. Grid tiles 168 square with 20 between.</span>
+          <div style="margin-top:20px;border:1px dashed var(--line-strong);border-radius:12px;width:416px;padding:12px;align-self:center;display:flex;flex-direction:column;gap:4px;background:var(--bg-raised)"><span style="font-weight:700">Sheet</span><span style="font-size:12px;color:var(--fg-muted)">520 wide (states 640, shortcuts 620), 60 below the window’s top, dims the window. Jobs, pickers, save states, rename.</span></div>
+          <div style="margin-top:14px;border:1px dashed var(--line-strong);border-radius:12px;width:256px;padding:12px;align-self:center;display:flex;flex-direction:column;gap:4px;background:var(--bg-raised)"><span style="font-weight:700">Alert</span><span style="font-size:12px;color:var(--fg-muted)">320 wide, 140 down: icon, title, message, Details, buttons.</span></div>
+        </div>
+        <div style="position:absolute;right:0;top:42px;width:240px;bottom:0;background:var(--bg-window);border-left:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:6px">
+          <span style="font-weight:700">Game info</span><span style="font-size:12px;color:var(--fg-muted)">The inspector, 300 wide, ⌘I. In the player, the personal build’s debug drawer takes this place, also 300.</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:14px">
+        <sc-for list="{{ sizes }}" as="z" hint-placeholder-count="3">
+          <div style="padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--bg-content);display:flex;flex-direction:column;gap:6px">
+            <div style="font-weight:700">{{ z.title }}</div>
+            <sc-for list="{{ z.items }}" as="it" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;gap:12px;font-size:13px"><span style="color:var(--fg-muted)">{{ it.k }}</span><span style="font-family:var(--font-mono);text-align:right">{{ it.v }}</span></div></sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section aria-label="Navigation" style="display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-size:22px">Navigation</h2>
+      <div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:14px">
+        <sc-for list="{{ nav }}" as="n" hint-placeholder-count="4">
+          <div style="padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--bg-content);display:flex;flex-direction:column;gap:6px">
+            <div style="font-weight:700">{{ n.title }}</div>
+            <sc-for list="{{ n.items }}" as="it" hint-placeholder-count="4"><div style="font-size:13px;line-height:1.45"><span style="font-weight:600">{{ it.from }}</span><span style="color:var(--fg-muted)"> → {{ it.to }}</span></div></sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section aria-label="Keyboard" style="display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-size:22px">Every keyboard shortcut, and the menus that carry them</h2>
+      <p style="margin:0;color:var(--fg-muted);max-width:900px">Every destination has a key. ⌘ shortcuts never reach the game; plain keys do, once input exists (G4). The prototype answers the same keys; tools/check.mjs fails if a listed key reaches nothing.</p>
+      <div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:14px">
+        <sc-for list="{{ keys }}" as="g" hint-placeholder-count="4">
+          <div style="padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--bg-content);display:flex;flex-direction:column;gap:5px">
+            <div style="font-weight:700">{{ g.title }}</div>
+            <sc-for list="{{ g.items }}" as="k" hint-placeholder-count="6"><div style="display:flex;justify-content:space-between;gap:10px;font-size:13px"><span>{{ k.label }}</span><span style="font-size:12px;padding:0 6px;border:1px solid var(--line-strong);border-radius:4px;color:var(--fg-muted);white-space:nowrap">{{ k.key }}</span></div></sc-for>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:14px">
+        <sc-for list="{{ menus }}" as="m" hint-placeholder-count="7">
+          <div style="padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--bg-raised);display:flex;flex-direction:column;gap:4px">
+            <div style="font-weight:700">{{ m.title }} menu</div>
+            <div style="font-size:13px;color:var(--fg-muted);line-height:1.5">{{ m.items }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section aria-label="States" style="display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-size:22px">The states every screen draws</h2>
+      <div style="overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--bg-content)">
+        <div role="table" aria-label="States by screen" style="min-width:1100px">
+          <div role="row" style="display:grid;grid-template-columns:170px repeat(7, minmax(0, 1fr));gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);font-size:12px;font-weight:700;color:var(--fg-muted);background:var(--bg-raised)">
+            <span role="columnheader">Screen</span><sc-for list="{{ stateCols }}" as="c" hint-placeholder-count="7"><span role="columnheader">{{ c }}</span></sc-for>
+          </div>
+          <sc-for list="{{ states }}" as="r" hint-placeholder-count="8">
+            <div role="row" style="display:grid;grid-template-columns:170px repeat(7, minmax(0, 1fr));gap:10px;padding:8px 16px;border-bottom:1px solid var(--line);font-size:12px;line-height:1.4">
+              <span role="cell" style="font-weight:700;font-size:13px">{{ r.screen }}</span>
+              <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="7"><span role="cell" style="{{ c.style }}">{{ c.text }}</span></sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section aria-label="SwiftUI" style="display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-size:22px">Each piece in SwiftUI</h2>
+      <p style="margin:0;color:var(--fg-muted);max-width:900px">macOS 14 and iOS 17, the package’s floors. Each place is a Presentation module with Views and ViewModels (ADR 0020): Library, Player, Jobs, SaveStates, MemoryCards, BIOS, Settings and, in personal builds, Tools, beside today’s player and acknowledgements.</p>
+      <div style="border:1px solid var(--line);border-radius:12px;background:var(--bg-content);overflow:hidden">
+        <sc-for list="{{ controls }}" as="c" hint-placeholder-count="10">
+          <div style="display:grid;grid-template-columns:260px 1fr;gap:16px;padding:9px 16px;border-bottom:1px solid var(--line);font-size:13px;line-height:1.45">
+            <span style="font-weight:600">{{ c.piece }}</span><span style="font-family:var(--font-mono);font-size:12px;overflow-wrap:anywhere">{{ c.swiftui }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark","contrast"],"default":"light"},"$preview":{"width":1440,"height":4300}}'>
+/*TOKENS:BEGIN*/var TOKENS = {"name":"iStation: Graphite and Amber","version":1,"about":"Every color, font, size, space, radius and duration the iStation apps draw with, named for its role. The prototype (html/main.html) embeds this file verbatim as TOKENS; tools/check.mjs fails if the two differ. In SwiftUI each role becomes a case of the styles module (Palette, Typography, Metrics, Motion), as the swiftui map says.","themes":["dark","light","contrast"],"color":{"dark":{"bg-window":"#1E1E21","bg-sidebar":"#26262A","bg-content":"#19191B","bg-raised":"#2B2B30","bg-toolbar":"#232327","bg-control":"#3A3A40","bg-control-hover":"#45454C","bg-control-pressed":"#505058","bg-hover-row":"#2A2A2F","bg-selected":"#4A3B1F","bg-screen":"#000000","bg-picture":"#1C1C1F","bg-overlay":"#00000099","line":"#38383E","line-strong":"#7A7A82","focus":"#8AB4FF","fg":"#EDEDEF","fg-muted":"#AEAEB5","fg-faint":"#6E6E76","fg-on-screen":"#F2F2F2","fg-on-screen-muted":"#A6A6A6","fg-on-accent":"#1B1305","fg-on-danger":"#FFFFFF","accent":"#F2A93B","accent-hover":"#F6B85A","accent-pressed":"#DC9426","accent-text":"#F5B65A","ok":"#62D6AA","ok-bg":"#16382D","warn":"#F2C14E","warn-bg":"#3A2F12","danger":"#FF8177","danger-bg":"#421F1C","danger-solid":"#C2362D","info":"#8AB4FF","info-bg":"#1B2C45","verify":"#CDA8FF","verify-bg":"#32244A","shadow":"#00000080","traffic-close":"#FF5F57","traffic-minimize":"#FEBC2E","traffic-zoom":"#28C840"},"light":{"bg-window":"#F3F3F5","bg-sidebar":"#E8E8EC","bg-content":"#FFFFFF","bg-raised":"#FFFFFF","bg-toolbar":"#EFEFF2","bg-control":"#E6E6EA","bg-control-hover":"#DCDCE1","bg-control-pressed":"#D0D0D6","bg-hover-row":"#F0F0F4","bg-selected":"#F7E2BC","bg-screen":"#000000","bg-picture":"#1C1C1F","bg-overlay":"#00000059","line":"#DADADF","line-strong":"#8B8B93","focus":"#2F6FDB","fg":"#1C1C1E","fg-muted":"#5C5C64","fg-faint":"#A3A3AA","fg-on-screen":"#F2F2F2","fg-on-screen-muted":"#A6A6A6","fg-on-accent":"#FFFFFF","fg-on-danger":"#FFFFFF","accent":"#A35F00","accent-hover":"#935500","accent-pressed":"#8C5100","accent-text":"#8A5000","ok":"#0B7350","ok-bg":"#DCF2E9","warn":"#7D5800","warn-bg":"#FAEFD0","danger":"#B0261E","danger-bg":"#FBE4E2","danger-solid":"#B0261E","info":"#1E5CB8","info-bg":"#E1EBFA","verify":"#6A3DAE","verify-bg":"#EFE7FA","shadow":"#00000033","traffic-close":"#FF5F57","traffic-minimize":"#FEBC2E","traffic-zoom":"#28C840"},"contrast":{"bg-window":"#000000","bg-sidebar":"#0B0B0B","bg-content":"#000000","bg-raised":"#121212","bg-toolbar":"#0B0B0B","bg-control":"#1F1F1F","bg-control-hover":"#2C2C2C","bg-control-pressed":"#3A3A3A","bg-hover-row":"#1A1A1A","bg-selected":"#3D2D00","bg-screen":"#000000","bg-picture":"#141414","bg-overlay":"#000000CC","line":"#8F8F8F","line-strong":"#FFFFFF","focus":"#FFD60A","fg":"#FFFFFF","fg-muted":"#D9D9D9","fg-faint":"#8F8F8F","fg-on-screen":"#FFFFFF","fg-on-screen-muted":"#D0D0D0","fg-on-accent":"#000000","fg-on-danger":"#000000","accent":"#FFC24D","accent-hover":"#FFD27A","accent-pressed":"#E6AA30","accent-text":"#FFC24D","ok":"#7CF0C0","ok-bg":"#002B1D","warn":"#FFE066","warn-bg":"#2E2500","danger":"#FF9A92","danger-bg":"#3A0A07","danger-solid":"#FF9A92","info":"#A3CCFF","info-bg":"#00213F","verify":"#DEC6FF","verify-bg":"#2A0F4A","shadow":"#000000","traffic-close":"#FF5F57","traffic-minimize":"#FEBC2E","traffic-zoom":"#28C840"}},"contrastPairs":[{"fg":"fg","bg":"bg-window","min":4.5},{"fg":"fg","bg":"bg-sidebar","min":4.5},{"fg":"fg","bg":"bg-content","min":4.5},{"fg":"fg","bg":"bg-raised","min":4.5},{"fg":"fg","bg":"bg-toolbar","min":4.5},{"fg":"fg","bg":"bg-control","min":4.5},{"fg":"fg","bg":"bg-control-hover","min":4.5},{"fg":"fg","bg":"bg-control-pressed","min":4.5},{"fg":"fg","bg":"bg-hover-row","min":4.5},{"fg":"fg","bg":"bg-selected","min":4.5},{"fg":"fg-muted","bg":"bg-window","min":4.5},{"fg":"fg-muted","bg":"bg-sidebar","min":4.5},{"fg":"fg-muted","bg":"bg-content","min":4.5},{"fg":"fg-muted","bg":"bg-raised","min":4.5},{"fg":"fg-muted","bg":"bg-toolbar","min":4.5},{"fg":"fg-muted","bg":"bg-control","min":4.5},{"fg":"fg-muted","bg":"bg-hover-row","min":4.5},{"fg":"fg-muted","bg":"bg-selected","min":4.5},{"fg":"accent-text","bg":"bg-content","min":4.5},{"fg":"accent-text","bg":"bg-raised","min":4.5},{"fg":"accent-text","bg":"bg-sidebar","min":4.5},{"fg":"fg-on-accent","bg":"accent","min":4.5},{"fg":"fg-on-accent","bg":"accent-hover","min":4.5},{"fg":"fg-on-accent","bg":"accent-pressed","min":4.5},{"fg":"fg-on-danger","bg":"danger-solid","min":4.5},{"fg":"ok","bg":"ok-bg","min":4.5},{"fg":"ok","bg":"bg-content","min":4.5},{"fg":"ok","bg":"bg-raised","min":4.5},{"fg":"warn","bg":"warn-bg","min":4.5},{"fg":"warn","bg":"bg-content","min":4.5},{"fg":"warn","bg":"bg-raised","min":4.5},{"fg":"danger","bg":"danger-bg","min":4.5},{"fg":"danger","bg":"bg-content","min":4.5},{"fg":"danger","bg":"bg-raised","min":4.5},{"fg":"info","bg":"info-bg","min":4.5},{"fg":"info","bg":"bg-content","min":4.5},{"fg":"info","bg":"bg-raised","min":4.5},{"fg":"verify","bg":"verify-bg","min":4.5},{"fg":"fg-on-screen","bg":"bg-screen","min":4.5},{"fg":"fg-on-screen-muted","bg":"bg-screen","min":4.5},{"fg":"fg-on-screen-muted","bg":"bg-picture","min":4.5},{"fg":"focus","bg":"bg-content","min":3},{"fg":"focus","bg":"bg-window","min":3},{"fg":"line-strong","bg":"bg-content","min":3},{"fg":"line-strong","bg":"bg-raised","min":3},{"fg":"accent","bg":"bg-content","min":3}],"font":{"ui":"-apple-system, BlinkMacSystemFont, \"SF Pro Text\", system-ui, \"Helvetica Neue\", sans-serif","display":"-apple-system, BlinkMacSystemFont, \"SF Pro Display\", system-ui, \"Helvetica Neue\", sans-serif","mono":"ui-monospace, \"SF Mono\", Menlo, Consolas, monospace"},"type":{"mac":{"largetitle":26,"title":20,"title2":17,"title3":15,"headline":13,"body":13,"callout":12,"caption":11},"ios":{"largetitle":34,"title":28,"title2":22,"title3":20,"headline":17,"body":17,"callout":16,"caption":13}},"textScale":{"s":0.92,"m":1,"l":1.12,"xl":1.25},"weight":{"regular":400,"medium":500,"semibold":600,"bold":700},"space":{"1":4,"2":8,"3":12,"4":16,"5":20,"6":24,"8":32,"10":40},"radius":{"control":6,"card":10,"sheet":12,"window":12,"device":44,"pill":999},"motion":{"fast":120,"base":200,"slow":320,"ease":"cubic-bezier(0.2, 0, 0, 1)","reduced":0},"size":{"mac":{"control":28,"toolbar":52,"sidebar":220,"inspector":300,"row":30,"tile":168,"windowMinWidth":800,"windowMinHeight":560,"windowWidth":1280,"windowHeight":800,"pictureMinWidth":640,"pictureMinHeight":480},"ios":{"control":44,"toolbar":52,"sidebar":320,"inspector":320,"row":64,"tile":160,"windowMinWidth":320,"windowMinHeight":568,"windowWidth":390,"windowHeight":844,"pictureMinWidth":320,"pictureMinHeight":240}},"swiftui":{"bg-window":"Palette.window: Color(nsColor: .windowBackgroundColor) / Color(uiColor: .systemBackground)","bg-sidebar":"Palette.sidebar: the NavigationSplitView sidebar's own material","bg-content":"Palette.content: Color(nsColor: .controlBackgroundColor) / .secondarySystemBackground","bg-raised":"Palette.raised: sheet and popover background","bg-toolbar":"Palette.toolbar: the window toolbar's own material","bg-control":"Palette.control: bordered button fill (.buttonStyle(.bordered))","bg-selected":"Palette.selected: a List or Table row's selection, tinted by the accent","bg-screen":"Palette.screen (exists today): Color.black","bg-picture":"the frame the console draws; a placeholder in the design only","bg-overlay":"the system's sheet and alert dimming; not drawn by the app","line":"Palette.separator: Color(nsColor: .separatorColor)","line-strong":"Palette.controlBorder: a field's or bordered button's edge","focus":"the system focus ring (.focusable(), FocusState); tinted by the accent on macOS","fg":"Palette.text: .primary","fg-muted":"Palette.secondaryText (exists today): .secondary","fg-faint":"Palette.disabledText: .tertiary, disabled controls only","fg-on-screen":"Palette.onScreen (exists today): Color.white","fg-on-screen-muted":"Palette.onScreenSecondary","fg-on-accent":"Palette.onAccent","fg-on-danger":"Palette.onDestructive","accent":"Palette.accent: the app's AccentColor asset; .tint(Palette.accent)","accent-text":"Palette.accentText: links and accent-colored labels","ok":"Palette.ok","warn":"Palette.warning","danger":"Palette.danger","info":"Palette.info","verify":"Palette.verify (design pages only)","font.ui":"Typography: Font.body and the system text styles","font.mono":"Typography.mono: Font.system(.body, design: .monospaced)","type.*":"Typography: .largeTitle, .title, .title2, .title3, .headline, .body, .callout, .caption; scaled by DynamicTypeSize","space.*":"Metrics.space1 to space10","radius.*":"Metrics.radiusControl, radiusCard, radiusSheet","motion.*":"Motion.fast, base, slow: Animation.snappy(duration:); none when accessibilityReduceMotion"}};/*TOKENS:END*/
+
+var SHORTCUTS = [
+  { title: 'Library', items: [['Add Games…', '⌘O'], ['Add Folder…', '⇧⌘O'], ['Search', '⌘F'], ['All Games', '⌘1'], ['PS1', '⌘2'], ['PS2', '⌘3'], ['Recently Played', '⌘4'], ['Memory Cards', '⌘5'], ['BIOS', '⌘6'], ['Tools (personal build)', '⌘7'], ['Show or hide the sidebar', '⌃⌘S'], ['Show or hide game info', '⌘I'], ['Play the selected game', '↩'], ['Move the selection', '↑ ↓'], ['Remove from Library…', '⌘⌫']] },
+  { title: 'Playing', items: [['Pause or resume', '⌘P'], ['Reset…', '⌘R'], ['Save State…', '⌘S'], ['Load State…', '⌘L'], ['Save Screenshot', '⇧⌘S'], ['Full screen', '⌃⌘F'], ['Debug drawer (personal build)', '⌥⌘D'], ['Stop playing…', '⌘.']] },
+  { title: 'Windows', items: [['Settings', '⌘,'], ['Acknowledgements', '⌥⌘A'], ['Keyboard Shortcuts', '⌘/'], ['Close a window, sheet or alert', 'Esc']] },
+  { title: 'Jobs and tools', items: [['Stop the running job', '⌘.'], ['Record a trace (personal build)', '⇧⌘R']] }
+];
+
+var MENUS = [
+  { title: 'iStation', items: 'About iStation · Acknowledgements… ⌥⌘A · Settings… ⌘, · Hide · Quit' },
+  { title: 'File', items: 'Add Games… ⌘O · Add Folder… ⇧⌘O · Show in Finder · Remove from Library… ⌘⌫' },
+  { title: 'View', items: 'as List · as Grid · Show Sidebar ⌃⌘S · Show Game Info ⌘I · Enter Full Screen ⌃⌘F' },
+  { title: 'Game', items: 'Play ↩ · Pause ⌘P · Reset… ⌘R · Save State… ⌘S · Load State… ⌘L · Save Screenshot ⇧⌘S · Stop… ⌘.' },
+  { title: 'Console', items: 'Run the BIOS · Memory Cards ⌘5 · BIOS ⌘6' },
+  { title: 'Tools (personal build)', items: 'Tools ⌘7 · Debug Drawer ⌥⌘D · Record a Trace… ⇧⌘R' },
+  { title: 'Help', items: 'Keyboard Shortcuts ⌘/' }
+];
+
+var SIZES = [
+  { title: 'Mac window', items: [['Default', '1280 × 800'], ['Minimum', '800 × 560'], ['Sidebar', '220 (180 to 280)'], ['Game info, debug drawer', '300'], ['Toolbar', '52'], ['Row', '30'], ['Control', '28'], ['Tile', '168']] },
+  { title: 'Mac breakpoints and other windows', items: [['Under 1100 wide with Game info', 'sidebar hides'], ['Content under 880', 'no Format column'], ['Content under 700', 'no Last played'], ['Picture', 'fit, or whole multiples of 320 × 240'], ['Player view minimum', '640 × 480 (Metrics today)'], ['Settings window', '680 wide'], ['Acknowledgements', '560 wide'], ['About', '300 wide']] },
+  { title: 'iPhone', items: [['Portrait', '390 × 844, library and settings'], ['Landscape', '844 × 390, the player'], ['List row', '64'], ['Touch target', '44 minimum'], ['On-screen buttons', '48 to 64'], ['Bottom sheet', 'up to 86% tall'], ['Alert', '290 wide'], ['Corner radius', '44']] }
+];
+
+var NAV = [
+  { title: 'First run', items: [['Welcome', 'Choose BIOS File… (picker)'], ['Picker', 'the BIOS check job'], ['Check failed', 'Choose Another File…'], ['Check done', 'the empty library']] },
+  { title: 'Library', items: [['Sidebar ⌘1 to ⌘7', 'All Games, PS1, PS2, Recently Played, Memory Cards, BIOS, Tools'], ['Add Games ⌘O', 'picker, then the list'], ['Add Folder ⇧⌘O', 'picker, then the scan job'], ['Play ↩', 'the opening job, then the player'], ['Game info ⌘I', 'the inspector']] },
+  { title: 'Player', items: [['Pause ⌘P', 'paused, Resume'], ['Save ⌘S, Load ⌘L', 'the save-state sheet'], ['Reset ⌘R, Stop ⌘.', 'their alerts'], ['Stop', 'back to the library'], ['Full screen ⌃⌘F', 'the HUD only, Esc to leave']] },
+  { title: 'Windows and iPhone', items: [['⌘,', 'Settings window'], ['⌥⌘A', 'Acknowledgements window'], ['⌘/', 'Keyboard Shortcuts sheet'], ['iPhone library', 'a row plays; + adds; gear opens Settings'], ['iPhone player', 'Pause opens the menu sheet']] }
+];
+
+var STATE_COLS = ['Empty', 'Loading', 'Running', 'Stopped', 'Error', 'Refused', 'Done'];
+var STATES = [
+  ['First run', ['Welcome', 'BIOS check', 'BIOS check', 'Check stopped', 'Wrong size', '', 'Check done']],
+  ['Library', ['Empty library; no search results', 'Scan running', '', 'Scan stopped', 'File moved', 'PS2 game', 'Scan done']],
+  ['Player', ['No picture yet (today)', 'Opening a game', 'Running', 'Paused', '', 'PS2 game; Play off today', '']],
+  ['Save states', ['Empty slots', '', '', '', 'Older format', '', 'Saved (a toast)']],
+  ['Memory cards', ['No cards yet', '', '', '', '', '', 'Moved to Trash (a toast)']],
+  ['Controllers', ['No controller', '', '', '', '', '', '']],
+  ['Tools', ['Nothing printed', '', 'Recording', 'Stopped, files deleted', 'Traces differ', '', 'Recorded']],
+  ['iPhone', ['Welcome', 'Opening a game', 'Playing', 'Paused', '', '', '']]
+];
+
+var CONTROLS = [
+  ['Window and sidebar', 'WindowGroup; NavigationSplitView { List(selection:) { Section } } detail: { … }; .navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 280)'],
+  ['Sidebar rows', 'Label(title, systemImage:) with .badge(count); .keyboardShortcut("1") on the matching CommandMenu items'],
+  ['Library as a list', 'Table(games, selection: $selection) { TableColumn("Name") … }; .contextMenu(forSelectionType:) { } primaryAction: { play }'],
+  ['Library as a grid', 'ScrollView { LazyVGrid(columns: [GridItem(.adaptive(minimum: 168), spacing: 20)]) }'],
+  ['Game info', '.inspector(isPresented:) { Form { LabeledContent } }; .inspectorColumnWidth(300)'],
+  ['Toolbar', '.toolbar { ToolbarItemGroup(placement: .primaryAction) }; Picker(.segmented) for list and grid; .searchable(text:placement: .toolbar)'],
+  ['Choosing files and folders', '.fileImporter(isPresented:allowedContentTypes: [.cue, .iso, .m3u, .psExe], allowsMultipleSelection: true); [.folder] for Add Folder; bookmarkData(options: .withSecurityScope)'],
+  ['Jobs', '.sheet { JobView }: List of steps (Label with a ProgressView() spinner while running), ProgressView(value:total:), Button("Stop").keyboardShortcut(".")'],
+  ['Alerts with Details', 'A small sheet in the alert’s layout: SwiftUI’s .alert can’t hold a DisclosureGroup, and Details shows the exact call'],
+  ['The picture', 'MTKView in an NSViewRepresentable (UIViewRepresentable on iPhone) presenting each frame the software rasterizer draws: v0.1.0’s Metal presentation; the Metal renderer itself is v0.3.0’s (G11). Sized to 4:3 or square pixels, nearest-neighbour unless smoothing'],
+  ['HUD and debug drawer', '.overlay(alignment: .bottom) { HUDView().background(.regularMaterial) }; the drawer is the player’s .inspector'],
+  ['Full screen', 'the window’s own full screen (⌃⌘F, View menu); .toolbar(.hidden, for: .windowToolbar) while in it'],
+  ['Save states', '.sheet { LazyVGrid of slot Buttons }; .confirmationDialog for Replace'],
+  ['Memory cards', 'List(selection:) beside a Form; NSWorkspace.activateFileViewerSelecting for Show in Finder; FileManager.trashItem'],
+  ['Settings', 'Settings { TabView { ControllersSettings().tabItem { Label } … } }; Form(.grouped); Picker(.segmented); Picker(.radioGroup); Toggle; Slider'],
+  ['Controllers', 'NotificationCenter for .GCControllerDidConnect; GCController.current?.battery; Grid for the mapping table'],
+  ['Acknowledgements and About', 'Window("Acknowledgements", id:) (exists today) with List and Link; orderFrontStandardAboutPanel(options:) with the version'],
+  ['Menus and keys', 'CommandMenu("Game"), CommandMenu("Console"), CommandGroup(after: .appInfo) (exists today); .keyboardShortcut on each Button'],
+  ['iPhone', 'NavigationStack; List with .searchable; .fullScreenCover for the player (landscape); .sheet with .presentationDetents([.medium]) for pause; on-screen pad as SwiftUI Buttons feeding the same input as GameController']
+];
+
+function rootVars(theme) {
+  var c = TOKENS.color[theme], out = [];
+  Object.keys(c).forEach(function (k) { out.push('--' + k + ':' + c[k]); });
+  Object.keys(TOKENS.font).forEach(function (k) { out.push('--font-' + k + ':' + TOKENS.font[k]); });
+  return out.join(';');
+}
+
+class Component extends DCLogic {
+  renderVals() {
+    var theme = this.props.theme === 'dark' || this.props.theme === 'contrast' ? this.props.theme : 'light';
+    return {
+      rootStyle: rootVars(theme) + ';background:var(--bg-window);color:var(--fg);font-family:var(--font-ui);font-size:14px;line-height:1.4;min-height:100%',
+      sizes: SIZES.map(function (z) { return { title: z.title, items: z.items.map(function (i) { return { k: i[0], v: i[1] }; }) }; }),
+      nav: NAV.map(function (n) { return { title: n.title, items: n.items.map(function (i) { return { from: i[0], to: i[1] }; }) }; }),
+      keys: SHORTCUTS.map(function (g) { return { title: g.title, items: g.items.map(function (k) { return { label: k[0], key: k[1] }; }) }; }),
+      menus: MENUS,
+      stateCols: STATE_COLS,
+      states: STATES.map(function (r) { return { screen: r[0], cells: r[1].map(function (t) { return { text: t || 'not drawn', style: t ? '' : 'color:var(--fg-muted)' }; }) }; }),
+      controls: CONTROLS.map(function (c) { return { piece: c[0], swiftui: c[1] }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

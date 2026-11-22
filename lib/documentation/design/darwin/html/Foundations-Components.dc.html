@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Components in their states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.ist,.ist *{box-sizing:border-box}
+.ist{line-height:1.35;-webkit-font-smoothing:antialiased;outline:none}
+.ist button,.ist input,.ist select{font:inherit;color:inherit}
+.ist p{margin:0}
+.ist .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:var(--size-control);padding:0 12px;border-radius:var(--radius-control);border:1px solid var(--line-strong);background:var(--bg-control);color:var(--fg);cursor:pointer;white-space:nowrap;transition:background var(--motion-fast) var(--ease)}
+.ist .btn:hover{background:var(--bg-control-hover)}
+.ist .btn:active{background:var(--bg-control-pressed)}
+.ist .btn:disabled{color:var(--fg-faint);background:var(--bg-control);border-color:var(--line);cursor:default}
+.ist .btn-primary{background:var(--accent);border-color:var(--accent);color:var(--fg-on-accent);font-weight:600}
+.ist .btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.ist .btn-primary:active{background:var(--accent-pressed);border-color:var(--accent-pressed)}
+.ist .btn-primary:disabled{background:var(--bg-control);border-color:var(--line);color:var(--fg-faint)}
+.ist .btn-danger{background:var(--danger-solid);border-color:var(--danger-solid);color:var(--fg-on-danger);font-weight:600}
+.ist .btn-danger:hover{background:var(--danger-solid)}
+.ist .btn-plain{background:transparent;border-color:transparent;color:var(--accent-text)}
+.ist .btn-plain:hover{background:var(--bg-control)}
+.ist .btn-wide{width:100%}
+.ist .tb{width:32px;height:28px;padding:0;border-radius:var(--radius-control);border:0;background:transparent;color:var(--fg-muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.ist .tb:hover{background:var(--bg-control);color:var(--fg)}
+.ist .tb[aria-pressed="true"]{background:var(--bg-control-pressed);color:var(--fg)}
+.ist .tb:disabled{color:var(--fg-faint);background:transparent;cursor:default}
+.ist .sbrow,.ist .grow,.ist .pick{display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;color:var(--fg);cursor:pointer;text-align:left}
+.ist .sbrow{height:28px;padding:0 8px;border-radius:var(--radius-control)}
+.ist .sbrow:hover,.ist .grow:hover,.ist .pick:hover{background:var(--bg-hover-row)}
+.ist .grow{display:grid;align-items:center;height:var(--size-row);padding:0 12px;border-radius:var(--radius-control)}
+.ist .pick{height:30px;padding:0 10px;border-radius:var(--radius-control)}
+.ist .tile{display:flex;flex-direction:column;gap:6px;width:var(--size-tile);padding:0;border:0;background:transparent;color:var(--fg);cursor:pointer;text-align:left}
+.ist .slot{display:flex;flex-direction:column;gap:4px;padding:8px;border-radius:var(--radius-card);border:1px solid var(--line);background:var(--bg-content);color:var(--fg);cursor:pointer;text-align:left}
+.ist .slot:hover{background:var(--bg-hover-row)}
+.ist .seg{display:inline-flex;padding:2px;border-radius:var(--radius-control);background:var(--bg-control);gap:2px}
+.ist .seg button{border:0;border-radius:4px;padding:3px 10px;background:transparent;color:var(--fg);cursor:pointer}
+.ist .seg button[aria-pressed="true"]{background:var(--bg-raised);font-weight:600;box-shadow:0 1px 2px var(--shadow)}
+.ist .tab{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:72px;padding:6px 8px;border:0;border-radius:var(--radius-control);background:transparent;color:var(--fg-muted);cursor:pointer}
+.ist .tab:hover{background:var(--bg-control);color:var(--fg)}
+.ist .tab[aria-pressed="true"]{background:var(--bg-control-pressed);color:var(--fg)}
+.ist .field{height:var(--size-control);border-radius:var(--radius-control);border:1px solid var(--line-strong);background:var(--bg-content);color:var(--fg);padding:0 8px;min-width:0}
+.ist .field::placeholder{color:var(--fg-muted)}
+.ist :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.ist:focus-visible{outline:none}
+.ist .ic{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ist .icf{fill:currentColor;stroke:none}
+.ist .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.ist .kbd{display:inline-block;font-size:var(--text-caption);line-height:1.4;padding:0 6px;border:1px solid var(--line-strong);border-radius:4px;color:var(--fg-muted);background:var(--bg-control);white-space:nowrap}
+.ist .chip{display:inline-flex;align-items:center;gap:4px;font-size:var(--text-caption);font-weight:600;line-height:1.5;padding:0 6px;border-radius:var(--radius-pill);white-space:nowrap}
+.ist .muted{color:var(--fg-muted)}
+.ist .cap{font-size:var(--text-caption)}
+.ist .ellip{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ist details summary{cursor:pointer;color:var(--accent-text);font-size:var(--text-callout)}
+.ist a{color:var(--accent-text)}
+.ist a:hover{color:var(--accent-text);text-decoration:underline}
+.ist progress{width:100%;height:6px;accent-color:var(--accent)}
+.ist input[type=range]{accent-color:var(--accent);width:220px}
+.ist input[type=checkbox],.ist input[type=radio]{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.ist .spin{animation:ist-spin 0.9s linear infinite;transform-origin:50% 50%}
+@keyframes ist-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.ist *{transition:none!important;animation:none!important}}
+</style>
+</helmet>
+<div style="{{ pageStyle }}">
+  <div style="max-width:1360px;margin:0 auto;padding:48px 40px 64px;display:flex;flex-direction:column;gap:28px">
+    <header style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:13px;font-weight:600;color:var(--accent-text);letter-spacing:0.04em;text-transform:uppercase">Foundations · Components</div>
+      <h1 style="margin:0;font-size:36px;line-height:1.15;font-family:var(--font-display)">Every component, in every state, in each theme</h1>
+      <p style="margin:0;max-width:900px;color:var(--fg-muted);font-size:16px;line-height:1.5">Drawn with the prototype’s own classes and icons (copied from html/main.html; the check fails if they drift). Hover, pressed and focus are drawn as they look, since a still page can’t hold the pointer.</p>
+    </header>
+    <sc-for list="{{ themes }}" as="th" hint-placeholder-count="3">
+      <section class="ist" aria-label="{{ th.name }}" style="{{ th.style }}">
+        <h2 style="margin:0;font-size:22px">{{ th.name }}</h2>
+
+        <div style="display:grid;grid-template-columns:140px repeat(5, minmax(0, 1fr));gap:10px 14px;align-items:center">
+          <span></span><sc-for list="{{ stateNames }}" as="sn" hint-placeholder-count="5"><span class="cap muted" style="font-weight:600">{{ sn }}</span></sc-for>
+          <sc-for list="{{ buttons }}" as="b" hint-placeholder-count="4">
+            <span class="cap muted" style="font-weight:600">{{ b.kind }}</span>
+            <sc-for list="{{ b.states }}" as="st" hint-placeholder-count="5"><span><button class="{{ st.cls }}" style="{{ st.style }}" disabled="{{ st.disabled }}">{{ b.label }}</button></span></sc-for>
+          </sc-for>
+          <span class="cap muted" style="font-weight:600">Toolbar button</span>
+          <sc-for list="{{ toolbar }}" as="t" hint-placeholder-count="5"><span><button class="tb" aria-label="{{ t.label }}" aria-pressed="{{ t.pressed }}" disabled="{{ t.disabled }}" style="{{ t.style }}"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="{{ icon.grid }}"></path></svg></button></span></sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:14px">
+          <sc-for list="{{ fields }}" as="f" hint-placeholder-count="4">
+            <label style="display:flex;flex-direction:column;gap:4px"><span class="cap muted" style="font-weight:600">{{ f.state }}</span><input class="field" value="{{ f.value }}" placeholder="Search" style="{{ f.style }}" readOnly="{{ true }}"><span class="cap" style="{{ f.helpStyle }}">{{ f.help }}</span></label>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center">
+          <div class="seg" role="group" aria-label="Segmented control"><button aria-pressed="true">Dark</button><button aria-pressed="false">Light</button><button aria-pressed="false">High contrast</button></div>
+          <label style="display:flex;gap:6px;align-items:center"><input type="checkbox" checked="{{ true }}" readOnly="{{ true }}">On</label>
+          <label style="display:flex;gap:6px;align-items:center"><input type="checkbox" checked="{{ false }}" readOnly="{{ true }}">Off</label>
+          <label style="display:flex;gap:6px;align-items:center;color:var(--fg-faint)"><input type="checkbox" disabled="{{ true }}">Disabled</label>
+          <label style="display:flex;gap:6px;align-items:center"><input type="radio" name="{{ th.radio }}" checked="{{ true }}" readOnly="{{ true }}">Chosen</label>
+          <label style="display:flex;gap:6px;align-items:center"><input type="radio" name="{{ th.radio }}" readOnly="{{ true }}">Not chosen</label>
+          <span style="display:flex;gap:6px;align-items:center"><span class="kbd">⌘O</span><span class="kbd">⇧⌘O</span><span class="kbd">↩</span></span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:240px 1fr;gap:20px">
+          <div style="display:flex;flex-direction:column;gap:4px;padding:8px;border-radius:var(--radius-card);background:var(--bg-sidebar)">
+            <sc-for list="{{ sidebar }}" as="it" hint-placeholder-count="3"><button class="sbrow" style="{{ it.style }}"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--accent-text)"><path class="ic" d="{{ icon.stack }}"></path></svg><span style="flex:1">{{ it.label }}</span><span class="cap muted">{{ it.note }}</span></button></sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;padding:6px;border-radius:var(--radius-card);background:var(--bg-content);border:1px solid var(--line)">
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="5">
+              <button class="grow" style="{{ r.style }}">
+                <span style="display:flex;align-items:center;gap:8px;min-width:0"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--fg-muted)"><path class="ic" d="{{ icon.disc }}"></path></svg><span class="ellip">{{ r.name }}</span><sc-if value="{{ r.chip }}" hint-placeholder-val="{{ false }}"><span class="chip" style="{{ r.chipStyle }}">{{ r.chip }}</span></sc-if></span>
+                <span style="{{ r.consoleStyle }}">{{ r.console }}</span><span class="mono" style="{{ r.consoleStyle }}">{{ r.serial }}</span><span class="muted">{{ r.state }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <sc-for list="{{ chips }}" as="c" hint-placeholder-count="10"><span class="chip" style="{{ c.style }}">{{ c.text }}</span></sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:12px">
+          <sc-for list="{{ banners }}" as="bn" hint-placeholder-count="4"><div role="note" style="{{ bn.style }}"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="flex:none"><path class="ic" d="{{ bn.icon }}"></path></svg><span>{{ bn.text }}</span></div></sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 320px;gap:20px;align-items:start">
+          <div style="display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:var(--radius-sheet);background:var(--bg-raised);border:1px solid var(--line)">
+            <div style="font-weight:600">Job steps</div>
+            <sc-for list="{{ steps }}" as="st" hint-placeholder-count="5">
+              <div style="display:flex;gap:10px;align-items:center"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="{{ st.iconStyle }}"><path class="ic" d="{{ st.icon }}"></path></svg><span style="flex:1">{{ st.label }}</span><span class="cap" style="{{ st.iconStyle }}">{{ st.state }}</span></div>
+            </sc-for>
+            <progress value="40" max="100" aria-label="Progress, 40 percent"></progress>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px">
+            <sc-for list="{{ slots }}" as="sl" hint-placeholder-count="4">
+              <button class="slot" style="{{ sl.ring }}"><span style="height:48px;border-radius:6px;background:var(--bg-screen);border:1px solid var(--line)"></span><span style="font-weight:600">{{ sl.title }}</span><span class="cap muted">{{ sl.when }}</span><sc-if value="{{ sl.old }}" hint-placeholder-val="{{ false }}"><span class="chip" style="background:var(--warn-bg);color:var(--warn);align-self:flex-start">Older format</span></sc-if></button>
+            </sc-for>
+          </div>
+          <div role="img" aria-label="An alert with Details" style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:20px;border-radius:var(--radius-sheet);border:1px solid var(--line);background:var(--bg-raised);box-shadow:0 10px 30px var(--shadow)">
+            <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--warn)"><path class="ic" d="{{ icon.warn }}"></path></svg>
+            <div style="font-weight:700;font-size:var(--text-headline)">Reset the console?</div>
+            <p style="font-size:var(--text-callout)">The game starts again from the beginning. Anything you haven’t saved is lost.</p>
+            <details open="{{ true }}" style="align-self:stretch;text-align:left"><summary>Details</summary><pre class="mono cap" style="margin:6px 0 0;padding:8px;border-radius:var(--radius-control);background:var(--bg-content);border:1px solid var(--line);white-space:pre-wrap">PS1Console.powerOn(bios:) with my-console-bios.bin (524,288 bytes)</pre></details>
+            <div style="display:flex;gap:8px;align-self:stretch"><button class="btn" style="flex:1">Cancel</button><button class="btn btn-danger" style="flex:1">Reset</button></div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(10, minmax(0, 1fr));gap:10px">
+          <sc-for list="{{ icons }}" as="ic" hint-placeholder-count="20"><div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:8px;background:var(--bg-content)"><svg width="22" height="22" viewBox="0 0 24 24" role="img" aria-label="{{ ic.name }}"><path class="ic" d="{{ ic.d }}"></path></svg><span class="cap muted" style="font-size:10px">{{ ic.name }}</span></div></sc-for>
+        </div>
+      </section>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":4600}}'>
+/*TOKENS:BEGIN*/var TOKENS = {"name":"iStation: Graphite and Amber","version":1,"about":"Every color, font, size, space, radius and duration the iStation apps draw with, named for its role. The prototype (html/main.html) embeds this file verbatim as TOKENS; tools/check.mjs fails if the two differ. In SwiftUI each role becomes a case of the styles module (Palette, Typography, Metrics, Motion), as the swiftui map says.","themes":["dark","light","contrast"],"color":{"dark":{"bg-window":"#1E1E21","bg-sidebar":"#26262A","bg-content":"#19191B","bg-raised":"#2B2B30","bg-toolbar":"#232327","bg-control":"#3A3A40","bg-control-hover":"#45454C","bg-control-pressed":"#505058","bg-hover-row":"#2A2A2F","bg-selected":"#4A3B1F","bg-screen":"#000000","bg-picture":"#1C1C1F","bg-overlay":"#00000099","line":"#38383E","line-strong":"#7A7A82","focus":"#8AB4FF","fg":"#EDEDEF","fg-muted":"#AEAEB5","fg-faint":"#6E6E76","fg-on-screen":"#F2F2F2","fg-on-screen-muted":"#A6A6A6","fg-on-accent":"#1B1305","fg-on-danger":"#FFFFFF","accent":"#F2A93B","accent-hover":"#F6B85A","accent-pressed":"#DC9426","accent-text":"#F5B65A","ok":"#62D6AA","ok-bg":"#16382D","warn":"#F2C14E","warn-bg":"#3A2F12","danger":"#FF8177","danger-bg":"#421F1C","danger-solid":"#C2362D","info":"#8AB4FF","info-bg":"#1B2C45","verify":"#CDA8FF","verify-bg":"#32244A","shadow":"#00000080","traffic-close":"#FF5F57","traffic-minimize":"#FEBC2E","traffic-zoom":"#28C840"},"light":{"bg-window":"#F3F3F5","bg-sidebar":"#E8E8EC","bg-content":"#FFFFFF","bg-raised":"#FFFFFF","bg-toolbar":"#EFEFF2","bg-control":"#E6E6EA","bg-control-hover":"#DCDCE1","bg-control-pressed":"#D0D0D6","bg-hover-row":"#F0F0F4","bg-selected":"#F7E2BC","bg-screen":"#000000","bg-picture":"#1C1C1F","bg-overlay":"#00000059","line":"#DADADF","line-strong":"#8B8B93","focus":"#2F6FDB","fg":"#1C1C1E","fg-muted":"#5C5C64","fg-faint":"#A3A3AA","fg-on-screen":"#F2F2F2","fg-on-screen-muted":"#A6A6A6","fg-on-accent":"#FFFFFF","fg-on-danger":"#FFFFFF","accent":"#A35F00","accent-hover":"#935500","accent-pressed":"#8C5100","accent-text":"#8A5000","ok":"#0B7350","ok-bg":"#DCF2E9","warn":"#7D5800","warn-bg":"#FAEFD0","danger":"#B0261E","danger-bg":"#FBE4E2","danger-solid":"#B0261E","info":"#1E5CB8","info-bg":"#E1EBFA","verify":"#6A3DAE","verify-bg":"#EFE7FA","shadow":"#00000033","traffic-close":"#FF5F57","traffic-minimize":"#FEBC2E","traffic-zoom":"#28C840"},"contrast":{"bg-window":"#000000","bg-sidebar":"#0B0B0B","bg-content":"#000000","bg-raised":"#121212","bg-toolbar":"#0B0B0B","bg-control":"#1F1F1F","bg-control-hover":"#2C2C2C","bg-control-pressed":"#3A3A3A","bg-hover-row":"#1A1A1A","bg-selected":"#3D2D00","bg-screen":"#000000","bg-picture":"#141414","bg-overlay":"#000000CC","line":"#8F8F8F","line-strong":"#FFFFFF","focus":"#FFD60A","fg":"#FFFFFF","fg-muted":"#D9D9D9","fg-faint":"#8F8F8F","fg-on-screen":"#FFFFFF","fg-on-screen-muted":"#D0D0D0","fg-on-accent":"#000000","fg-on-danger":"#000000","accent":"#FFC24D","accent-hover":"#FFD27A","accent-pressed":"#E6AA30","accent-text":"#FFC24D","ok":"#7CF0C0","ok-bg":"#002B1D","warn":"#FFE066","warn-bg":"#2E2500","danger":"#FF9A92","danger-bg":"#3A0A07","danger-solid":"#FF9A92","info":"#A3CCFF","info-bg":"#00213F","verify":"#DEC6FF","verify-bg":"#2A0F4A","shadow":"#000000","traffic-close":"#FF5F57","traffic-minimize":"#FEBC2E","traffic-zoom":"#28C840"}},"contrastPairs":[{"fg":"fg","bg":"bg-window","min":4.5},{"fg":"fg","bg":"bg-sidebar","min":4.5},{"fg":"fg","bg":"bg-content","min":4.5},{"fg":"fg","bg":"bg-raised","min":4.5},{"fg":"fg","bg":"bg-toolbar","min":4.5},{"fg":"fg","bg":"bg-control","min":4.5},{"fg":"fg","bg":"bg-control-hover","min":4.5},{"fg":"fg","bg":"bg-control-pressed","min":4.5},{"fg":"fg","bg":"bg-hover-row","min":4.5},{"fg":"fg","bg":"bg-selected","min":4.5},{"fg":"fg-muted","bg":"bg-window","min":4.5},{"fg":"fg-muted","bg":"bg-sidebar","min":4.5},{"fg":"fg-muted","bg":"bg-content","min":4.5},{"fg":"fg-muted","bg":"bg-raised","min":4.5},{"fg":"fg-muted","bg":"bg-toolbar","min":4.5},{"fg":"fg-muted","bg":"bg-control","min":4.5},{"fg":"fg-muted","bg":"bg-hover-row","min":4.5},{"fg":"fg-muted","bg":"bg-selected","min":4.5},{"fg":"accent-text","bg":"bg-content","min":4.5},{"fg":"accent-text","bg":"bg-raised","min":4.5},{"fg":"accent-text","bg":"bg-sidebar","min":4.5},{"fg":"fg-on-accent","bg":"accent","min":4.5},{"fg":"fg-on-accent","bg":"accent-hover","min":4.5},{"fg":"fg-on-accent","bg":"accent-pressed","min":4.5},{"fg":"fg-on-danger","bg":"danger-solid","min":4.5},{"fg":"ok","bg":"ok-bg","min":4.5},{"fg":"ok","bg":"bg-content","min":4.5},{"fg":"ok","bg":"bg-raised","min":4.5},{"fg":"warn","bg":"warn-bg","min":4.5},{"fg":"warn","bg":"bg-content","min":4.5},{"fg":"warn","bg":"bg-raised","min":4.5},{"fg":"danger","bg":"danger-bg","min":4.5},{"fg":"danger","bg":"bg-content","min":4.5},{"fg":"danger","bg":"bg-raised","min":4.5},{"fg":"info","bg":"info-bg","min":4.5},{"fg":"info","bg":"bg-content","min":4.5},{"fg":"info","bg":"bg-raised","min":4.5},{"fg":"verify","bg":"verify-bg","min":4.5},{"fg":"fg-on-screen","bg":"bg-screen","min":4.5},{"fg":"fg-on-screen-muted","bg":"bg-screen","min":4.5},{"fg":"fg-on-screen-muted","bg":"bg-picture","min":4.5},{"fg":"focus","bg":"bg-content","min":3},{"fg":"focus","bg":"bg-window","min":3},{"fg":"line-strong","bg":"bg-content","min":3},{"fg":"line-strong","bg":"bg-raised","min":3},{"fg":"accent","bg":"bg-content","min":3}],"font":{"ui":"-apple-system, BlinkMacSystemFont, \"SF Pro Text\", system-ui, \"Helvetica Neue\", sans-serif","display":"-apple-system, BlinkMacSystemFont, \"SF Pro Display\", system-ui, \"Helvetica Neue\", sans-serif","mono":"ui-monospace, \"SF Mono\", Menlo, Consolas, monospace"},"type":{"mac":{"largetitle":26,"title":20,"title2":17,"title3":15,"headline":13,"body":13,"callout":12,"caption":11},"ios":{"largetitle":34,"title":28,"title2":22,"title3":20,"headline":17,"body":17,"callout":16,"caption":13}},"textScale":{"s":0.92,"m":1,"l":1.12,"xl":1.25},"weight":{"regular":400,"medium":500,"semibold":600,"bold":700},"space":{"1":4,"2":8,"3":12,"4":16,"5":20,"6":24,"8":32,"10":40},"radius":{"control":6,"card":10,"sheet":12,"window":12,"device":44,"pill":999},"motion":{"fast":120,"base":200,"slow":320,"ease":"cubic-bezier(0.2, 0, 0, 1)","reduced":0},"size":{"mac":{"control":28,"toolbar":52,"sidebar":220,"inspector":300,"row":30,"tile":168,"windowMinWidth":800,"windowMinHeight":560,"windowWidth":1280,"windowHeight":800,"pictureMinWidth":640,"pictureMinHeight":480},"ios":{"control":44,"toolbar":52,"sidebar":320,"inspector":320,"row":64,"tile":160,"windowMinWidth":320,"windowMinHeight":568,"windowWidth":390,"windowHeight":844,"pictureMinWidth":320,"pictureMinHeight":240}},"swiftui":{"bg-window":"Palette.window: Color(nsColor: .windowBackgroundColor) / Color(uiColor: .systemBackground)","bg-sidebar":"Palette.sidebar: the NavigationSplitView sidebar's own material","bg-content":"Palette.content: Color(nsColor: .controlBackgroundColor) / .secondarySystemBackground","bg-raised":"Palette.raised: sheet and popover background","bg-toolbar":"Palette.toolbar: the window toolbar's own material","bg-control":"Palette.control: bordered button fill (.buttonStyle(.bordered))","bg-selected":"Palette.selected: a List or Table row's selection, tinted by the accent","bg-screen":"Palette.screen (exists today): Color.black","bg-picture":"the frame the console draws; a placeholder in the design only","bg-overlay":"the system's sheet and alert dimming; not drawn by the app","line":"Palette.separator: Color(nsColor: .separatorColor)","line-strong":"Palette.controlBorder: a field's or bordered button's edge","focus":"the system focus ring (.focusable(), FocusState); tinted by the accent on macOS","fg":"Palette.text: .primary","fg-muted":"Palette.secondaryText (exists today): .secondary","fg-faint":"Palette.disabledText: .tertiary, disabled controls only","fg-on-screen":"Palette.onScreen (exists today): Color.white","fg-on-screen-muted":"Palette.onScreenSecondary","fg-on-accent":"Palette.onAccent","fg-on-danger":"Palette.onDestructive","accent":"Palette.accent: the app's AccentColor asset; .tint(Palette.accent)","accent-text":"Palette.accentText: links and accent-colored labels","ok":"Palette.ok","warn":"Palette.warning","danger":"Palette.danger","info":"Palette.info","verify":"Palette.verify (design pages only)","font.ui":"Typography: Font.body and the system text styles","font.mono":"Typography.mono: Font.system(.body, design: .monospaced)","type.*":"Typography: .largeTitle, .title, .title2, .title3, .headline, .body, .callout, .caption; scaled by DynamicTypeSize","space.*":"Metrics.space1 to space10","radius.*":"Metrics.radiusControl, radiusCard, radiusSheet","motion.*":"Motion.fast, base, slow: Animation.snappy(duration:); none when accessibilityReduceMotion"}};/*TOKENS:END*/
+
+var ICON = {
+  plus: 'M12 5v14M5 12h14',
+  folder: 'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
+  folderPlus: 'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM12 10v6M9 13h6',
+  play: 'M8 5.5v13l10.5-6.5z',
+  pause: 'M8.5 5v14M15.5 5v14',
+  stop: 'M7 7h10v10H7z',
+  reset: 'M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4',
+  save: 'M5 4h11l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6',
+  load: 'M12 4v11M7 10l5 5 5-5M5 20h14',
+  camera: 'M4 8h3l2-3h6l2 3h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z',
+  fullscreen: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5',
+  sidebar: 'M4 5h16v14H4zM9.5 5v14',
+  list: 'M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01',
+  grid: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+  info: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v5M12 8h.01',
+  search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4',
+  chevronLeft: 'M15 5l-7 7 7 7',
+  chevronRight: 'M9 5l7 7-7 7',
+  check: 'M5 12.5l4.5 4.5L19 7',
+  checkCircle: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8 12.5l3 3 5-6',
+  warn: 'M12 4l9 16H3zM12 10v4M12 17h.01',
+  error: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9 9l6 6M15 9l-6 6',
+  stopCircle: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.5h5v5h-5z',
+  pending: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z',
+  spinner: 'M12 3a9 9 0 1 0 9 9',
+  x: 'M6 6l12 12M18 6L6 18',
+  disc: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 14.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
+  stack: 'M12 3l9 5-9 5-9-5zM3 13l9 5 9-5',
+  exe: 'M7 3h7l4 4v14H7zM14 3v4h4M10 13l-2 2 2 2M14 13l2 2-2 2',
+  doc: 'M7 3h7l4 4v14H7zM14 3v4h4M10 12h5M10 16h5',
+  card: 'M6 3h9l3 3v15H6zM9 7v2M12 7v2M15 7v2',
+  chip: 'M7 7h10v10H7zM10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4',
+  gamepad: 'M7.5 8h9A4.5 4.5 0 0 1 21 12.5v.5a3.5 3.5 0 0 1-6 2.4L13.7 14h-3.4L9 15.4A3.5 3.5 0 0 1 3 13v-.5A4.5 4.5 0 0 1 7.5 8zM8 10.5v3M6.5 12h3M15.5 11.5h.01M17.5 13h.01',
+  keyboard: 'M3 7h18v10H3zM6.5 10h.01M9.5 10h.01M12.5 10h.01M15.5 10h.01M18 10h.01M7 14h10',
+  gear: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM10.5 3h3l.5 2.3 1.6.9 2.2-.8 1.5 2.6-1.7 1.6v1.8l1.7 1.6-1.5 2.6-2.2-.8-1.6.9-.5 2.3h-3l-.5-2.3-1.6-.9-2.2.8L3.5 16l1.7-1.6v-1.8L3.5 11 5 8.4l2.2.8 1.6-.9z',
+  clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2',
+  tools: 'M14.5 6.5a4 4 0 0 0-5.3 5.3L4 17l3 3 5.2-5.2a4 4 0 0 0 5.3-5.3l-2.5 2.5-2.5-.5-.5-2.5z',
+  sound: 'M4 10h4l5-4v12l-5-4H4zM16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11',
+  display: 'M3 5h18v12H3zM8 21h8M12 17v4',
+  palette: 'M12 21a9 9 0 1 1 9-9c0 2-1.5 3-3 3h-2a2 2 0 0 0-1.5 3.3A1.7 1.7 0 0 1 12 21zM7.5 11h.01M10 7.5h.01M14.5 7.5h.01',
+  person: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0',
+  trash: 'M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13',
+  pencil: 'M4 20h4L19 9l-4-4L4 16z',
+  external: 'M14 4h6v6M20 4l-9 9M18 14v6H4V6h6',
+  locate: 'M12 21s7-6.3 7-12a7 7 0 1 0-14 0c0 5.7 7 12 7 12zM12 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+  finder: 'M4 5h16v14H4zM9 9.5v2M15 9.5v2M9 15c2 1.3 4 1.3 6 0',
+  copy: 'M8 8h11v12H8zM5 16V4h11',
+  up: 'M12 5v14M6 11l6-6 6 6',
+  down: 'M12 5v14M6 13l6 6 6-6',
+  left: 'M5 12h14M11 6l-6 6 6 6',
+  right: 'M5 12h14M13 6l6 6-6 6',
+  shapeTriangle: 'M12 5l8 14H4z',
+  shapeCircle: 'M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z',
+  shapeCross: 'M6 6l12 12M18 6L6 18',
+  shapeSquare: 'M5 5h14v14H5z'
+};
+
+var NAMES = { dark: 'Dark', light: 'Light', contrast: 'High contrast' };
+
+function vars(theme) {
+  var c = TOKENS.color[theme], t = TOKENS.type.mac, size = TOKENS.size.mac, out = [];
+  Object.keys(c).forEach(function (k) { out.push('--' + k + ':' + c[k]); });
+  Object.keys(t).forEach(function (k) { out.push('--text-' + k + ':' + t[k] + 'px'); });
+  Object.keys(TOKENS.font).forEach(function (k) { out.push('--font-' + k + ':' + TOKENS.font[k]); });
+  Object.keys(TOKENS.radius).forEach(function (k) { out.push('--radius-' + k + ':' + TOKENS.radius[k] + 'px'); });
+  ['fast', 'base', 'slow'].forEach(function (k) { out.push('--motion-' + k + ':' + TOKENS.motion[k] + 'ms'); });
+  out.push('--ease:' + TOKENS.motion.ease);
+  ['control', 'toolbar', 'sidebar', 'inspector', 'row', 'tile'].forEach(function (k) { out.push('--size-' + k + ':' + size[k] + 'px'); });
+  return out.join(';');
+}
+
+class Component extends DCLogic {
+  renderVals() {
+    var focus = 'outline:2px solid var(--focus);outline-offset:2px';
+    function states(cls, hover, pressed) {
+      return [
+        { cls: cls, style: '', disabled: false },
+        { cls: cls, style: hover, disabled: false },
+        { cls: cls, style: pressed, disabled: false },
+        { cls: cls, style: focus, disabled: false },
+        { cls: cls, style: '', disabled: true }
+      ];
+    }
+    return {
+      icon: ICON,
+      pageStyle: vars('light') + ';background:var(--bg-window);color:var(--fg);font-family:var(--font-ui);font-size:14px;line-height:1.4;min-height:100%',
+      stateNames: ['Default', 'Hover', 'Pressed', 'Focused', 'Disabled'],
+      themes: TOKENS.themes.map(function (t) { return { name: NAMES[t], radio: 'radio-' + t, style: vars(t) + ';display:flex;flex-direction:column;gap:22px;padding:24px;border-radius:16px;background:var(--bg-window);color:var(--fg);border:1px solid var(--line);font-size:var(--text-body)' }; }),
+      buttons: [
+        { kind: 'Primary', label: 'Play', states: states('btn btn-primary', 'background:var(--accent-hover);border-color:var(--accent-hover)', 'background:var(--accent-pressed);border-color:var(--accent-pressed)') },
+        { kind: 'Secondary', label: 'Add Folder…', states: states('btn', 'background:var(--bg-control-hover)', 'background:var(--bg-control-pressed)') },
+        { kind: 'Destructive', label: 'Move to Trash', states: states('btn btn-danger', 'filter:brightness(1.08)', 'filter:brightness(0.92)') },
+        { kind: 'Plain', label: 'Done', states: states('btn btn-plain', 'background:var(--bg-control)', 'background:var(--bg-control-pressed)') }
+      ],
+      toolbar: [
+        { label: 'Grid, default', pressed: 'false', disabled: false, style: '' },
+        { label: 'Grid, hover', pressed: 'false', disabled: false, style: 'background:var(--bg-control);color:var(--fg)' },
+        { label: 'Grid, on', pressed: 'true', disabled: false, style: '' },
+        { label: 'Grid, focused', pressed: 'false', disabled: false, style: focus },
+        { label: 'Grid, disabled', pressed: 'false', disabled: true, style: '' }
+      ],
+      fields: [
+        { state: 'Empty', value: '', style: '', help: '', helpStyle: '' },
+        { state: 'Filled', value: 'harbor', style: '', help: '', helpStyle: '' },
+        { state: 'Focused', value: 'harbor', style: focus, help: '', helpStyle: '' },
+        { state: 'Error', value: '-3', style: 'border-color:var(--danger)', help: 'A whole number of at least 0.', helpStyle: 'color:var(--danger)' }
+      ],
+      sidebar: [
+        { label: 'All Games', note: '7', style: '' },
+        { label: 'PS1 (hover)', note: '6', style: 'background:var(--bg-hover-row)' },
+        { label: 'Recently Played', note: '5', style: 'background:var(--bg-selected)' }
+      ],
+      rows: [
+        { name: 'Moonbase Courier', console: 'PS1', serial: 'SCUS-94210', state: 'Default', chip: '', chipStyle: '', consoleStyle: '', style: 'grid-template-columns:minmax(0, 1fr) 60px 110px 90px;column-gap:12px' },
+        { name: 'Harbor Lights (USA)', console: 'PS1', serial: 'SLUS-01042', state: 'Selected', chip: '', chipStyle: '', consoleStyle: '', style: 'grid-template-columns:minmax(0, 1fr) 60px 110px 90px;column-gap:12px;background:var(--bg-selected)' },
+        { name: 'Lantern Street', console: 'PS1', serial: 'SLUS-00777', state: 'Missing', chip: 'File missing', chipStyle: 'background:var(--warn-bg);color:var(--warn)', consoleStyle: '', style: 'grid-template-columns:minmax(0, 1fr) 60px 110px 90px;column-gap:12px' },
+        { name: 'Night Ferry', console: 'PS2', serial: 'SLUS-21311', state: 'Refused', chip: 'Plays later', chipStyle: 'background:var(--bg-control);color:var(--fg-muted)', consoleStyle: '', style: 'grid-template-columns:minmax(0, 1fr) 60px 110px 90px;column-gap:12px' },
+        { name: 'Tidepool', console: 'Unknown', serial: 'Unknown', state: 'Today', chip: '', chipStyle: '', consoleStyle: 'color:var(--fg-muted)', style: 'grid-template-columns:minmax(0, 1fr) 60px 110px 90px;column-gap:12px' }
+      ],
+      chips: [
+        ['Running', 'ok'], ['Paused', 'warn'], ['File missing', 'warn'], ['Personal build', 'verify'], ['ready', 'ok'], ['app', 'info'], ['gap', 'warn'], ['verify', 'verify'], ['Failed', 'danger']
+      ].map(function (c) { return { text: c[0], style: 'background:var(--' + c[1] + '-bg);color:var(--' + c[1] + ')' }; }).concat([{ text: 'PS1', style: 'background:var(--bg-control);color:var(--fg)' }, { text: 'Plays later', style: 'background:var(--bg-control);color:var(--fg-muted)' }]),
+      banners: [
+        ['info', 'info', 'Discs play from v0.2.0.'], ['ok', 'checkCircle', 'Your BIOS works: it reached its shell.'], ['warn', 'warn', 'Stopped after 5 of 9.'], ['danger', 'error', 'A PS1 BIOS is exactly 524,288 bytes.']
+      ].map(function (b) { return { text: b[2], icon: ICON[b[1]], style: 'display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:var(--radius-control);background:var(--' + b[0] + '-bg);color:var(--' + b[0] + ')' }; }),
+      steps: [
+        ['Read the file', 'done', 'checkCircle', 'ok', 'Done'], ['Check its size', 'running', 'spinner', 'info', 'Working'], ['Work out its fingerprint', 'pending', 'pending', 'fg-faint', ''], ['Run 60 frames', 'stopped', 'stopCircle', 'warn', 'Stopped'], ['Check its size', 'failed', 'error', 'danger', 'Failed']
+      ].map(function (s) { return { label: s[0], icon: ICON[s[2]], state: s[4] || 'Waiting', iconStyle: 'color:var(--' + s[3] + ')' }; }),
+      slots: [
+        { title: 'Slot 3', when: 'Empty', ring: '', old: false },
+        { title: 'Slot 1', when: 'Today, 9:30', ring: '', old: false },
+        { title: 'Slot 2', when: 'Selected', ring: 'border:2px solid var(--accent);padding:7px', old: false },
+        { title: 'Slot 5', when: 'Oct 2', ring: '', old: true }
+      ],
+      icons: Object.keys(ICON).map(function (k) { return { name: k, d: ICON[k] }; })
+    };
+  }
+}
+</script>
+</body>
+</html>
