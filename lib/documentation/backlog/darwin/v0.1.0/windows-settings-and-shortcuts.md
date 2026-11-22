@@ -30,6 +30,8 @@ Today the app has an "Acknowledgements…" item after About (`apps/macos/Sources
 - 2026-11-22: About is the standard About panel, with the build routine in its credits, not a custom window; the design's About board is the panel's content (the default, confirmed by the user).
 - 2026-11-22: the acknowledgements stay as the list gives them, Play!'s notices included before PS2 code ships: the design shows what the backend says (the default, confirmed by the user).
 - 2026-11-22: Settings remembers the last tab (the default, confirmed by the user).
+- 2026-11-22: the design's changes land in its local mirror, pass its checks and are published to the canvas as this item lands, keeping the two identical (the user's call, before the group run).
+- 2026-11-22: each screen is checked against its board by rendering its previews to images and comparing them with the board in the built-in browser; no app is launched for the check (the user's call, before the group run).
 
 **Open calls:** none of its own — all answered 2026-11-22; two are others':
 - (consumed decision) The theme setting's default and its high-contrast behaviour are 5a's: Match the system, with High contrast while Increase Contrast is on (decided 2026-11-22).

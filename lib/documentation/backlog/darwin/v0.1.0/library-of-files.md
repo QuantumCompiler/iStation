@@ -33,6 +33,7 @@ v0.1.0 builds it to the design's **Today** level. Disc images (.cue, .iso, .m3u)
 - 2026-11-22: Add Folder looks for .cue, .iso, .m3u and .exe files, groups an .m3u's discs under it, and skips the .bin tracks a .cue names (the default, confirmed by the user).
 - 2026-11-22: no artwork and no titles from a database: a game is named by its file and can be renamed, and nothing leaves the Mac (contract row C47, verify), as the design has it (the default, confirmed by the user).
 - 2026-11-22: discs are listed today, with Play off and the reason, rather than hidden, so the user sees what they added; 5h fills in console and serial (the default, confirmed by the user).
+- 2026-11-22: each screen is checked against its board by rendering its previews to images and comparing them with the board in the built-in browser; no app is launched for the check (the user's call, before the group run).
 
 **Open calls:** none — all answered 2026-11-22.
 

@@ -30,6 +30,8 @@
 - 2026-11-22: colors resolve in code through dynamic `NSColor`/`UIColor` providers, not an asset catalog, so each role maps one to one to `tokens.json` and the test can compare them (the default, confirmed by the user).
 - 2026-11-22: the theme setting's default is "Match the system", resolving to dark or light; "High contrast" is also chosen when macOS's or iOS's Increase Contrast is on (the default, confirmed by the user).
 - 2026-11-22: the shared components live in `styles` from the start: the design shows each in at least two modules, ADR 0020's bar for promotion (the default, confirmed by the user).
+- 2026-11-22: the design's changes land in its local mirror, pass its checks and are published to the canvas as this item lands, keeping the two identical (the user's call, before the group run).
+- 2026-11-22: each screen is checked against its board by rendering its previews to images and comparing them with the board in the built-in browser; no app is launched for the check (the user's call, before the group run).
 
 **Open calls:** none — all answered 2026-11-22.
 

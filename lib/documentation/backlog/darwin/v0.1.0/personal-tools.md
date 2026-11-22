@@ -37,6 +37,8 @@ Today these exist only as the command-line tool. Recorded 2026-11-21 from `istat
 - 2026-11-22: traces go to the personal build's own data folder, `Traces` in its Application Support folder (`local.istation.macos.personal`), with Show in Finder, unless Settings › Personal picks another folder through the file picker, kept by bookmark. The default `~/Traces` was confirmed first, then replaced once it was seen to break CLAUDE.md's ⚠ "Tests and previews never touch the real home folder" (the apps reach the user's folders only through the file picker and their own containers) (the user's call).
 - 2026-11-22: Compare shows TraceDiff's result in the words `istation-run diff` prints, records quoted as TraceKit formats them (the default, confirmed by the user).
 - 2026-11-22: the Console tab's values come from 6a's snapshot between frames, refreshed while paused or on each frame when running (the default, confirmed by the user).
+- 2026-11-22: the design's changes land in its local mirror, pass its checks and are published to the canvas as this item lands, keeping the two identical (the user's call, before the group run).
+- 2026-11-22: each screen is checked against its board by rendering its previews to images and comparing them with the board in the built-in browser; no app is launched for the check (the user's call, before the group run).
 
 **Open calls:** none — all answered 2026-11-22.
 

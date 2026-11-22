@@ -26,6 +26,8 @@
 - 2026-11-22: one window: the player takes the main window, one console at a time, as the design has it (the default, confirmed by the user).
 - 2026-11-22: Stop asks first and saves nothing by itself; Save First… joins the Stop alert with save states (5l) (the default, confirmed by the user).
 - 2026-11-22: Reset's and Stop's Details name the calls as the design does, e.g. "PS1Console.powerOn(bios:) with my-console-bios.bin (524,288 bytes)" — the design's placeholder name; the app shows the kept file's own (the default, confirmed by the user).
+- 2026-11-22: the design's changes land in its local mirror, pass its checks and are published to the canvas as this item lands, keeping the two identical (the user's call, before the group run).
+- 2026-11-22: each screen is checked against its board by rendering its previews to images and comparing them with the board in the built-in browser; no app is launched for the check (the user's call, before the group run).
 
 **Open calls:** none — all answered 2026-11-22.
 

@@ -24,6 +24,7 @@ Measured, not guessed, 2026-11-21, with a probe package linking `PS1Core` by pat
 - 2026-11-22: `reachedShell` watches for 0x80030000 from power-on until it is first reached, then stops watching, so the boot pays one compare per instruction and play pays nothing (the default, confirmed by the user).
 - 2026-11-22: the debug values are one `Sendable` snapshot taken between frames, not live accessors, so the narrow interface stays serializable (the default, confirmed by the user).
 - 2026-11-22: trace recording in the app uses a personal-only console type, generic over its tracer, beside `PS1Console`; `PS1Console` stays fixed to `NoTracer`, so the App Store build's specialization is untouched (the default, confirmed by the user).
+- 2026-11-22: the design's changes land in its local mirror, pass its checks and are published to the canvas as this item lands, keeping the two identical (the user's call, before the group run).
 
 **Open calls:** none — all answered 2026-11-22.
 
