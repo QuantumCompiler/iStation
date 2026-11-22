@@ -51,7 +51,7 @@ Then the repository takes the layout and procedure of the user's Apogee reposito
 
 - [ ] The CD-ROM drive and disc images, its timing fixed against psx-spx, test suites and SwanStation's recorded behaviour (ProjectPSX's known weak spot): its document is [6d](../../backlog/darwin/v0.2.0/interface-discs.md)'s split; playing discs ([5i](../../backlog/darwin/v0.2.0/playing-discs.md))
 - [ ] The GTE, SPU and MDEC (MDEC timing fixed the same way); the SPU's document is [6i](../../backlog/darwin/v0.3.0/interface-sound.md)'s split
-- [ ] Pads and memory cards, through the GameController framework: pads ([6e](../../backlog/darwin/v0.2.0/interface-pads.md)), Controllers ([5j](../../backlog/darwin/v0.2.0/controllers-settings.md)), memory cards ([6f](../../backlog/darwin/v0.2.0/interface-memory-cards.md), [5k](../../backlog/darwin/v0.2.0/memory-cards-pane.md))
+- [ ] Pads and memory cards, through the GameController framework: pads on both ports, Bluetooth or USB ([6e](../../backlog/darwin/v0.2.0/interface-pads.md)), Controllers ([5j](../../backlog/darwin/v0.2.0/controllers-settings.md)), memory cards ([6f](../../backlog/darwin/v0.2.0/interface-memory-cards.md), [5k](../../backlog/darwin/v0.2.0/memory-cards-pane.md))
 - [ ] Discs read in the library: the readers in a product ([6c](../../backlog/darwin/v0.2.0/interface-disc-readers.md)), console, serial and PS2 refused ([5h](../../backlog/darwin/v0.2.0/library-reads-discs.md)). BIOS and game import through the file picker moved to v0.1.0 (5c, 5d; the user's call, 2026-11-21)
 - [ ] Save states, versioned ([ADR 0016](../../adrs/darwin/two-build-routines-and-a-fresh-start.md) §5): [6g](../../backlog/darwin/v0.2.0/interface-save-states.md), [5l](../../backlog/darwin/v0.2.0/save-states-sheet.md)
 - [ ] The video standard, PAL or NTSC, paced and shown ([6h](../../backlog/darwin/v0.2.0/interface-video-standard.md))
@@ -61,6 +61,7 @@ Then the repository takes the layout and procedure of the user's Apogee reposito
 
 - [ ] A Metal renderer, checked against the software rasterizer; choosing it ([6j](../../backlog/darwin/v0.3.0/interface-renderer-choice.md))
 - [ ] Audio through Core Audio / AVAudioEngine ([6i](../../backlog/darwin/v0.3.0/interface-sound.md)), Settings › Audio ([5m](../../backlog/darwin/v0.3.0/audio-settings.md))
+- [ ] The DualShock, from the controller spike of 2026-11-22 (a DualSense over Bluetooth worked under the App Store sandbox with no new entitlement): the analog pad ([7a](../../backlog/darwin/v0.3.0/dualshock-analog-pad.md)), rumble ([7b](../../backlog/darwin/v0.3.0/dualshock-rumble.md)), and per-port settings with player 2 ([7c](../../backlog/darwin/v0.3.0/controllers-pad-type-rumble-and-player-two.md))
 - [ ] Gate: PS1 games run at full speed on Apple Silicon with Metal, sound and a controller
 
 ### v0.4.0 — The iOS app

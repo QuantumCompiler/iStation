@@ -57,7 +57,7 @@ Every item follows this shape (sections in order; omit one only when it is genui
 
 Rows are in suggested build order. **Gates** name only pending items; an item builds on everything shipped plus its gate chain; no cycles. **Split first** items are groomed into their sub-documents before anyone builds. Moving an item between tables is a `git mv`, its row, its Version cell and its links. Same-table links are bare filenames; cross-table links `../<table-dir>/<file>`; links out of the backlog climb to `lib/documentation/` — `../../../assistant/darwin/…` from a table's directory, one `../` more from an OS folder's (this index itself: `../../assistant/darwin/…`).
 
-**Ids spent so far:** track 1 (`1a`), track 2 (`2a`–`2e`, cancelled), track 3 (`3a`–`3g`), track 4 (`4a`–`4f`), track 5 (`5a`–`5o`), track 6 (`6a`–`6j`); `M1`, `M2` (cancelled); `A1` (cancelled), `A2`.
+**Ids spent so far:** track 1 (`1a`), track 2 (`2a`–`2e`, cancelled), track 3 (`3a`–`3g`), track 4 (`4a`–`4f`), track 5 (`5a`–`5o`), track 6 (`6a`–`6j`), track 7 (`7a`–`7c`); `M1`, `M2` (cancelled); `A1` (cancelled), `A2`.
 
 ### Architecture
 
@@ -99,7 +99,7 @@ Three interface items are **split first** (6b here; 6d, 6g in v0.2.0; 6i in v0.3
 
 ### v0.2.0
 
-Tracks 5 and 6 continue (the v0.1.0 preamble tells the story): the library reads discs, discs play, and pads, memory cards and save states arrive, each interface item ahead of its screen. 6d and 6g are split first: the CD-ROM drive (ROADMAP v0.2.0's first line) and every device's saved state get their own documents before building. The GTE, SPU and MDEC line has no document yet.
+Tracks 5 and 6 continue (the v0.1.0 preamble tells the story): the library reads discs, discs play, and pads, memory cards and save states arrive, each interface item ahead of its screen. 6d and 6g are split first: the CD-ROM drive (ROADMAP v0.2.0's first line) and every device's saved state get their own documents before building. The GTE, SPU and MDEC line has no document yet. 6e was amended by the controller spike of 2026-11-22 (the v0.3.0 preamble tells it): both ports, the input service's start from notifications, its thresholds, the PS button claimed during play, the handoff to the session (so it now waits on 5b), focus, and the apps' controller declarations.
 
 | # | Item | Version | File | Status |
 |---|---|---|---|---|
@@ -107,7 +107,7 @@ Tracks 5 and 6 continue (the v0.1.0 preamble tells the story): the library reads
 | 5h | **The library reads discs** — console and serial, PS1 and PS2 filters, the scan's results, PS2 refused with the reason | v0.2.0 | [library-reads-discs.md](v0.2.0/library-reads-discs.md) | 🔒 6c, 5d |
 | 6d | **The narrow interface: discs** — gap G9, split first: the CD-ROM drive, then `insertDisc`, `ejectDisc` and the lid | v0.2.0 | [interface-discs.md](v0.2.0/interface-discs.md) | 🟢 |
 | 5i | **Playing discs** — the opening job, reset with the disc, multi-disc games | v0.2.0 | [playing-discs.md](v0.2.0/playing-discs.md) | 🔒 6d, 5h |
-| 6e | **The narrow interface: pads** — gap G4: the ports device, `setPad`, and GameController input | v0.2.0 | [interface-pads.md](v0.2.0/interface-pads.md) | 🟢 |
+| 6e | **The narrow interface: pads** — gap G4: both ports, `setPad`, and GameController input, the PS button claimed during play | v0.2.0 | [interface-pads.md](v0.2.0/interface-pads.md) | 🔒 5b |
 | 5j | **Controllers** — Settings › Controllers, the mapping, the keyboard, the HUD's ports | v0.2.0 | [controllers-settings.md](v0.2.0/controllers-settings.md) | 🔒 6e, 5e |
 | 6f | **The narrow interface: memory cards** — gap G8: the card device, its bytes in and out, and a reader for its directory | v0.2.0 | [interface-memory-cards.md](v0.2.0/interface-memory-cards.md) | 🔒 6e |
 | 5k | **Memory cards** — the pane, its empty state, Move to Trash, and the card policy in Settings | v0.2.0 | [memory-cards-pane.md](v0.2.0/memory-cards-pane.md) | 🔒 6f, 5e, 5d |
@@ -119,11 +119,16 @@ Tracks 5 and 6 continue (the v0.1.0 preamble tells the story): the library reads
 
 Tracks 5 and 6 continue: sound, and the choice of renderer once the Metal renderer exists. 6i is split first: the SPU's port belongs to v0.2.0's "GTE, SPU and MDEC" line. ROADMAP v0.3.0's Metal renderer has no document yet; 6j gains it as a gate when it is written.
 
+**Track 7: the DualShock, from the controller spike.** On 2026-11-22 a spike asked what an external Bluetooth controller needs. A probe app signed ad-hoc with the App Store routine's macOS entitlements ran on macOS 27.0.1 with the user's DualSense in three runs. GameController needed no new entitlement or usage string: the DualSense connected 110 ms after launch as `GCDualSenseGamepad`, battery 0.95, with haptics in each grip. All 14 digital buttons arrived as the right PS1 bit under the design's mapping, and both sticks reported their full range. A snapshot controller built in code made the mapping testable without hardware; one read of all 14 elements took 1.5 µs. The spike numbered ten walls (W1–W10). W1 (no pad in the core) was already 6e's. W2 and W5–W9, and W10's Info.plist half, were written into 6e (v0.2.0), and W10's iOS half into 5o (v0.4.0). The rest became this track: ProjectPSX's only pad is digital (`DigitalController.cs:4`), so the analog pad (W3, 7a) and its rumble (W4, 7b) are iStation's own code from psx-spx, and their settings and port 2's mapping are 7c. The user's calls that day: this track is v0.3.0's, both ports carry a pad, iStation claims the PS button during play, and a game keeps running without input while another app is in front. Each is a dated decision in the documents it shapes, and the rest are `[default: …]`.
+
 | # | Item | Version | File | Status |
 |---|---|---|---|---|
 | 6i | **The narrow interface: sound** — gap G3, split first: the SPU, `drainAudio`, and AVAudioEngine output | v0.3.0 | [interface-sound.md](v0.3.0/interface-sound.md) | 🟢 |
 | 5m | **Sound settings** — Settings › Audio: volume, muting, output | v0.3.0 | [audio-settings.md](v0.3.0/audio-settings.md) | 🔒 6i, 5e |
 | 6j | **Choosing the renderer** — gap G11: the renderer setting and its picker, after the Metal renderer | v0.3.0 | [interface-renderer-choice.md](v0.3.0/interface-renderer-choice.md) | 🔒 5g |
+| 7a | **The analog pad: the DualShock** — iStation's own from psx-spx: analog mode, the sticks, L3 and R3, the pad type | v0.3.0 | [dualshock-analog-pad.md](v0.3.0/dualshock-analog-pad.md) | 🔒 6e |
+| 7b | **Rumble** — the DualShock's two motors, played in a controller's grips through GameController's haptics | v0.3.0 | [dualshock-rumble.md](v0.3.0/dualshock-rumble.md) | 🔒 7a |
+| 7c | **Controllers: the pad type, rumble and player 2** — per port: its mapping, Digital or Analog, rumble, the player lights | v0.3.0 | [controllers-pad-type-rumble-and-player-two.md](v0.3.0/controllers-pad-type-rumble-and-player-two.md) | 🔒 7a, 7b, 5j |
 
 ### v0.4.0
 
