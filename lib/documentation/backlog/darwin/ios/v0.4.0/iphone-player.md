@@ -3,7 +3,7 @@
 **What / why.** The design's iPhone player turns the phone to landscape and fills the screen:
 - **The picture:** fitted to the height, 520 × 390 on a 844 × 390 screen.
 - **The on-screen pad:** the direction pad on the left; four face buttons drawn as plain outlines in one color, each named in words for VoiceOver; L1, L2, R1 and R2 in the corners; Select and Start below.
-- **Pause:** a button at the top centre that opens a bottom sheet with Resume, Save State, Load State, Reset… and Quit Game….
+- **Pause:** a button at the top centre that opens a bottom sheet with Resume, Save State, Load State, Reset… and Quit Game…. Reset… and Quit Game… are 5b's Reset and Stop (decided 2026-11-22): each asks first with its Details as on the Mac, and Quit Game… saves nothing by itself, offering Save First… once save states exist (5l).
 - **Save and Load State:** the same eight slots as the Mac, in a bottom sheet.
 
 The on-screen pad feeds the same input the controllers do (6e); a connected controller hides it.

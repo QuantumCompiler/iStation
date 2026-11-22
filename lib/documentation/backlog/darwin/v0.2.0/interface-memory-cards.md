@@ -14,7 +14,7 @@
 **Seam + files.**
 - Business, `ps1`: the memory card on the port device (6e), `PS1Console.insertMemoryCard(slot:bytes:)`, `memoryCard(slot:) -> [UInt8]?`, `memoryCardChanged(slot:)`.
 - Data, new module `memorycard`: reads a card's directory from its bytes (blocks used of 15, each save's block count).
-- Business `session` (5b): writes a changed card back between frames.
+- Business `session` (5b: a Business module, decided 2026-11-22, importing only the standard library and Swift concurrency, its Core constraint): between frames, hands a changed card's bytes to a writer the macOS app target supplies; the session opens no file, and the app writes the card file.
 - Tests: `tests/business/ps1/` (a program built in code writes a sector; the bytes come back changed); `tests/data/memorycard/` (directories built in code).
 
 **Reference.** The design: contract rows C33 and C34 and gap G8 on the `Contract` board; `Mac-Cards` shows "3 of 15 blocks". ProjectPSX: `Devices/Input/MemoryCard.cs`. Public documentation: psx-spx's memory card data format.

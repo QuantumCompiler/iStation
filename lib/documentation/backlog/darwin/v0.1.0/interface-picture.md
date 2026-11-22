@@ -13,18 +13,19 @@
 
 **Seam + files.**
 - Business, `ps1`: `PS1Console.picture: PS1Picture?` refreshed by `runFrame()` (width, height, 15- or 24-bit, the display area's pixels); under `PERSONAL_BUILD`, `vramSnapshot` (1024 × 512 at 16 bits).
-- Presentation, `player`: a `FrameView` (`MTKView` in an `NSViewRepresentable`, and a `UIViewRepresentable` for the iPhone later) that uploads each picture to a texture and draws it, nearest-neighbour unless smoothing is on.
+- Presentation, `player`: a `FrameView` (`MTKView` in an `NSViewRepresentable`, and a `UIViewRepresentable` for the iPhone later) that uploads each picture's raw rows to a texture, converts 15- or 24-bit pixels in its fragment shader and draws the latest picture only, nearest-neighbour unless smoothing is on.
 - Tests: `tests/business/ps1/` (a frame drawn by a code-built program gives the expected dimensions and pixels); `tests/presentation/player/` (the picture's size and shape for each mode).
+- The design: the `Contract` board's G1 change (`html/Contract.dc.html`) names `PS1Picture`, carrying the display area's raw rows and their mode, one per vertical blank, replaced in place, converted by Metal's shader, in the same change.
 
 **Reference.** The design: contract rows C21, C22, C45 and gap G1 on the `Contract` board; the `Layout` board's "The picture" row. ProjectPSX: `Host/IHostWindow.cs`, and `Devices/GPU/GPU.cs`, which sets GPUSTAT's PAL bit (bit 20) and 24-bit bit (bit 21) at `:216–217`. Public documentation: psx-spx's GPU display modes.
 
 **Decisions made** (dated):
 - 2026-11-21: each screen's gaps get interface items, track 6, with core internals left as open calls, and the screens are gated on them (the user's call).
+- 2026-11-22: the core hands the display area's raw 15- or 24-bit rows and their mode, and the conversion to a texture's format happens in the Metal shader, keeping pixel formats out of the core and the copy out of the hot path (the default, confirmed by the user).
+- 2026-11-22: one picture per vertical blank, replaced in place, never queued; the session (5b) presents the latest (the default, confirmed by the user).
+- 2026-11-22: the split happens before anyone builds: the GPU's document is written with `/istation-backlog-create-item` and takes its own v0.1.0 row ahead of this one; building the GPU is core work for a session that has read no GPL emulator's source (the default, confirmed by the user).
 
-**Open calls:**
-- [default: the core hands the display area's raw 15- or 24-bit rows and their mode, and the conversion to a texture's format happens in the Metal shader] This keeps pixel formats out of the core, and the copy out of the hot path.
-- [default: one picture per vertical blank, replaced in place, never queued] The session (5b) presents the latest.
-- [default: the split happens before anyone builds: the GPU's document is written with `/istation-backlog-create-item` and takes its own v0.1.0 row ahead of this one] Building the GPU is core work for a session that has read no GPL emulator's source.
+**Open calls:** none — all answered 2026-11-22.
 
 **Guardrail(s).** Hermetic tests over a program built in code that fills a known rectangle: the picture's size, mode and pixels match. VRAM compared with SwanStation's recorded VRAM is the fourth ROADMAP line's guardrail.
 

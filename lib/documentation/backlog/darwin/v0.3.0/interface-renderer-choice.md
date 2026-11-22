@@ -10,6 +10,7 @@
 **Seam + files.**
 - Business, `ps1`: a renderer value among the console's settings (`.software`, `.metal`), applied between frames.
 - Presentation `settings`: the Video tab's renderer picker.
+- Presentation `player`: what `FrameView` draws under the Metal renderer is the Metal renderer's document's to decide, since the core imports no Metal (ADR 0015 §1). 6b's raw-row upload and shader conversion (decided 2026-11-22) stay the software rasterizer's path, and 5g's screenshots and 5l's thumbnails keep a source of raw rows, or a read-back, under either renderer.
 - Tests: `tests/business/ps1/` (switching between frames keeps VRAM), `tests/presentation/settings/` (the picker appears only with two renderers).
 
 **Reference.** The design: board `Mac-SettingsVideo` and contract row C24; the `Layout` board's picture row.

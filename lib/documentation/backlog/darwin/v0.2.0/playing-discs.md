@@ -12,7 +12,7 @@
 - No real game in tests: discs are in-memory fakes behind the session protocol.
 
 **Seam + files.**
-- Business `session` (5b): open, identify (6c), power on, insert (6d), with each step reported for the job, and disc swap for a playlist.
+- Business `session` (5b: a Business module, decided 2026-11-22, importing only the standard library and Swift concurrency, its Core constraint): power on and insert (6d), each step reported for the job, and disc swap for a playlist. Opening the file through its bookmark and identifying it (6c's `DiscIdentity.read(url:)`) are an opener the macOS app target supplies, reported as the job's first two steps.
 - Presentation `library` and `player`: Play for discs, the opening job, the Reset alert's Details, and a disc-change command in the Game menu for multi-disc games.
 - Tests: `tests/business/session/` (the steps, cancel, swap); `tests/presentation/library/` (Play enabled for PS1 discs, refused for PS2 and missing files).
 

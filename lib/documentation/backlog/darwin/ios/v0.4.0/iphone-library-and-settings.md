@@ -1,11 +1,11 @@
 # The iPhone app: first run, library and settings
 
 **What / why.** ROADMAP v0.4.0 is the iOS app playing PS1. The design recomposes the Mac app's places for an iPhone held in portrait:
-- **Welcome:** Choose BIOS File through the Files picker.
+- **Welcome:** Choose BIOS File through the Files picker, with 5c's copy (decided 2026-11-22): for App Store strangers, what a BIOS is, briefly, and one sentence of guidance — it comes from your own console, iStation can't provide one, and it's a 512 KB file — with "iPhone" for "Mac"; the design's `iOS-Welcome` takes the same words in this item's change.
 - **Library:** a large-title list with search. Each row has the game's initials, name, console, serial and size; a moved file shows as "Can't find the file", and PS2 discs as "plays in a later version".
 - **Toolbar:** Add (+) and Settings (the gear).
 - **Opening a game:** a bottom sheet with the job's steps.
-- **Settings:** a grouped list (BIOS, controllers, memory cards, display, appearance, version, Acknowledgements).
+- **Settings:** a grouped list (BIOS, controllers, memory cards, display, appearance — 5a's four themes, Match the system first and the default, decided 2026-11-22 — version, Acknowledgements).
 
 Today the iOS app is one screen: the player with an Acknowledgements button (`apps/ios/Sources/iStationApp.swift`). The view-models are the Mac app's (5c, 5d, 5h, 5e); this item is the iPhone's views and composition. Measured, not guessed, 2026-11-21 (probe): the iOS app carries two acknowledgements, iStation and ProjectPSX.
 

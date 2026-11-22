@@ -16,22 +16,24 @@ Today the app has an "Acknowledgements…" item after About (`apps/macos/Sources
 - Keys never collide: ⌘ shortcuts go to the app, plain keys to the game (once 6e exists).
 
 **Seam + files.**
-- Presentation, new place `settings`: `SettingsViewModel` (theme, text size, personal options) over `UserDefaults` through a small injected store; one view per tab; previews per tab.
+- Presentation, new place `settings`: `SettingsViewModel` (theme, from 5a's `Theme`: Match the system — the default — Dark, Light or High contrast; text size; personal options) over `UserDefaults` through a small injected store; one view per tab; previews per tab.
+- The design, in the same change (its CLAUDE.md): the Appearance board's theme control (`SG.themeOpts` in `html/main.html`, and the iPhone's Appearance row) gains Match the system, first and selected by default, and the `Contract` board's "Graphite and amber" decision says the theme follows the system by default.
 - Presentation `acknowledgements`: the listed state restyled to the design (name, licence chip, copyright line, source link), its previews kept.
 - Presentation `styles`: the Keyboard Shortcuts list as data shared by the sheet and the menus.
 - The macOS app target: a `Settings` scene; `CommandMenu`s for Game, Console and Tools; `CommandGroup`s for File, View and Help; About through the standard panel with the version and routine.
-- Tests: `tests/presentation/settings/` (defaults, persistence), and a test that every listed shortcut has a menu item and no two items share a key.
+- Tests: `tests/presentation/settings/` (defaults, persistence, the last tab remembered), and a test that every listed shortcut has a menu item and no two items share a key.
 
 **Reference.** The design: boards `Mac-SettingsAppearance`, `Mac-SettingsPersonal`, `Mac-Acknowledgements`, `Mac-About` and `Mac-Shortcuts`; the `Layout` board's shortcuts and menus; contract rows C37–C39; `tools/check.mjs`' check that each of the 29 shortcuts acts where it applies. In-house: `AcknowledgementsCommand` and `AcknowledgementsViewModel` today.
 
 **Decisions made** (dated):
 - 2026-11-21: the design's Today parts are v0.1.0's, Settings and Acknowledgements among them (the user's call).
+- 2026-11-22: About is the standard About panel, with the build routine in its credits, not a custom window; the design's About board is the panel's content (the default, confirmed by the user).
+- 2026-11-22: the acknowledgements stay as the list gives them, Play!'s notices included before PS2 code ships: the design shows what the backend says (the default, confirmed by the user).
+- 2026-11-22: Settings remembers the last tab (the default, confirmed by the user).
 
-**Open calls:**
-- (consumed decision) The theme setting's default and its high-contrast behaviour are 5a's.
-- [default: About uses the standard About panel, with the build routine in its credits] Not a custom window; the design's About board is the panel's content.
-- [default: the acknowledgements stay as the list gives them, Play!'s notices included before PS2 code ships] The design shows what the backend says.
-- [default: Settings remembers the last tab]
+**Open calls:** none of its own — all answered 2026-11-22; two are others':
+- (consumed decision) The theme setting's default and its high-contrast behaviour are 5a's: Match the system, with High contrast while Increase Contrast is on (decided 2026-11-22).
+- (consumed decision) The Personal tab's trace folder is 5f's: the personal build's own `Traces` folder in its Application Support folder (`local.istation.macos.personal`), with Show in Finder, unless another is picked through the file picker and kept by bookmark — never `~/Traces` (decided 2026-11-22). Whichever of 5e and 5f builds the row first changes the `Mac-SettingsPersonal` board's row with it.
 
 **Guardrail(s).** View-model tests for every setting's default and persistence; the shortcut test above; a preview per tab and per acknowledgements state matching its board; `ArchitectureTests` keep the Personal tab out of App Store builds.
 

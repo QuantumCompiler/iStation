@@ -29,14 +29,14 @@ v0.1.0 builds it to the design's **Today** level. Disc images (.cue, .iso, .m3u)
 **Decisions made** (dated):
 - 2026-11-21: the design's Today parts are v0.1.0's, moving game import from v0.2.0 into v0.1.0 (the user's call).
 - 2026-11-21: each screen's gaps get interface items, track 6, and the screens are gated on them (the user's call).
+- 2026-11-22: the library is `library.json` in the app's container through the Data `library` store, every field defaulted: one file, versioned, as save states and cards will be (the default, confirmed by the user).
+- 2026-11-22: Add Folder looks for .cue, .iso, .m3u and .exe files, groups an .m3u's discs under it, and skips the .bin tracks a .cue names (the default, confirmed by the user).
+- 2026-11-22: no artwork and no titles from a database: a game is named by its file and can be renamed, and nothing leaves the Mac (contract row C47, verify), as the design has it (the default, confirmed by the user).
+- 2026-11-22: discs are listed today, with Play off and the reason, rather than hidden, so the user sees what they added; 5h fills in console and serial (the default, confirmed by the user).
 
-**Open calls:**
-- [default: the library is `library.json` in the app's container through the Data `library` store, every field defaulted] One file, versioned, as save states and cards will be.
-- [default: Add Folder looks for .cue, .iso, .m3u and .exe files, groups an .m3u's discs under it, and skips the .bin tracks a .cue names]
-- [default: no artwork and no titles from a database: a game is named by its file and can be renamed] The design's decision, and nothing leaves the Mac (contract row C47, verify).
-- [default: discs are listed today, with Play off and the reason, rather than hidden] The user can see what they added; 5h fills in console and serial.
+**Open calls:** none — all answered 2026-11-22.
 
-**Guardrail(s).** Store tests: round trip, defaults from a recorded fixture, and a stale bookmark kept and flagged. View-model tests: the scan's steps, Stop, Scan Again skipping added games with no duplicates, search with no results, remove confirming first, Play enabled only for a recognized PS-EXE. A preview per board's state.
+**Guardrail(s).** Store tests: round trip, defaults from a recorded fixture, and a stale bookmark kept and flagged. View-model tests: the scan's steps over a `Sandbox` folder built in the test (finding .cue, .iso, .m3u and .exe files, one entry for an .m3u and its discs, no entry for a .cue's .bin tracks), Stop, Scan Again skipping added games with no duplicates, search with no results, remove confirming first, Play enabled only for a recognized PS-EXE. A preview per board's state.
 
 **Acceptance criteria:**
 - [ ] Adding files and folders, search, rename, remove, the grid, Game info and Locate… work as the boards above show, with their keys.

@@ -12,7 +12,7 @@
 
 **Seam + files.**
 - Business, `ps1`: `PS1Console.insertDisc(_ disc: PS1Disc)`, `ejectDisc()`, `isLidOpen`. `PS1Disc` is a value with its track list and a sector-reading function the app supplies.
-- The app side, `session` (5b): builds a `PS1Disc` from `DiscIdentity`'s files (6c) and reads sectors from the bookmarked file.
+- The macOS app target: builds a `PS1Disc` from `DiscIdentity`'s files (6c), its sector-reading function reading the bookmarked file; Business `session` (5b: a Business module, decided 2026-11-22, importing only the standard library and Swift concurrency, its Core constraint) inserts it and never opens a file.
 - Tests: `tests/business/ps1/` with in-memory discs (a data track, an audio track, two discs swapped).
 
 **Reference.** The design: contract row C30 and gap G9 on the `Contract` board; the opening job on `Mac-PlayerOpening` ("Insert the disc", "Disc 1 of 3"). ProjectPSX: the files above, and `toggleCdRomLid()`. Public documentation: psx-spx's CD-ROM chapter.

@@ -16,7 +16,7 @@
 - Presentation, new place `savestates`: the sheet's view-model over the session (5b) and a slot store, with views and previews per state.
 - Presentation `player`: the toolbar and Game menu commands; Stop's Save First….
 - Presentation `library`: Game info's save-state count.
-- The app side: `…/Application Support/iStation/Save States/<serial>/slot-<n>.state`, each with a thumbnail from the latest picture (6b, 5g).
+- The app side: `…/Application Support/iStation/Save States/<serial>/slot-<n>.state`, each with a thumbnail made from the latest picture's raw 15- or 24-bit rows (6b) by 5g's shared converter in `styles`, since the core hands no RGBA and Metal converts only what is on screen (decided 2026-11-22).
 - Tests: `tests/presentation/savestates/` (first empty slot chosen, replace confirming, load confirming, older format refused).
 
 **Reference.** The design: boards `Mac-StatesSave`, `Mac-StatesOverwrite`, `Mac-StatesLoad`, `Mac-StatesVersionError` and `Mac-StopConfirm`; contract rows C31 and C32; the `Processes` board's file table; the scripted flow "play" in `tools/check.mjs`, which saves, replaces and refuses an older save.
@@ -25,7 +25,7 @@
 - 2026-11-21: each screen's gaps get interface items, track 6, and the screens are gated on them (the user's call).
 
 **Open calls:**
-- [default: eight slots per game, keyed by the disc's serial] The design's decision; a PS-EXE with no serial keys by its file's fingerprint.
+- [default: eight slots per game, keyed by the disc's serial] The design's decision; a PS-EXE with no serial keys by its file's SHA-1, worked out as 5c fingerprints the BIOS and kept in `library.json` (5d) as a defaulted field.
 - [default: no automatic save on Stop; Stop asks, and offers Save First…] The design's decision.
 
 **Guardrail(s).** View-model tests over a fake session and store for each state; a preview per board's state.
