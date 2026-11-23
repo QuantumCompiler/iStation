@@ -1,6 +1,6 @@
 # The Infrastructure layer
 
-**Position.** First of the four ([ADR 0018](../../../../documentation/adrs/darwin/four-layers-dependencies-point-down.md)): the mechanisms everything stands on, behind one small interface each. Today only byte decoding; the cores' hosts (memory, clocks, audio and video sinks) arrive as the cores need them.
+**Position.** First of the four ([ADR 0024](../../../../documentation/adrs/darwin/four-layers-and-business-holds-the-session.md)): the mechanisms everything stands on, behind one small interface each. Today only byte decoding; the cores' hosts (memory, clocks, audio and video sinks) arrive as the cores need them.
 
 **Modules:** `bytes` (little-endian reads over byte buffers)
 

@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: 2026 iStation contributors
 
-import BusinessPS1
+import BusinessSession
 import PresentationAcknowledgements
 import PresentationPlayer
 import PresentationStyles
 import SwiftUI
 
 /// The iOS app: the player, with the acknowledgements one tap away.
-/// The composition root: it builds the console and the view-models, and holds no logic.
+/// The composition root: it builds the console session and the view-models, and holds no logic.
 @main
 struct iStationApp: App {
-    @State private var player = PlayerViewModel(console: PS1Console())
+    @State private var player = PlayerViewModel(session: ConsoleSession())
     @State private var acknowledgements = AcknowledgementsViewModel(entries: Acknowledgement.bundled(for: "iOS"))
 
     var body: some Scene {

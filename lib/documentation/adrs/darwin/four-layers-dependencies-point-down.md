@@ -1,6 +1,6 @@
 # ADR 0018 — Four layers, dependencies point down, regardless of language and framework
 
-**Status:** Accepted · **Date:** 2026-11-14 · Supersedes [ADR 0001](layer-enforcement.md)
+**Status:** Superseded by [ADR 0024](four-layers-and-business-holds-the-session.md) (2026-11-22): Business is the cores and what the apps do with one, `session`, where it said the cores alone; the rule otherwise carries · **Date:** 2026-11-14 · Supersedes [ADR 0001](layer-enforcement.md)
 
 ## Context
 

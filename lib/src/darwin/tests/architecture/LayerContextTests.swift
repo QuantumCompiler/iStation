@@ -140,9 +140,9 @@ import Testing
         #expect(violations.isEmpty, "\(violations.report)")
     }
 
-    @Test("ADR 0018 lists the layers in the map's order")
+    @Test("ADR 0024 lists the layers in the map's order")
     func adrListsTheLayersInOrder() {
-        let path = "lib/documentation/adrs/darwin/four-layers-dependencies-point-down.md"
+        let path = "lib/documentation/adrs/darwin/four-layers-and-business-holds-the-session.md"
         let adr = Repository.text(Repository.root.appendingPathComponent(path)) ?? ""
         let listed = Pattern.captures(#"^\d\. \*\*([A-Za-z]+)\*\*"#, in: adr, options: [.anchorsMatchLines])
             .compactMap { $0.first ?? nil }.map { $0.lowercased() }

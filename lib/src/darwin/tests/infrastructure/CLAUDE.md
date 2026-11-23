@@ -8,4 +8,4 @@
 
 **Conventions:** hermetic — no network, nothing written outside the test's `Sandbox`, never the real home folder (`ArchitectureTests` fails on any reach for it), no processes.
 
-**Depth:** [ADR 0019](../../../../documentation/adrs/darwin/tests-live-in-the-layer-of-what-they-test.md) · [ADR 0018](../../../../documentation/adrs/darwin/four-layers-dependencies-point-down.md) · [DEVELOPER.md](../../../../documentation/assistant/darwin/DEVELOPER.md) (the test table).
+**Depth:** [ADR 0019](../../../../documentation/adrs/darwin/tests-live-in-the-layer-of-what-they-test.md) · [ADR 0024](../../../../documentation/adrs/darwin/four-layers-and-business-holds-the-session.md) · [DEVELOPER.md](../../../../documentation/assistant/darwin/DEVELOPER.md) (the test table).

@@ -694,3 +694,134 @@ Decided by the hardware (2026-11-14, ps1-tests' `cop` and its `psx.log`, recorde
   - Contract rows C40 and C41 are ready for what they name, their notes saying where the speed and the putchar output come from; C42, recording in the app, is the app's.
   - At the Today level a PS-EXE plays, since 5d builds it so; the BIOS check's and Tools' Today boards keep their before-6a state.
   - In personal builds 5b's session runs `PS1TracingConsole` with an instruction-counting tracer and optional putchar capture, which gives 5f's speed and putchar output; the App Store build runs `PS1Console`, and 6a's interface doesn't grow. 5b's session powers on with an optional PS-EXE, boots it before the first frame, and Reset does both again. Decided in the group run without the user, for the user's veto, and recorded in 5b's and 5f's documents.
+
+## Milestone U — The console session and the player
+
+**Goal.** v0.1.0 item 5b: the service that runs the console off the main actor, which every later screen uses (power on, frames at a steady pace, pause, reset and stop), and the player the design draws over it on macOS: the toolbar, the HUD, the "No picture yet" panel, the paused overlay, and Reset's and Stop's confirmations with their Details. Until now the player was one state, "Nothing to play yet.", and nothing ran the console.
+
+**Built** (5b, 2026-11-22):
+
+- **Business, the new module `session`** (`lib/src/darwin/source/business/session/`, iStation's own code, `Module(.business, "Session", uses: ["BusinessPS1", "BusinessR3000A"], testSupport: ["SupportMIPS"])`, in the `PS1Core` product):
+  - `ConsoleSession.swift`: `ConsoleSession<SessionClock: Clock>`, an actor that owns one `PS1Console`, or under `PERSONAL_BUILD` a `PS1TracingConsole` with an instruction-counting tracer. It offers `powerOn(bios:exe:)` (the PS-EXE given to `boot(exe:)` before the first frame; under `PERSONAL_BUILD` also `powerOn(bios:exe:capturesBIOSPutchar:)`), `pause()`, `resume()`, `reset()` (power on and boot the same PS-EXE again), `stop()` (the loop ended and the console released), `snapshot` and `snapshots()`. `ConsoleSession()` runs on `ContinuousClock`. Its frame loop is a `Task.detached` that holds the session weakly, sleeps on the clock and asks the actor for each frame. `FramePace` puts frame n at start + n/60 s.
+  - `ConsoleSessionSnapshot.swift`: a `Sendable`, `Equatable` value carrying the state (powered off, running, paused or stopped), the frame, the frames per second, `reachedShell` and `bootIsPending`; under `PERSONAL_BUILD` also `instructions` and `debugSnapshot`.
+  - `ConsoleSessionControls.swift`: the protocol the player drives (pause, resume, reset, stop, snapshots), so previews and tests use fakes.
+  - `InstructionCounter.swift` (personal only): the `R3000ATracer` that counts, as `istation-run` does.
+- **Presentation, `player`**:
+  - `Models/PlayerRun.swift`: the BIOS file's name and size, and a PS-EXE's name and file name, told by whatever starts a run.
+  - `Models/PlayerAlert.swift`: a question's title, message, Details and confirm button.
+  - `ViewModels/PlayerViewModel.swift`: `PlayerViewModel(session:)`, with states `.nothingLoaded`, `.running`, `.paused` and `.stopped`. Its intents are pause, resume, toggle pause, ask to reset, ask to stop, confirm, cancel and full screen. `started(_:)` follows the session's snapshots. It also gives the texts as `main.html` writes them.
+  - `Views/PlayerView.swift`, `PlayerHUD.swift` and (macOS) `PlayerWindow.swift`: the screen, the HUD, `playerWindow(_:idleTitle:)` (the title, the toolbar, full screen kept in step with the window's own) and `PlayerCommands`, the Game menu.
+  - `Previews/PreviewPlayer.swift`: a `PreviewSession` and a named preview per state: twelve of the screen, four of the HUD and six of the window.
+- **`styles`**: `SheetButtonStyle` is public, for the paused overlay's Resume.
+- **The apps**:
+  - **macOS**: the composition root builds one `ConsoleSession()` and `PlayerViewModel(session:)`. It has one `Window` scene with a minimum of 800 × 560 less the toolbar and 1280 × 800 by default, the player area at least 640 × 480. The Game menu has ⌘P, ⌘R, ⌃⌘F and ⌘.; the File menu's print items and New Window are gone.
+  - **iOS**: builds `PlayerViewModel(session: ConsoleSession())`.
+- **Tests**:
+  - `tests/business/session/`: `ConsoleSessionTests` (23) and `PersonalSessionTests` (3, personal builds), over code-built BIOS images and EXEs and a `ManualClock`, with one real-time test on `ContinuousClock`.
+  - `tests/presentation/player/`: `PlayerViewModelTests` (38) over a scripted `FakeSession`.
+  - `tests/support/mips/Programs.swift`: the image builders the PS1 and session harnesses share.
+  - `BusinessSessionTests` joins the `macOS Personal` scheme.
+- **The architecture**:
+  - [ADR 0024](../../adrs/darwin/four-layers-and-business-holds-the-session.md) supersedes ADR 0018. Business is the cores and what the apps do with one, `session`, and the apps run a console only through it.
+  - `LayerContextTests.adrListsTheLayersInOrder` reads ADR 0024.
+  - Every live citation of the layer law points at it: the router, the three source cards, the tests cards, SPEC and the Presentation card.
+  - ADR 0002's table has the `session` row and the Player row's new edge, and its products sentence names `BusinessSession`.
+- **The design**:
+  - The `Processes` board's console-thread row says the session paces `runFrame` by `ContinuousClock` at 60 a second until the video standard is known (G12), one call at a time in one isolation domain.
+  - Contract rows C06, C07, C08 and C50 name `ConsoleSession`'s calls and are tagged ready, with their evidence.
+  - The `Layout` board's window row says one `Window` scene.
+  - Published to [the canvas](https://claude.ai/artifact/LA2jv631Ar184Dviuju8hu) as this item landed.
+- **The docs**:
+  - CLAUDE.md: what this is, the architecture, the UI section, the personal-only API, the Codebase Map's `ps1`, `session` and `player` rows, the products, and Code Style.
+  - DEVELOPER: the tree, the `ps1`, `session`, `styles` and `player` entries, both apps, and the test table.
+  - The Business card's Position, Modules and May-depend-on lines, and the Business tests card's conventions.
+
+**Trade-offs.**
+
+- **One isolation domain, not one thread.** ADR 0015 §4's "driven from one thread" is read as the session actor's isolation. Every call into the console (frames, power on, boot, reads) runs on the actor, one at a time and between frames. Every session method is synchronous on the actor, so nothing can enter between a frame's start and its end.
+- **Pacing:**
+  - The first frame comes a sixtieth after power on, resume or reset, so frame 0 can be seen.
+  - A frame up to one frame late is caught up. One later than that restarts the pace from now, so a stall never becomes a burst.
+  - Frames per second counts each whole second of running, and is 0 until a whole second has run and while paused.
+- **The personal build counts every instruction and takes a debug snapshot each frame.** A review measured about 76 µs a frame for the snapshot even with a full 1 MB TTY. The personal routine compiles at `-Onone` (`apps/Config/Personal.xcconfig`, unchanged since v0.0.1), where the core benchmarks about 13 M instructions a second. A BIOS that runs more instructions a frame than that allows shows fewer than 60 frames a second there. The session reports what it measures. The App Store build and `istation-run` are optimized.
+- **The App Store side of the session is compiled, not run, by the routine checks.** `swift test` runs the debug build, `PERSONAL_BUILD` included. The release path passed 23 session tests by hand (`swift test -c release -Xswiftc -enable-testing --filter BusinessSessionTests`). Adding that run to `cicd.sh` would lengthen CI and is the user's call.
+- **Departures from the boards, at the Today level:**
+  - While paused, the overlay replaces the "No picture yet" panel. With no picture under the scrim, the two would overlap.
+  - Stop keeps the boards' chevron, but its label is "Stop" and its tip "Stop (⌘.)": there is no library to go back to until 5d.
+  - Stop's alert has no Save First…, which comes with save states (5l).
+  - Enter Full Screen sits in the Game menu, where the design's menus put it under View. AppKit's own View › Enter Full Screen still answers ⌃⌘F too; both reach the same state, and 5e's menus settle it.
+  - In the shipped app nothing starts a run until 5c (Run the BIOS) and 5d (opening a PS-EXE), so the toolbar and the Game menu stay disabled. Their behaviour is proved by the view-model tests and seen in the previews.
+
+**Verified** (2026-11-22):
+
+- `lib/scripts/cicd.sh --app darwin --test` in the item's worktree passed (exit 0): the strict build, `swift test` (372 tests in 12 runs, up from 309 in 11; `BusinessSessionTests` 26, `PresentationPlayerTests` 38, up from 1) and both apps' personal routine, for macOS and the iOS Simulator.
+- `swift build -c release --explicit-target-dependency-import-check=error` is clean.
+- A review built the macOS App Store routine (Release) with no warnings.
+- The `macOS Personal` scheme's `xcodebuild test` passed the session and player tests.
+- The Thread Sanitizer reported nothing over the player tests and the session suite.
+- Repeat runs: the session tests passed 20 times in a row, and 20 more with four test processes running at once. The player tests passed 20 times in a row.
+- Probes over a code-built BIOS:
+  - In real time, the release session reached frames 60, 120 and 180 at 1.005, 2.003 and 3.004 s. Pause held frame 180 over 300 ms; resume carried on, reset went to 0 and stop released the console.
+  - 800 controls sent from 8 tasks at once left exactly one loop.
+  - A session let go without `stop()` ended its loop and finished its streams.
+- Mutations, each restored:
+  - The loop going on after pause, or the EXE not given at power on: 7 session tests failed.
+  - Asking without pausing, Reset's Details losing the `boot(exe:)` line, or stopping without leaving full screen: 9 player tests failed.
+  - Unchained controls, or the catch-up rule disabled, were each caught.
+  - Reverting the review's three view-model fixes failed 8 checks.
+  - The layer-order check pointed at an ADR 0024 copy with Data and Business swapped failed.
+- **The boards, rendered.** A throwaway test, not committed, rendered each state's view in the light, dark and high-contrast themes. They were compared in the built-in browser with `Mac-TodayPlayer`, `Mac-PlayerPaused`, `Mac-PlayerFullscreen`, `Mac-ResetConfirm`, `Mac-StopConfirm`, `Mac-PlayerMin` and `Mac-PlayerRunning`'s HUD.
+  - The HUD, the panel, both alerts with their Details, full screen's Pause and Exit buttons and the fit at 800 × 560 match at the Today level, with the departures above.
+  - Window chrome (the title and the toolbar) doesn't render to an image; the six "Window, …" previews show it in Xcode's canvas.
+- `node tools/check.mjs` and `--render` pass: 54 contract rows (21 ready, 11 app, 19 gaps, 3 verify), 137 pages. The docs validator is clean on a copy of the worktree.
+
+**Decisions consumed.**
+
+- 2026-11-21: the design's Today parts are v0.1.0's; each screen's gaps get interface items, and the screens are gated on them (the user's calls).
+- 2026-11-22 (the defaults, confirmed by the user):
+  - the runner is a new Business module, `session`;
+  - frames are paced by `ContinuousClock` at 60 a second until 6h reports the video standard, with frames per second shown without a target (G12);
+  - one window, one console at a time;
+  - Stop asks first and saves nothing;
+  - Reset's and Stop's Details name the calls, with the kept file's own name in place of the design's placeholder.
+- 2026-11-22 (the user's calls, before the group run): the design is published as the item lands; screens are checked against their boards by rendered previews.
+- 2026-11-22 (made in the group run without the user, for the user's veto):
+  - personal builds run the session on `PS1TracingConsole` with an instruction-counting tracer and optional BIOS putchar capture;
+  - the session takes a PS-EXE with power on, boots it before the first frame, and Reset does both again.
+- 2026-11-22, rulings made building it:
+  - **The module's edges:**
+    - The Session row also uses `BusinessR3000A`, because `InstructionCounter` is an `R3000ATracer`; it is imported only under `#if PERSONAL_BUILD`, and the import checks read it as text in every build.
+    - The row's test support is `SupportMIPS`. The image builders the two harnesses share moved into `SupportMIPS` (`Programs.swift`); `makeBIOS` and `shellBIOS` stay in each harness, since a Support target can't use a module.
+    - `BusinessSession` joins `PS1Core`, and the Player row uses it.
+  - **Session states and controls:**
+    - The session has a `.poweredOff` state before power on.
+    - Power on works in any state and starts afresh. A wrong-size BIOS throws `PS1Error.biosSize` and changes nothing.
+    - Reset also runs a paused session, as the prototype does; it does nothing powered off or stopped.
+    - Stop ends the loop and releases the console. The stopped snapshot keeps where it stopped, with frames per second 0. Pause, resume and reset do nothing afterwards.
+    - Putchar capture is a separate `powerOn` overload that exists only under `PERSONAL_BUILD`, and Reset keeps its setting.
+  - **Snapshot streams:** each `snapshots()` call is a new stream that starts with the current snapshot, keeps only the newest when its reader lags, and finishes at the next `stop()`.
+  - **Following a run:**
+    - The player never powers anything on. A starter (5c, 5d) powers the session on, then calls `started(_:)`.
+    - The player follows the session across a stop, taking the next stream once it shows Stopped, so either call order works.
+    - A player let go cancels its follow.
+    - Controls reach the session in the order given, and the player's state comes only from snapshots.
+  - **Asking:**
+    - Asking Reset or Stop always sends a pause, and Cancel leaves the game paused, as `main.html` does.
+    - The paused overlay hides while a question is open.
+    - One question at a time.
+  - **The texts:**
+    - They are `main.html`'s, including Reset's "The game starts again…" when only the BIOS runs.
+    - Stop's title is "Stop playing <name>?" for a program and "Stop the BIOS?" for the BIOS; the Game menu keeps "Stop…", as the design's menu names it.
+    - Numbers are grouped as en-US, not by the system locale, so Details are exact.
+    - The rate is a whole number, hidden until a second has been measured.
+  - **The window:**
+    - While a run plays the window is titled with the run's name, and with the routine's title otherwise.
+    - The toolbar hides in full screen, where the HUD carries Pause or Resume and Exit full screen (Esc).
+    - Full screen sits in its own toolbar group in place of the board's separator.
+    - Closing the window leaves the session as it is; 5d decides what closing does to a run.
+    - The stopped screen says "Stopped. Nothing is running." until 5d's library takes its place.
+  - **The HUD:** the name is one line, truncated, since the design's `max-width: 280px` has no token. The bar's shadow falls from its shape alone.
+  - **Contract rows:** C06, C07, C08 and C50 are tagged ready, backed by the session's tests.
+  - **The layer law's citations:** every live citation points at ADR 0024. ADR 0023's account of what the apps build is corrected in ADR 0024's Consequences rather than by a superseding record. Superseded ADRs keep their own references as history.
+  - **The real-time test** asserts at most 60 frames a second (+2) and at least 15 over half a second after the first frame. The exact 60 is the `ManualClock` tests' proof.
+  - **A Sony file's name** is never used in a test: the kept-file test uses `bios-backup.bin`.

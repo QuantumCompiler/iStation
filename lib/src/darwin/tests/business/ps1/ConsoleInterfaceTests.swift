@@ -9,13 +9,6 @@ import Testing
 /// The shell's address, where a BIOS hands over to its shell (psx-spx).
 let shellAddress: UInt32 = 0x8003_0000
 
-/// BIOS code that stores `words` into RAM at `address`, as a BIOS copies its shell there; uses t0 and t1.
-func storing(_ words: [UInt32], at address: UInt32) -> [UInt32] {
-    [MIPS.lui(t0, Int(address >> 16)), MIPS.ori(t0, t0, Int(address & 0xFFFF))] + words.enumerated().flatMap { index, word in
-        [MIPS.lui(t1, Int(word >> 16)), MIPS.ori(t1, t1, Int(word & 0xFFFF)), MIPS.sw(t1, 4 * index, t0)]
-    }
-}
-
 /// A 512 KB BIOS built in code — never Sony's — that prints `banner`, runs `padding` nops, copies a
 /// stand-in shell to 0x80030000 and jumps there. The stand-in jumps straight back to the BIOS's own
 /// endless loop, so once the shell's address is reached the PC leaves it for good; the padding moves

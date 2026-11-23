@@ -230,13 +230,16 @@ private struct ResultRow: View {
 
 /// The design's sheet and alert buttons (`.btn`, `.btn-primary`, `.btn-danger` in html/main.html):
 /// bordered on the control's fill, the accent's default button, and the destructive one, each with
-/// its hover and pressed fills and the faint disabled look. Internal to the job sheet and the alert
-/// until a place needs the design's buttons too.
-struct SheetButtonStyle: ButtonStyle {
+/// its hover and pressed fills and the faint disabled look. The job sheet and the alert draw theirs
+/// with it, and so does the player's paused overlay, whose Resume is the design's primary button.
+public struct SheetButtonStyle: ButtonStyle {
     /// Which of the design's buttons.
-    enum Kind {
+    public enum Kind: Sendable {
+        /// Bordered on the control's fill: Cancel, Close (`.btn`).
         case bordered
+        /// The accent's default button: Resume, Done (`.btn-primary`).
         case primary
+        /// The danger fill, for what can't be undone: Reset, Stop (`.btn-danger`).
         case destructive
     }
 
@@ -244,12 +247,13 @@ struct SheetButtonStyle: ButtonStyle {
     let fillsWidth: Bool
 
     /// A style drawing `kind`, as wide as its row allows when `fillsWidth`.
-    init(_ kind: Kind, fillsWidth: Bool = false) {
+    public init(_ kind: Kind, fillsWidth: Bool = false) {
         self.kind = kind
         self.fillsWidth = fillsWidth
     }
 
-    func makeBody(configuration: Configuration) -> some View {
+    /// The button, drawn as `kind`.
+    public func makeBody(configuration: Configuration) -> some View {
         SheetButton(label: configuration.label, isPressed: configuration.isPressed, kind: kind, fillsWidth: fillsWidth)
     }
 }

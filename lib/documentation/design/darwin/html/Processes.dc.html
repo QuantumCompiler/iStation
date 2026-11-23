@@ -73,7 +73,7 @@ var LEFT = [
 ];
 var MIDDLE = [
   ['Views and view-models, main actor', 'One Presentation module per place (Library, Player, SaveStates, MemoryCards, BIOS, Settings, Tools), drawing from one styles module: its tokens, and the shared job sheet, Details alert, chips, banners and keycaps. View-models import no UI toolkit (ADR 0023).'],
-  ['The console thread', 'One PS1Console, driven from one thread by a service on a Task.detached: runFrame at the display’s pace, then the frame, audio and input crossings of the narrow interface (ADR 0015 §5). Paused means not calling runFrame.'],
+  ['The console thread', 'One PS1Console, driven one call at a time in one isolation domain, the Business session module’s, by its frame loop, a Task.detached (ADR 0024): runFrame paced by ContinuousClock at 60 a second until the video standard is known (G12), then the frame, audio and input crossings of the narrow interface (ADR 0015 §5). Paused means not calling runFrame.'],
   ['Apple frameworks', 'CryptoKit for the BIOS fingerprint; GameController for input; AVAudioEngine for sound (v0.3.0); Metal to present each frame (v0.1.0) and to render it (v0.3.0).'],
   ['Personal builds only', 'TraceKit, the Tools pane and the debug drawer, under PERSONAL_BUILD. App Store builds carry none of them.']
 ];

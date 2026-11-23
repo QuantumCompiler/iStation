@@ -4,6 +4,7 @@
 import BusinessPS1
 import BusinessR3000A
 import Foundation
+import SupportMIPS
 import Testing
 
 /// The spike's loop (Milestone D) on the whole console — CPU, bus, devices, wait states — for 600

@@ -1,6 +1,6 @@
 # The Presentation layer
 
-**Position.** Fourth of the four ([ADR 0018](../../../../documentation/adrs/darwin/four-layers-dependencies-point-down.md)): EmuKit, the SwiftUI views the macOS and iOS apps share — the player and the acknowledgements screen, and the tokens they draw with. The apps themselves are targets in `lib/src/darwin/iStation.xcodeproj` (`lib/src/darwin/apps/`), the composition roots.
+**Position.** Fourth of the four ([ADR 0024](../../../../documentation/adrs/darwin/four-layers-and-business-holds-the-session.md)): EmuKit, the SwiftUI views the macOS and iOS apps share — the player and the acknowledgements screen, and the tokens they draw with. The apps themselves are targets in `lib/src/darwin/iStation.xcodeproj` (`lib/src/darwin/apps/`), the composition roots.
 
 **Modules:** `styles` (the visual tokens from the design's tokens.json — palette (dynamic, three themes), theme, typography, metrics, motion, symbols — and the shared components), `player` (the player's screen), `acknowledgements` (every notice the app carries)
 

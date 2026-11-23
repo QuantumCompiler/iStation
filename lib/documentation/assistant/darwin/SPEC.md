@@ -105,7 +105,7 @@ On the Mac App Store and the iOS App Store, eligible under App Review Guidelines
 
 ## Principles
 
-- **Layered, and the law is mechanical.** Four layers, dependencies pointing down, enforced by a check — see [ADR 0018](../../adrs/darwin/four-layers-dependencies-point-down.md).
+- **Layered, and the law is mechanical.** Four layers, dependencies pointing down, enforced by a check — see [ADR 0024](../../adrs/darwin/four-layers-and-business-holds-the-session.md).
 - **The oracle decides.** A ported subsystem is right when its guest-visible behaviour matches the oracle's; the first divergence is the bug.
 - **Provenance stays clean and visible.** Every ported file names the permissive file it comes from and keeps its notice; nothing is learned from a GPL emulator's code, and a session that has read one writes no core code ([ADR 0013](../../adrs/darwin/shipped-code-derives-only-from-permissive-references.md)).
 - **Release builds carry no tools.** Anything for debugging or tracing compiles only into personal builds.

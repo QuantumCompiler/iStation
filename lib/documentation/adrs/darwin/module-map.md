@@ -21,11 +21,12 @@ The directory naming follows SwiftPM's freedom of `path:`: lowercase module dire
 | data | `tracing` | — |
 | business | `r3000a` | — |
 | business | `ps1` | `BusinessR3000A` |
+| business | `session` | `BusinessPS1`, `BusinessR3000A` |
 | presentation | `styles` | — |
-| presentation | `player` | `BusinessPS1`, `PresentationStyles` |
+| presentation | `player` | `BusinessPS1`, `BusinessSession`, `PresentationStyles` |
 | presentation | `acknowledgements` | `PresentationStyles` |
 
-The table as of 2026-11-07, after v0.0.1's item 3b retired the library app's 17 other modules ([Milestone F](../../assistant/darwin/MILESTONES.md#milestone-f--the-skeleton-and-both-build-routines)) and items 3e and 3f ported `r3000a` and `ps1` from ProjectPSX ([Milestone I](../../assistant/darwin/MILESTONES.md#milestone-i--the-r3000a-interpreter), [Milestone J](../../assistant/darwin/MILESTONES.md#milestone-j--the-ps1-console)). The library products the apps link are `PS1Core` (`BusinessR3000A`, `BusinessPS1`) and `EmuKit` (the three Presentation modules); `TraceKit` (`DataTracing`, item 3c) is for personal builds only.
+The table as of 2026-11-22, after v0.0.1's item 3b retired the library app's 17 other modules ([Milestone F](../../assistant/darwin/MILESTONES.md#milestone-f--the-skeleton-and-both-build-routines)), items 3e and 3f ported `r3000a` and `ps1` from ProjectPSX ([Milestone I](../../assistant/darwin/MILESTONES.md#milestone-i--the-r3000a-interpreter), [Milestone J](../../assistant/darwin/MILESTONES.md#milestone-j--the-ps1-console)), and v0.1.0's item 5b added `session` ([ADR 0024](four-layers-and-business-holds-the-session.md)). The library products the apps link are `PS1Core` (`BusinessR3000A`, `BusinessPS1` and `BusinessSession`) and `EmuKit` (the three Presentation modules); `TraceKit` (`DataTracing`, item 3c) is for personal builds only. `BusinessSession` joined `PS1Core` with 5b because the apps build the session, and run the console only through it: it ships with the cores it runs.
 
 ## Consequences
 

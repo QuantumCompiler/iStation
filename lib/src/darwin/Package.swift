@@ -29,9 +29,10 @@ let modules: [Module] = [
 
     Module(.business, "R3000A", testSupport: ["SupportMIPS", "SupportR3000ATrace", "SupportSandbox"], derivedFrom: .projectPSX),
     Module(.business, "PS1", uses: ["BusinessR3000A"], testSupport: ["SupportMIPS", "SupportR3000ATrace", "SupportSandbox"], derivedFrom: .projectPSX),
+    Module(.business, "Session", uses: ["BusinessPS1", "BusinessR3000A"], testSupport: ["SupportMIPS"]),
 
     Module(.presentation, "Styles"),
-    Module(.presentation, "Player", uses: ["BusinessPS1", "PresentationStyles"]),
+    Module(.presentation, "Player", uses: ["BusinessPS1", "BusinessSession", "PresentationStyles"]),
     Module(.presentation, "Acknowledgements", uses: ["PresentationStyles"]),
 ]
 
@@ -47,7 +48,7 @@ let testSupport: [Support] = [
 /// The library products the apps in iStation.xcodeproj link (ADR 0016). The apps are the entry
 /// points: nothing in the package is an executable, and nothing imports an app.
 let products: [Product] = [
-    .library(name: "PS1Core", targets: ["BusinessR3000A", "BusinessPS1"]),
+    .library(name: "PS1Core", targets: ["BusinessR3000A", "BusinessPS1", "BusinessSession"]),
     .library(name: "EmuKit", targets: ["PresentationStyles", "PresentationPlayer", "PresentationAcknowledgements"]),
     // Personal builds only: no app links it in its App Store routine (ADR 0016).
     .library(name: "TraceKit", targets: ["DataTracing"]),
@@ -115,7 +116,7 @@ let package = Package(
     } + testSupport.map { support in
         .target(name: support.target, dependencies: dependencies(support.uses), path: support.path, swiftSettings: settings)
     } + [
-        // The layering, layer-context and project-rule checks (ADRs 0002, 0013, 0014, 0016–0019, 0021–0023). Reads files only.
+        // The layering, layer-context and project-rule checks (ADRs 0002, 0013, 0014, 0016, 0017, 0019, 0021–0024). Reads files only.
         .testTarget(name: "ArchitectureTests", path: "tests/architecture"),
     ]
 )

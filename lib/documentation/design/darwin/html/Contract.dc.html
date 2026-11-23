@@ -106,9 +106,9 @@ var ROWS = [
   { area: 'Console', id: 'C03', part: 'Run the console a frame at a time', by: 'PS1Console.runFrame()', tag: 'ready', gap: '', note: 'Probe: 60 calls in 0.014 s on the CPU-check image. Does nothing while powered off (checked).' },
   { area: 'Console', id: 'C04', part: 'Frame counter in the HUD and title', by: 'PS1Console.frame', tag: 'ready', gap: '', note: 'Probe: 60 after 60 runFrame calls; 0 after powering on again.' },
   { area: 'Console', id: 'C05', part: 'Whether the console is on', by: 'PS1Console.isPoweredOn', tag: 'ready', gap: '', note: 'Probe: false before powerOn, true after.' },
-  { area: 'Console', id: 'C06', part: 'Reset', by: 'powerOn(bios:) again; for a PS-EXE, then boot(exe:) again', tag: 'app', gap: '', note: 'Powering on again makes a new machine at frame 0 (probe), with no EXE waiting. The shell is entered once per power-on, so a PS-EXE needs boot(exe:) again, given right after powerOn, before the first frame (6a). With discs it also needs insertDisc (G9).' },
-  { area: 'Console', id: 'C07', part: 'Pause and resume', by: 'the app’s own runFrame loop', tag: 'app', gap: '', note: 'The app stops and restarts calling runFrame; the core keeps no paused state.' },
-  { area: 'Console', id: 'C08', part: 'Frames per second', by: 'frame deltas over ContinuousClock time', tag: 'app', gap: '', note: 'Measured by the app. Shown without a target until the video standard is known (G12).' },
+  { area: 'Console', id: 'C06', part: 'Reset', by: 'ConsoleSession.reset(): PS1Console.powerOn(bios:) again; for a PS-EXE, then boot(exe:) again', tag: 'ready', gap: '', note: 'Powering on again makes a new machine at frame 0 (probe), with no EXE waiting. The shell is entered once per power-on, so the session gives the same PS-EXE to boot(exe:) again right after powerOn, before the first frame (6a, 5b’s session tests). With discs it also needs insertDisc (G9).' },
+  { area: 'Console', id: 'C07', part: 'Pause and resume', by: 'ConsoleSession.pause(), resume()', tag: 'ready', gap: '', note: 'The session’s frame loop ends and starts again, paced by ContinuousClock at 60 a second; the core keeps no paused state, and the frame holds while paused (5b’s session tests).' },
+  { area: 'Console', id: 'C08', part: 'Frames per second', by: 'ConsoleSessionSnapshot.framesPerSecond', tag: 'ready', gap: '', note: 'The session counts the frames run over each whole second of running, 0 until one has and while paused. Shown without a target until the video standard is known (G12).' },
   { area: 'BIOS', id: 'C09', part: 'BIOS size and fingerprint', by: 'the file’s bytes; CryptoKit Insecure.SHA1', tag: 'app', gap: '', note: 'The docs name BIOS files only by size and hash; the design does the same and never claims a model or region.' },
   { area: 'BIOS', id: 'C10', part: '“It reached its shell”', by: 'PS1Console.reachedShell', tag: 'ready', gap: 'G10', note: 'True once the PC first reaches 0x80030000, then stays; the watch runs from power-on and stops then (6a’s console-interface tests). The Today boards keep “it powered on and ran 60 frames”, the state before 6a.' },
   { area: 'BIOS', id: 'C11', part: 'Keep access to the BIOS and games across launches', by: '.fileImporter, security-scoped bookmarks, the App Sandbox’s read-only user-selected files', tag: 'verify', gap: '', note: 'Assumed on both OSes. The macOS App Store entitlements hold files.user-selected.read-only but not files.bookmarks.app-scope, which Apple documents for app-scoped bookmarks: item 5c probes a bookmark across relaunches under the App Store routine and adds it if needed.' },
@@ -131,7 +131,7 @@ var ROWS = [
   { area: 'Playing', id: 'C24', part: 'Renderer choice', by: 'nothing yet', tag: 'gap', gap: 'G11', note: 'Software only until v0.3.0’s Metal renderer; the setting shows “Software” as text.' },
   { area: 'Playing', id: 'C25', part: '50 or 60 frames a second', by: 'nothing yet', tag: 'gap', gap: 'G12', note: 'The GPU’s status has the bit; PS1Console doesn’t report it.' },
   { area: 'Playing', id: 'C30', part: 'Insert and swap discs', by: 'nothing yet', tag: 'gap', gap: 'G9', note: 'v0.2.0’s CD-ROM. Until then Play is off for discs and says why; the BIOS and a PS-EXE run.' },
-  { area: 'Playing', id: 'C50', part: 'Stop playing', by: 'the app ends its loop and releases the console', tag: 'app', gap: '', note: 'Confirms first, with Save First… once save states exist.' },
+  { area: 'Playing', id: 'C50', part: 'Stop playing', by: 'ConsoleSession.stop()', tag: 'ready', gap: '', note: 'Ends the session’s frame loop and releases the console, saving nothing; every snapshot stream finishes with the stopped snapshot (5b’s session tests). The player confirms first, with Save First… once save states exist.' },
   { area: 'Playing', id: 'C35', part: 'Tell PS2 discs apart', by: 'SystemCNF.Console.ps2 (BOOT2)', tag: 'gap', gap: 'G2', note: 'The reader exists; linking it is G2.' },
   { area: 'Playing', id: 'C36', part: 'Play PS2 games', by: 'nothing yet', tag: 'gap', gap: 'G13', note: 'v2.x. PS2 discs are listed, say “plays later”, and Play refuses with the reason.' },
   { area: 'Save states and cards', id: 'C31', part: 'Save and load states', by: 'nothing yet', tag: 'gap', gap: 'G7', note: 'v0.2.0, versioned (ADR 0016 §5). Replacing a slot confirms; loading confirms.' },
@@ -233,7 +233,15 @@ var EVIDENCE = [
   'reachedShell                           false after powerOn, true once the PC reaches 0x80030000, still true after it leaves',
   'debugSnapshot                          nil while off; pc, registers, hi, lo, sr, cause, epc and cycles match PS1Machine.cpu after a known program',
   'debugSnapshot.tty, ttySinceEXE         “BIOS OK” and “OK” for a BIOS that prints “BIOS ” and an EXE that prints “OK”',
-  'PS1TracingConsole<Tracer>              its tracer sees what PS1Machine’s does over the same image and frames; withRAM reads the guest’s RAM'
+  'PS1TracingConsole<Tracer>              its tracer sees what PS1Machine’s does over the same image and frames; withRAM reads the guest’s RAM',
+  '',
+  '$ swift test --filter BusinessSessionTests (debug, so PERSONAL_BUILD), 2026-11-22: 5b’s session tests   passed',
+  '  hermetic: every BIOS image and EXE built in code; paced by a clock the test moves a sixtieth at a time',
+  'ConsoleSession.pause(), resume()        the frame holds while paused, framesPerSecond 0; resume runs on from it',
+  'ConsoleSession.reset()                  frame 0 again, the same PS-EXE given to boot(exe:) again before the first frame',
+  'ConsoleSession.stop()                   the loop ended, the console released, every stream finished with the stopped snapshot',
+  'framesPerSecond                         60 after 60 ticks of a sixtieth; 0 until a whole second has run',
+  'ContinuousClock pacing                  5b’s review, a probe linking PS1Core by path (release): frame 60 at 1.005 s, 120 at 2.003 s, 180 at 3.004 s, 59.92 per second'
 ].join('\n');
 
 var TAGS = {

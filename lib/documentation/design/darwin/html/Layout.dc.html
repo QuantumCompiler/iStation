@@ -158,7 +158,7 @@ var STATES = [
 ];
 
 var CONTROLS = [
-  ['Window and sidebar', 'WindowGroup; NavigationSplitView { List(selection:) { Section } } detail: { … }; .navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 280)'],
+  ['Window and sidebar', 'Window, a single scene rather than a WindowGroup: one window, one console at a time; NavigationSplitView { List(selection:) { Section } } detail: { … }; .navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 280)'],
   ['Sidebar rows', 'Label(title, systemImage:) with .badge(count); .keyboardShortcut("1") on the matching CommandMenu items'],
   ['Library as a list', 'Table(games, selection: $selection) { TableColumn("Name") … }; .contextMenu(forSelectionType:) { } primaryAction: { play }'],
   ['Library as a grid', 'ScrollView { LazyVGrid(columns: [GridItem(.adaptive(minimum: 168), spacing: 20)]) }'],
