@@ -10,7 +10,7 @@ import Testing
     @Test func aNewPlayerHasNothingLoaded() {
         let player = PlayerViewModel(console: PS1Console())
         #expect(player.state == .nothingLoaded)
-        #expect(player.consoleName == "PlayStation")
+        #expect(player.consoleName == "PS1")
         #expect(player.message == "Nothing to play yet.")
     }
 }

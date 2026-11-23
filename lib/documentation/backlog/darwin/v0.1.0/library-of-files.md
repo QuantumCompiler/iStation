@@ -17,14 +17,14 @@ v0.1.0 builds it to the design's **Today** level. Disc images (.cue, .iso, .m3u)
 **Seam + files.**
 - Data `library` (5c's): games join the store, each with its bookmark, file name, folder, format, size, added date, last played and a library-only name. A stale bookmark is reported, not dropped.
 - Presentation, new place `library`: `LibraryViewModel` (navigation, selection, search, view mode, inspector), `ScanViewModel` driving `JobSheet` (5a), `LibraryView` (`Table`, `LazyVGrid`, `.inspector`, `.searchable`), with previews per state.
-- The macOS app target: imported type declarations for .cue, .bin, .m3u and PS-EXE; the File menu's and sidebar's keys; the opening job for a PS-EXE (open the file, power on with the BIOS, `boot(exe:)`, then the player of 5b).
+- The macOS app target: imported type declarations for .cue, .bin, .m3u and PS-EXE; the File menu's and sidebar's keys; the opening job for a PS-EXE (open the file, then power on 5b's session with the BIOS and the EXE — the session gives it to `boot(exe:)` right after `powerOn(bios:)`, before the first frame runs, as the shell is entered once per power-on — then the player of 5b).
 - Tests: `tests/data/library/` (games round trip, stale bookmarks, fixture), `tests/presentation/library/` (filters, search, rename, remove, scan steps, Stop and Scan Again without duplicates, Play enabled only for a PS-EXE today).
 
 **Reference.** The design:
 - **Boards:** `Mac-LibraryEmpty`, `Mac-TodayLibrary`, `Mac-LibraryGrid`, `Mac-LibraryInspector`, `Mac-LibrarySearchEmpty`, `Mac-LibraryMissing`, `Mac-RemoveConfirm`, `Mac-Rename`, `Mac-LibraryMin`, `Mac-LibraryLight`, `Mac-LibraryContrast`, `Mac-ScanPicker`, `Mac-ScanRunning`, `Mac-ScanStopped` and `Mac-ScanDone`. The scan boards' read step and results are 5h's.
 - **Contract rows:** C11–C13, C18–C20, C47, C51–C53.
 - **Layout page:** the breakpoints. Under 880 points of content the Format column goes, under 700 Last played, and under 1100 points of window Game info hides the sidebar.
-- **Scripted flows:** "add a folder" and "refusals" in `tools/check.mjs`.
+- **Scripted flows:** "add a folder" and "refusals" in `tools/check.mjs`, and "today", whose PS-EXE takes the 3-step opening job to the player and whose Reset boots it again.
 
 **Decisions made** (dated):
 - 2026-11-21: the design's Today parts are v0.1.0's, moving game import from v0.2.0 into v0.1.0 (the user's call).

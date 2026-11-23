@@ -1069,7 +1069,8 @@ function advance(s0) {
       else if (j.step === 2) { if (j.ticks % 3 === 0) { j.step = 3; j.status = 'done'; } }
     } else if (j.kind === 'open') {
       if (j.ticks % 4 === 0) j.step += 1;
-      if (j.step >= 4) { s.job = null; s.sheet = ''; s.screen = 'player'; s.player = playerFor(j.id, 'running', 0); s.inspector = false; if (s.platform === 'ios') { s.w = 844; s.h = 390; } }
+      var og0 = gameById(s, j.id);
+      if (j.step >= (og0 && og0.format === 'exe' ? 3 : 4)) { s.job = null; s.sheet = ''; s.screen = 'player'; s.player = playerFor(j.id, 'running', 0); s.inspector = false; if (s.platform === 'ios') { s.w = 844; s.h = 390; } }
     } else if (j.kind === 'trace') {
       if (j.step === 0) { if (j.ticks % 3 === 0) j.step = 1; }
       else if (j.step === 1) { j.n = Math.min(j.total, j.n + 1); if (j.n >= j.total) j.step = 2; }
@@ -1095,7 +1096,7 @@ function visibleGames(s) {
 
 function canPlay(s, g) {
   if (!g) return { ok: false, why: '' };
-  if (s.level === 'today') return { ok: false, why: g.format === 'exe' ? 'A PS-EXE plays once the console can boot one (gap G5).' : 'Discs play from v0.2.0.' };
+  if (s.level === 'today' && g.format !== 'exe') return { ok: false, why: 'Discs play from v0.2.0.' };
   if (g.access === 'missing') return { ok: false, why: 'iStation can’t find this file.' };
   if (g.console === 'ps2') return { ok: false, why: 'PS2 games play in a later version of iStation.' };
   return { ok: true, why: '' };
@@ -1734,10 +1735,12 @@ function jobView(s, J, SH, sbtn) {
     else if (j.status === 'stopped') { J.summary = (j.n ? 'Stopped after ' + j.n + ' of ' + j.total + '. ' + tally + ' Scan Again skips the games already added.' : 'Stopped before reading any disc. Scan Again starts over.'); J.summaryStyle = 'padding:10px 12px;border-radius:var(--radius-control);background:var(--warn-bg);color:var(--warn)'; SH.buttons = [sbtn('Done', '', { type: 'closeSheet' }), sbtn('Scan Again', 'btn-primary', { type: 'rescan' }, { focus: true })]; }
     else SH.buttons = [sbtn('Stop', '', { type: 'stopJob' }, { tip: 'Stop (⌘.)' })];
   } else if (j.kind === 'open') {
-    var og = gameById(s, j.id);
-    J.contract = 'C11 C14 C01 C30';
+    var og = gameById(s, j.id), ogExe = !!og && og.format === 'exe';
+    J.contract = ogExe ? 'C11 C18 C01 C19' : 'C11 C14 C01 C30';
     SH.title = 'Opening ' + (og ? og.name : '');
-    var steps3 = [['Open the file', og ? og.file : ''], ['Read its SYSTEM.CNF', og ? og.console.toUpperCase() + ' · ' + (og.serial || 'no serial') : ''], ['Power on with your BIOS', BIOS_OK.file], ['Insert the disc', og && og.discs > 1 ? 'Disc 1 of ' + og.discs : '']];
+    var steps3 = ogExe
+      ? [['Open the file', og.file], ['Power on with your BIOS', BIOS_OK.file], ['Start the program', 'Once the BIOS reaches its shell']]
+      : [['Open the file', og ? og.file : ''], ['Read its SYSTEM.CNF', og ? og.console.toUpperCase() + ' · ' + (og.serial || 'no serial') : ''], ['Power on with your BIOS', BIOS_OK.file], ['Insert the disc', og && og.discs > 1 ? 'Disc 1 of ' + og.discs : '']];
     J.steps = steps3.map(function (l, i) { return stepRow(l[0], l[1], st(i)); });
     SH.buttons = [sbtn('Cancel', '', { type: 'stopJob' }, { tip: 'Cancel (⌘.)' })];
   } else if (j.kind === 'trace') {
@@ -1803,8 +1806,9 @@ function dialogView(s, go, mac) {
   var today = s.level === 'today';
   switch (dl.kind) {
     case 'reset':
-      D.contract = 'C06'; D.title = 'Reset the console?'; D.message = 'The game starts again from the beginning. Anything you haven’t saved is lost.';
-      D.details = 'PS1Console.powerOn(bios:) with my-console-bios.bin (524,288 bytes)' + (g ? '\nthen insertDisc(_:) with ' + g.file + '   (gap G9)' : '');
+      var gExe = !!g && g.format === 'exe';
+      D.contract = gExe ? 'C06 C19' : 'C06'; D.title = 'Reset the console?'; D.message = (gExe ? 'The program' : 'The game') + ' starts again from the beginning. Anything you haven’t saved is lost.';
+      D.details = 'PS1Console.powerOn(bios:) with my-console-bios.bin (524,288 bytes)' + (gExe ? '\nthen boot(exe:) with ' + g.file : g ? '\nthen insertDisc(_:) with ' + g.file + '   (gap G9)' : '');
       D.buttons = [btn('Cancel', '', 'cancel', true), btn('Reset', 'btn-danger', 'ok')]; break;
     case 'stop':
       D.contract = 'C50'; D.title = g ? 'Stop playing ' + g.name + '?' : 'Stop the BIOS?'; D.message = 'Anything you haven’t saved is lost.';

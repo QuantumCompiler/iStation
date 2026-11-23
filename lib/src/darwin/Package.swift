@@ -28,7 +28,7 @@ let modules: [Module] = [
     Module(.data, "Tracing", testSupport: ["SupportSandbox"]),
 
     Module(.business, "R3000A", testSupport: ["SupportMIPS", "SupportR3000ATrace", "SupportSandbox"], derivedFrom: .projectPSX),
-    Module(.business, "PS1", uses: ["BusinessR3000A"], testSupport: ["SupportMIPS"], derivedFrom: .projectPSX),
+    Module(.business, "PS1", uses: ["BusinessR3000A"], testSupport: ["SupportMIPS", "SupportR3000ATrace", "SupportSandbox"], derivedFrom: .projectPSX),
 
     Module(.presentation, "Styles"),
     Module(.presentation, "Player", uses: ["BusinessPS1", "PresentationStyles"]),

@@ -42,7 +42,7 @@ body{margin:0}
     <section aria-label="Flows" style="display:flex;flex-direction:column;gap:12px">
       <h2 style="margin:0;font-size:22px">What happens, step by step</h2>
       <div style="border:1px solid var(--line);border-radius:12px;background:var(--bg-content);overflow:hidden">
-        <sc-for list="{{ flows }}" as="f" hint-placeholder-count="6">
+        <sc-for list="{{ flows }}" as="f" hint-placeholder-count="7">
           <div style="display:grid;grid-template-columns:220px 1fr 120px;gap:16px;padding:10px 16px;border-bottom:1px solid var(--line);font-size:13px;line-height:1.5">
             <span style="font-weight:700">{{ f.what }}</span><span style="color:var(--fg-muted)">{{ f.steps }}</span><span style="font-family:var(--font-mono);font-size:12px">{{ f.rows }}</span>
           </div>
@@ -87,6 +87,7 @@ var FLOWS = [
   ['Check a BIOS', 'Picker → bookmark → read the bytes → size check (PS1Error.biosSize) → SHA-1 → powerOn → 60 × runFrame → reached the shell (G10)', 'C01–C03 C09 C10'],
   ['Add a folder', 'Picker → enumerate .cue .iso .m3u .exe → for each: ISO9660 → SYSTEM.CNF → console and serial (G2) → bookmark → library.json', 'C11 C14–C18 C20'],
   ['Play a game', 'Resolve the bookmark (C12) → SYSTEM.CNF → powerOn with the BIOS → insertDisc (G9) → runFrame loop → frames to the screen (G1)', 'C01 C03 C21 C30'],
+  ['Play a PS-EXE', 'Resolve the bookmark (C12) → PSEXE(bytes:) → powerOn with the BIOS → boot(exe:), before the first frame → runFrame loop: the EXE starts once the BIOS reaches its shell, or bootIsPending says it never did', 'C01 C03 C18 C19 C49'],
   ['Save and load', 'Pause the loop → saveState() (G7) → write slot-N.state with its format version → resume. Loading checks the version first.', 'C31 C32'],
   ['A memory card', 'insertMemoryCard at power-on → write the card file back when the console says it changed (G8)', 'C33 C34'],
   ['Record a trace', 'Personal build: a console with a TraceKit recorder (G6) → TraceWriter per file → finish(), or delete on Stop', 'C42']

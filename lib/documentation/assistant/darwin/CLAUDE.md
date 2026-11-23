@@ -121,9 +121,10 @@ Presentation is EmuKit: one module per user-facing place, each **`Views/` + `Vie
 **Sub-rules.**
 - The personal routine is the Debug configuration, the App Store routine the Release configuration; the package defines `PERSONAL_BUILD` only in debug.
 - A debug view lives in its module's `Debug/` and opens with `#if PERSONAL_BUILD`; a core reaches TraceKit only through a generic tracer that release builds specialize to nothing.
+- The core's personal-only API — `PS1DebugSnapshot`, `PS1TracingConsole` and `debugSnapshot` (on `PS1Console` and `PS1Machine`) — is declared under `#if PERSONAL_BUILD`, and a shipped file names it only inside an active `#if PERSONAL_BUILD` frame, never in that frame's `#else` or under `#if !PERSONAL_BUILD`. `PS1Console` stays fixed to `NoTracer`, so the App Store build's specialization is untouched; a recording uses `PS1TracingConsole`, generic over its tracer.
 - `CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO` stays in `apps/Config/AppStore.xcconfig`.
 
-**Enforcement.** `ArchitectureTests/ProjectRulesTests.swift` (`toolsArePersonalOnly`, `appStoreEntitlementsAreClean`).
+**Enforcement.** `ArchitectureTests/ProjectRulesTests.swift` (`toolsArePersonalOnly`, `appStoreEntitlementsAreClean`). Over every Swift file under `source/` and `apps/`, `toolsArePersonalOnly` fails on a TraceKit (`DataTracing`) import, or `PS1DebugSnapshot`, `PS1TracingConsole` or `debugSnapshot` named, outside an active `#if PERSONAL_BUILD` frame — a `//` comment doesn't count, a string literal does — and on a debug view that doesn't open with the guard; `thePersonalOnlyCheckCatchesItsViolations` keeps it honest against planted violations ([Milestone T](MILESTONES.md#milestone-t--the-narrow-interface-boot-the-shell-and-debug-values)).
 
 ### ⚠ Tests and previews never touch the real home folder
 
@@ -149,7 +150,7 @@ Presentation is EmuKit: one module per user-facing place, each **`Views/` + `Vie
 | Data | `playlists` | .cue track files and .m3u disc entries |
 | Data | `tracing` | TraceKit: trace records, files, the first divergence and checkpoints (personal builds only) |
 | Business | `r3000a` | the R3000A interpreter, generic over its bus, coprocessor 2 and tracer (ported from ProjectPSX) |
-| Business | `ps1` | the PS1 console: its memory map and wait states, interrupt controller, timers, DMA, the GPU's timing, stubs for the other devices, PS-EXE loading and the TTY (ported from ProjectPSX) |
+| Business | `ps1` | the PS1 console: its memory map and wait states, interrupt controller, timers, DMA, the GPU's timing, stubs for the other devices, PS-EXE loading and the TTY, and the narrow interface the apps hold — booting a PS-EXE, the BIOS's shell reached, and in personal builds the debug snapshot and the tracing console (ported from ProjectPSX) |
 | Presentation | `styles` | the visual tokens from the design's `tokens.json` — palette (dynamic, three themes), theme, typography, metrics, motion, symbols — and the shared components |
 | Presentation | `player` | the player's screen |
 | Presentation | `acknowledgements` | every notice the app carries |

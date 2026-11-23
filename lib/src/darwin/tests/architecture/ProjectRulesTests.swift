@@ -99,13 +99,43 @@ import Testing
     /// Modules that exist only in personal builds: their imports sit under `#if PERSONAL_BUILD`.
     static let toolModules: Set<String> = ["DataTracing"]
 
-    @Test("Tools and debug views compile only into personal builds")
-    func toolsArePersonalOnly() {
+    /// The core's personal-only symbols — the debug snapshot and the tracing console (v0.1.0 item 6a):
+    /// a shipped file names them only under `#if PERSONAL_BUILD`, as the core declares them there.
+    static let personalOnlySymbols = ["PS1DebugSnapshot", "PS1TracingConsole", "debugSnapshot"]
+
+    /// A line without its `//` comment, doc comments included: a comment may name a personal-only
+    /// symbol, or follow an `#endif`, and is not code. A `//` inside a string literal is kept.
+    static func code(of line: String) -> String {
+        var inString = false, escaped = false
+        var previous: Character?
+        for index in line.indices {
+            let character = line[index]
+            if inString {
+                if escaped { escaped = false } else if character == "\\" { escaped = true } else if character == "\"" { inString = false }
+                previous = nil
+            } else if character == "\"" {
+                inString = true
+                previous = nil
+            } else if character == "/", previous == "/" {
+                return String(line[..<line.index(before: index)])
+            } else {
+                previous = character
+            }
+        }
+        return line
+    }
+
+    /// What breaks the personal-only rule in `files`: a tool module imported, or one of the core's
+    /// personal-only symbols named, outside an active `#if PERSONAL_BUILD` frame (that frame's `#else`
+    /// is a release build), and a debug view that does not open with `#if PERSONAL_BUILD`.
+    static func personalOnlyViolations(in files: [SourceFile]) -> Violations {
         var violations = Violations()
-        for file in Self.shippedFiles {
+        let symbols = #"\b("# + personalOnlySymbols.joined(separator: "|") + #")\b"#
+        for file in files {
             var frames: [(condition: String, inElse: Bool)] = []
             for (number, line) in file.lines.enumerated() {
-                let trimmed = line.trimmingCharacters(in: .whitespaces)
+                let code = Self.code(of: line)
+                let trimmed = code.trimmingCharacters(in: .whitespaces)
                 if trimmed.hasPrefix("#if ") {
                     frames.append((String(trimmed.dropFirst(4)), false))
                 } else if trimmed.hasPrefix("#elseif "), !frames.isEmpty {
@@ -114,10 +144,12 @@ import Testing
                     frames[frames.count - 1].inElse = true
                 } else if trimmed == "#endif", !frames.isEmpty {
                     frames.removeLast()
-                } else if let imported = SourceFile(path: file.path, text: line).imports.first, Self.toolModules.contains(imported) {
-                    let guarded = frames.contains { !$0.inElse && Pattern.matches(#"(^|[\s(&|])PERSONAL_BUILD\b"#, in: $0.condition) }
-                    if !guarded {
+                } else if !frames.contains(where: { !$0.inElse && Pattern.matches(#"(^|[\s(&|])PERSONAL_BUILD\b"#, in: $0.condition) }) {
+                    if let imported = SourceFile(path: file.path, text: code).imports.first, Self.toolModules.contains(imported) {
                         violations.add("tool in a release build", "\(file.path):\(number + 1)", "imports \(imported) outside #if PERSONAL_BUILD")
+                    }
+                    if let symbol = Pattern.captures(symbols, in: code).first?.first ?? nil {
+                        violations.add("tool in a release build", "\(file.path):\(number + 1)", "names \(symbol) outside #if PERSONAL_BUILD")
                     }
                 }
             }
@@ -125,7 +157,49 @@ import Testing
                 violations.add("tool in a release build", file.path, "a debug view that does not open with #if PERSONAL_BUILD")
             }
         }
+        return violations
+    }
+
+    @Test("Tools, debug views and the core's personal-only symbols compile only into personal builds")
+    func toolsArePersonalOnly() {
+        let violations = Self.personalOnlyViolations(in: Self.shippedFiles)
         #expect(violations.isEmpty, "\(violations.report)")
+    }
+
+    @Test("The personal-only check fails on the debug snapshot or the tracing console named outside #if PERSONAL_BUILD")
+    func thePersonalOnlyCheckCatchesItsViolations() {
+        let planted = SourceFile(path: "source/presentation/player/ViewModels/Planted.swift", text: """
+            // SPDX-License-Identifier: MIT
+            import BusinessPS1
+            /// Reads `PS1Console.debugSnapshot`: a comment, which doesn't count.
+            let shipped = PS1Console().debugSnapshot // in a release build
+            #if PERSONAL_BUILD
+            let recorder = PS1TracingConsole<NoTracer>()
+            #if os(macOS)
+            let nested: PS1DebugSnapshot? = nil
+            #endif
+            #else
+            let fallback: PS1DebugSnapshot? = nil
+            #endif
+            #if !PERSONAL_BUILD
+            let negated = PS1TracingConsole<NoTracer>()
+            #endif
+            let label = "// debugSnapshot"
+            #if PERSONAL_BUILD
+            let inside = PS1TracingConsole<NoTracer>()
+            #endif // PERSONAL_BUILD
+            let after = PS1TracingConsole<NoTracer>()
+            """)
+        let violations = Self.personalOnlyViolations(in: [planted])
+        let flagged = violations.lines.map { Pattern.captures(#"Planted\.swift:(\d+): names (\w+)"#, in: $0).first ?? [] }
+        let expected: [[String?]] = [["4", "debugSnapshot"], ["11", "PS1DebugSnapshot"], ["14", "PS1TracingConsole"], ["16", "debugSnapshot"], ["20", "PS1TracingConsole"]]
+        #expect(flagged == expected, "\(violations.report)")
+        let guarded = SourceFile(path: "source/business/ps1/Guarded.swift", text: """
+            #if PERSONAL_BUILD
+            public struct PS1DebugSnapshot {}
+            #endif
+            """)
+        #expect(Self.personalOnlyViolations(in: [guarded]).isEmpty)
     }
 
     /// Each app and the SDK its routines' identifiers are conditioned on.

@@ -133,7 +133,7 @@ import Testing
     @Test func aNewConsoleIsPoweredOff() {
         let console = PS1Console()
         #expect(!console.isPoweredOn)
-        #expect(PS1Console.name == "PlayStation")
+        #expect(PS1Console.name == "PS1")
         console.runFrame()
         #expect(console.frame == 0)
     }

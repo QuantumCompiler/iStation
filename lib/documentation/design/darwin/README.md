@@ -12,7 +12,7 @@ The design of the macOS app (SwiftUI, first) and the iOS app (SwiftUI, from v0.4
 | **Foundations** | Color tokens in dark, light and high-contrast themes with each pair's contrast computed; type, spacing, radii and motion; every component in its states. |
 | **Exploration** | The three early directions and three accents, kept for reference. |
 
-The **Today** row of boards draws what v0.1.0's backend supports now: the library without disc reading, the BIOS running without a picture, the personal tools as `istation-run` commands to copy.
+The **Today** row of boards draws the backend's **today** level: the library without disc reading, the BIOS running without a picture, the personal tools as `istation-run` commands to copy. Since 6a a PS-EXE plays at the today level (G5); discs still play from v0.2.0. Two Today boards keep the state from before 6a, as items 5c and 5f cite them: `Mac-TodayBiosDone`, where the BIOS check says it powered on and ran 60 frames (G10), and `Mac-TodayTools`, the `istation-run` commands (G6). The Contract page says which gaps the backend has closed.
 
 **The backlog builds it**: track 5 is a document per screen or flow, track 6 one per gap, across the v0.1.0 to v0.4.0 tables of the [backlog index](../../backlog/darwin/README.md); each cites its boards and contract rows, and each gap on the Contract page names the item that closes it.
 
