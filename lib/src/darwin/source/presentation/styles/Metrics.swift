@@ -42,6 +42,40 @@ public struct LayoutSizes: Sendable, Equatable {
     /// The widest a pane's content grows, its inset included, as the BIOS pane's does. On iOS, the
     /// iPhone's width, as `welcomeWidth` is.
     public let paneMaxWidth: CGFloat
+    /// The narrowest content beside the sidebar and Game info that keeps the library's Format column, as
+    /// the Layout page's breakpoints have it: under it the column goes.
+    public let formatColumnMinWidth: CGFloat
+    /// The narrowest content that keeps the library's Last played column: under it the column goes.
+    public let lastPlayedColumnMinWidth: CGFloat
+    /// The narrowest window that keeps the sidebar while Game info shows: under it Game info hides the
+    /// sidebar. On iOS, where the library is a list, the breakpoints are the Mac's and never apply.
+    public let sidebarWithInfoMinWidth: CGFloat
+    /// The least the library table's Name column narrows to; it takes the width the others leave.
+    public let nameColumn: CGFloat
+    /// The library table's Console column.
+    public let consoleColumn: CGFloat
+    /// The library table's Serial column.
+    public let serialColumn: CGFloat
+    /// The library table's Format column.
+    public let formatColumn: CGFloat
+    /// The library table's Size column.
+    public let sizeColumn: CGFloat
+    /// The library table's Last played column. On iOS, where the library is a list, the table's columns
+    /// are the Mac's and never apply.
+    public let lastPlayedColumn: CGFloat
+    /// The height of Game info's box of initials, in place of artwork.
+    public let infoArtHeight: CGFloat
+    /// The width of Game info's column of fact names: Console, Serial, Format… On iOS, Game info's sizes
+    /// are the Mac's and never apply.
+    public let factNameWidth: CGFloat
+    /// The empty library's column of text, "Add your games". On iOS, the iPhone's width, as `welcomeWidth` is.
+    public let emptyWidth: CGFloat
+    /// The narrowest the library's games get: no wider than the least window holds beside the sidebar —
+    /// which the split view counts twice once Game info can show beside the games (measured) — and Game
+    /// info together, as the split view shows the two for a moment when the window narrows with Game info
+    /// open or Game info closes under the breakpoint. The games' height doesn't follow their text, so the
+    /// split view measuring them this narrow asks the window for no height. On iOS, the least iPhone's width.
+    public let gamesMinWidth: CGFloat
 
     /// A platform's sizes as tokens.json gives them.
     public init(
@@ -49,7 +83,11 @@ public struct LayoutSizes: Sendable, Equatable {
         windowMinWidth: CGFloat, windowMinHeight: CGFloat, windowWidth: CGFloat, windowHeight: CGFloat,
         pictureMinWidth: CGFloat, pictureMinHeight: CGFloat,
         sheetWidth: CGFloat, alertWidth: CGFloat, resultsMaxHeight: CGFloat,
-        welcomeWidth: CGFloat, paneMaxWidth: CGFloat
+        welcomeWidth: CGFloat, paneMaxWidth: CGFloat,
+        formatColumnMinWidth: CGFloat, lastPlayedColumnMinWidth: CGFloat, sidebarWithInfoMinWidth: CGFloat,
+        nameColumn: CGFloat, consoleColumn: CGFloat, serialColumn: CGFloat, formatColumn: CGFloat, sizeColumn: CGFloat,
+        lastPlayedColumn: CGFloat, infoArtHeight: CGFloat, factNameWidth: CGFloat, emptyWidth: CGFloat,
+        gamesMinWidth: CGFloat
     ) {
         self.control = control
         self.toolbar = toolbar
@@ -68,6 +106,19 @@ public struct LayoutSizes: Sendable, Equatable {
         self.resultsMaxHeight = resultsMaxHeight
         self.welcomeWidth = welcomeWidth
         self.paneMaxWidth = paneMaxWidth
+        self.formatColumnMinWidth = formatColumnMinWidth
+        self.lastPlayedColumnMinWidth = lastPlayedColumnMinWidth
+        self.sidebarWithInfoMinWidth = sidebarWithInfoMinWidth
+        self.nameColumn = nameColumn
+        self.consoleColumn = consoleColumn
+        self.serialColumn = serialColumn
+        self.formatColumn = formatColumn
+        self.sizeColumn = sizeColumn
+        self.lastPlayedColumn = lastPlayedColumn
+        self.infoArtHeight = infoArtHeight
+        self.factNameWidth = factNameWidth
+        self.emptyWidth = emptyWidth
+        self.gamesMinWidth = gamesMinWidth
     }
 }
 
@@ -115,7 +166,10 @@ public enum Metrics {
         windowMinWidth: 800, windowMinHeight: 560, windowWidth: 1280, windowHeight: 800,
         pictureMinWidth: 640, pictureMinHeight: 480,
         sheetWidth: 520, alertWidth: 320, resultsMaxHeight: 220,
-        welcomeWidth: 460, paneMaxWidth: 720
+        welcomeWidth: 460, paneMaxWidth: 720,
+        formatColumnMinWidth: 880, lastPlayedColumnMinWidth: 700, sidebarWithInfoMinWidth: 1100,
+        nameColumn: 180, consoleColumn: 72, serialColumn: 104, formatColumn: 120, sizeColumn: 80,
+        lastPlayedColumn: 130, infoArtHeight: 140, factNameWidth: 96, emptyWidth: 440, gamesMinWidth: 60
     )
 
     /// The iOS app's layout sizes.
@@ -124,7 +178,10 @@ public enum Metrics {
         windowMinWidth: 320, windowMinHeight: 568, windowWidth: 390, windowHeight: 844,
         pictureMinWidth: 320, pictureMinHeight: 240,
         sheetWidth: 390, alertWidth: 290, resultsMaxHeight: 220,
-        welcomeWidth: 390, paneMaxWidth: 390
+        welcomeWidth: 390, paneMaxWidth: 390,
+        formatColumnMinWidth: 880, lastPlayedColumnMinWidth: 700, sidebarWithInfoMinWidth: 1100,
+        nameColumn: 180, consoleColumn: 72, serialColumn: 104, formatColumn: 120, sizeColumn: 80,
+        lastPlayedColumn: 130, infoArtHeight: 140, factNameWidth: 96, emptyWidth: 390, gamesMinWidth: 320
     )
 
     /// This platform's layout sizes.

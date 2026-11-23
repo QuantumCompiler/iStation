@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+	SPDX-License-Identifier: MIT
+	SPDX-FileCopyrightText: 2026 iStation contributors
+
+	The macOS app's own Info.plist keys, merged with the ones Xcode generates from the build settings
+	(GENERATE_INFOPLIST_FILE, INFOPLIST_KEY_*): the kinds of file the library's choosers offer, which no
+	build setting can declare. Their identifiers are PresentationLibrary's GameFileTypes.
+-->
+<plist version="1.0">
+<dict>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>local.istation.cue-sheet</string>
+			<key>UTTypeDescription</key>
+			<string>Cue sheet</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.plain-text</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>cue</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>local.istation.disc-track</string>
+			<key>UTTypeDescription</key>
+			<string>Disc image track</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>bin</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>local.istation.disc-playlist</string>
+			<key>UTTypeDescription</key>
+			<string>Disc playlist</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.plain-text</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>m3u</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>local.istation.ps-exe</string>
+			<key>UTTypeDescription</key>
+			<string>PS-EXE program</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>exe</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>

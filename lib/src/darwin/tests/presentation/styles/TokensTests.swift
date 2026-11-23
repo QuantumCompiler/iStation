@@ -156,6 +156,12 @@ struct TokensTests {
         "pictureMinWidth": \.pictureMinWidth, "pictureMinHeight": \.pictureMinHeight,
         "sheetWidth": \.sheetWidth, "alertWidth": \.alertWidth, "resultsMaxHeight": \.resultsMaxHeight,
         "welcomeWidth": \.welcomeWidth, "paneMaxWidth": \.paneMaxWidth,
+        "formatColumnMinWidth": \.formatColumnMinWidth, "lastPlayedColumnMinWidth": \.lastPlayedColumnMinWidth,
+        "sidebarWithInfoMinWidth": \.sidebarWithInfoMinWidth,
+        "nameColumn": \.nameColumn, "consoleColumn": \.consoleColumn, "serialColumn": \.serialColumn,
+        "formatColumn": \.formatColumn, "sizeColumn": \.sizeColumn, "lastPlayedColumn": \.lastPlayedColumn,
+        "infoArtHeight": \.infoArtHeight, "factNameWidth": \.factNameWidth, "emptyWidth": \.emptyWidth,
+        "gamesMinWidth": \.gamesMinWidth,
     ]
 
     @Test("Every space has its Metrics member")

@@ -1,0 +1,63 @@
+{
+  "bios" : {
+    "bookmark" : "Ym9va21hcms=",
+    "checked" : "2026-11-22T10:30:00Z",
+    "fileName" : "my-console-bios.bin",
+    "folder" : "/Volumes/Archive/Console",
+    "sha1" : "6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c",
+    "size" : 524288
+  },
+  "games" : [
+    {
+      "added" : "2026-11-14T09:00:00Z",
+      "bookmark" : "Z2xhc3Mtb3JjaGFyZA==",
+      "discs" : [
+
+      ],
+      "fileName" : "Glass Orchard (Europe).cue",
+      "folder" : "/Volumes/Archive/Games/PS1",
+      "format" : "cue",
+      "id" : "6F1C2A3B-0D4E-4F50-8A61-72B3C4D5E6F7",
+      "size" : 398458880,
+      "tracks" : [
+        "Glass Orchard (Europe).bin"
+      ]
+    },
+    {
+      "added" : "2026-11-12T18:45:00Z",
+      "bookmark" : "dGlkZXBvb2w=",
+      "discs" : [
+        "Tidepool (Disc 1).cue",
+        "Tidepool (Disc 2).cue",
+        "Tidepool (Disc 3).cue"
+      ],
+      "fileName" : "Tidepool.m3u",
+      "folder" : "/Volumes/Archive/Games/PS1/Tidepool",
+      "format" : "m3u",
+      "id" : "0A9B8C7D-6E5F-4A3B-9C2D-1E0F9A8B7C6D",
+      "lastPlayed" : "2026-11-20T21:10:00Z",
+      "size" : 1953021952,
+      "tracks" : [
+
+      ]
+    },
+    {
+      "added" : "2026-11-18T08:15:00Z",
+      "bookmark" : "Z3B1LXRlc3Q=",
+      "discs" : [
+
+      ],
+      "fileName" : "gpu-test.exe",
+      "folder" : "/Volumes/Archive/Games/Homebrew",
+      "format" : "exe",
+      "id" : "C3D4E5F6-A7B8-4C9D-8E0F-1A2B3C4D5E6F",
+      "lastPlayed" : "2026-11-22T10:30:00Z",
+      "name" : "GPU test",
+      "size" : 34816,
+      "tracks" : [
+
+      ]
+    }
+  ],
+  "version" : 2
+}

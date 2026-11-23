@@ -160,6 +160,33 @@ private func record(_ file: URL = Files.bios, checked: Date = nov20, sha1: Strin
         #expect(pane.alert == nil)
     }
 
+    @Test func runTheBIOSThatCantBeSizedOrReadNamesTheCallThatFailed() async {
+        let gone = KeptFileError.cannotRead(path: Files.bios.path, reason: "Gone.")
+        let threw = #"threw KeptFileError.cannotRead(path: "/Users/you/Documents/Console/my-console-bios.bin", reason: "Gone.")"#
+        storage.fail(FakeStorage.Failures(size: gone))
+        var pane = makePane()
+        pane.runBIOS()
+        #expect(await settled(pane))
+        #expect(pane.alert == BIOSAlert(
+            title: "The BIOS couldn’t be read",
+            message: "iStation couldn’t open my-console-bios.bin where you keep it. Put it back, or choose it again.",
+            details: "KeptFile.size(at:) " + threw
+        ))
+        #expect(storage.reads(of: Files.bios) == 0, "not read once it couldn't be sized")
+
+        storage.fail(FakeStorage.Failures(bytes: gone))
+        pane = makePane()
+        pane.runBIOS()
+        #expect(await settled(pane))
+        #expect(pane.alert == BIOSAlert(
+            title: "The BIOS couldn’t be read",
+            message: "iStation couldn’t open my-console-bios.bin where you keep it. Put it back, or choose it again.",
+            details: "KeptFile.bytes(at:) " + threw
+        ))
+        #expect(await session.calls.isEmpty)
+        #expect(log.noted.isEmpty)
+    }
+
     @Test func runTheBIOSThatIsNoLongerABIOSsSizeSaysWhyUnread() async {
         storage.put([UInt8](repeating: 0, count: 1_000), at: Files.bios)
         let pane = makePane()

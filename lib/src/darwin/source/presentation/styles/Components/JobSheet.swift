@@ -137,6 +137,33 @@ public struct JobSheet: View {
     }
 }
 
+/// A job sheet as a `.sheet`'s content: it draws `job` while there is one, and once `job` is gone — the
+/// view-model went idle as the sheet began to close — the last job it drew, so its words don't vanish
+/// before the sheet does. The BIOS check's sheet and the library's scan and opening sheets present it.
+public struct PresentedJobSheet: View {
+    private let job: JobPresentation?
+    private let perform: @MainActor (JobPresentation.Action) -> Void
+    @State private var shown: JobPresentation?
+
+    /// A sheet drawing `job`, or the last one it drew, calling `perform` with each button pressed.
+    public init(_ job: JobPresentation?, perform: @escaping @MainActor (JobPresentation.Action) -> Void) {
+        self.job = job
+        self.perform = perform
+        _shown = State(initialValue: job)
+    }
+
+    public var body: some View {
+        Group {
+            if let job = job ?? shown {
+                JobSheet(job, perform: perform)
+            }
+        }
+        .onChange(of: job) { _, job in
+            if let job { shown = job }
+        }
+    }
+}
+
 /// One step: its symbol, or a spinner while it runs; its name and detail; and its state's word.
 private struct StepRow: View {
     let step: JobPresentation.Step
@@ -327,5 +354,9 @@ private struct SheetButton: View {
 
 #Preview("Every step state") {
     JobSheet(PreviewJobs.everyStep) { _ in }
+}
+
+#Preview("Presented") {
+    PresentedJobSheet(PreviewJobs.running) { _ in }
 }
 #endif

@@ -9,7 +9,9 @@ import Foundation
 /// `LibraryBIOSStorage`, over the library's `library.json` and `KeptFile`; previews and tests hand in
 /// one held in memory, so no view-model test touches a file. Every call is synchronous, as the store's
 /// and the kept file's are: the view-models choose where each runs, the file's bytes off the main actor.
-public protocol BIOSStorage: Sendable {
+/// Resolving a bookmark, sizing a file and reading it are `KeptFileReading`'s, which this refines, so
+/// Run the BIOS reads the kept BIOS through the library's own `readBIOS(_:expectedSize:)`.
+public protocol BIOSStorage: KeptFileReading {
     /// The BIOS the library keeps; nil for none.
     func keptBIOS() throws -> BIOSRecord?
 
@@ -18,15 +20,6 @@ public protocol BIOSStorage: Sendable {
 
     /// A bookmark to the file at `url`, to keep it by (`KeptFile.bookmark(for:)`).
     func bookmark(for url: URL) throws -> Data
-
-    /// Where `bookmark` leads now, and whether it should be made again (`KeptFile.resolve(_:)`).
-    func resolve(_ bookmark: Data) throws -> KeptFile.Resolved
-
-    /// The size in bytes of the file at `url`, without reading it (`KeptFile.size(at:)`).
-    func size(of url: URL) throws -> Int
-
-    /// The bytes of the file at `url` (`KeptFile.bytes(at:)`).
-    func bytes(of url: URL) throws -> [UInt8]
 }
 
 /// The BIOS kept in the app's library: the record in `library.json` through `LibraryStore`, and the

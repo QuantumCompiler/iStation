@@ -32,35 +32,51 @@ extension View {
     }
 }
 
-/// The Game menu: Pause or Resume (⌘P), Reset… (⌘R), Enter or Exit Full Screen (⌃⌘F) and Stop… (⌘.),
-/// each enabled only when it applies, as the design's shortcuts give them.
-public struct PlayerCommands: Commands {
+/// The Game menu: what the app puts first (the library's Play, ↩), then Pause or Resume (⌘P), Reset…
+/// (⌘R), Enter or Exit Full Screen (⌃⌘F) and Stop… (⌘.), each enabled only when it applies and the
+/// player holds the window, as the design's shortcuts give them.
+public struct PlayerCommands<Leading: View>: Commands {
     private let viewModel: PlayerViewModel
+    private let isActive: @MainActor () -> Bool
+    private let leading: Leading
 
-    /// The Game menu for `viewModel`.
-    public init(viewModel: PlayerViewModel) {
+    /// The Game menu for `viewModel`, opening with `leading`: the items the menu holds beyond the player's
+    /// own, as the design's Game menu opens with Play. The player's own items act only while `isActive`
+    /// says the player holds the window — a window that shows another place first, as the library's
+    /// opening sheet does while the player already follows the session it powers on, says no.
+    public init(viewModel: PlayerViewModel, isActive: @escaping @MainActor () -> Bool = { true }, @ViewBuilder leading: () -> Leading) {
         self.viewModel = viewModel
+        self.isActive = isActive
+        self.leading = leading()
     }
 
     public var body: some Commands {
         // ⌘P is the player's Pause: the File menu's printing items, which have nothing to print, give way.
         CommandGroup(replacing: .printItem) {}
         CommandMenu("Game") {
+            leading
             Button(viewModel.pauseTitle) { viewModel.togglePause() }
                 .keyboardShortcut("p")
-                .disabled(!viewModel.canTogglePause)
+                .disabled(!isActive() || !viewModel.canTogglePause)
             Button("Reset…") { viewModel.askToReset() }
                 .keyboardShortcut("r")
-                .disabled(!viewModel.canReset)
+                .disabled(!isActive() || !viewModel.canReset)
             Divider()
             Button(viewModel.fullScreenTitle) { viewModel.toggleFullScreen() }
                 .keyboardShortcut("f", modifiers: [.control, .command])
-                .disabled(!viewModel.canToggleFullScreen)
+                .disabled(!isActive() || !viewModel.canToggleFullScreen)
             Divider()
             Button("Stop…") { viewModel.askToStop() }
                 .keyboardShortcut(".")
-                .disabled(!viewModel.canStop)
+                .disabled(!isActive() || !viewModel.canStop)
         }
+    }
+}
+
+extension PlayerCommands where Leading == EmptyView {
+    /// The Game menu for `viewModel`, the player's own items alone, acting while `isActive`.
+    public init(viewModel: PlayerViewModel, isActive: @escaping @MainActor () -> Bool = { true }) {
+        self.init(viewModel: viewModel, isActive: isActive) { EmptyView() }
     }
 }
 
@@ -111,18 +127,18 @@ private struct PlayerSubtitle: ViewModifier {
     }
 }
 
-/// The toolbar as the design draws it in the player: Stop at the leading edge, then Pause or Resume
-/// and Reset, and after the design's separator Full screen, at the trailing edge, each naming its
-/// shortcut in its help. Stop says only "Stop" until the library (5d) gives it somewhere to go back to.
+/// The toolbar as the design draws it in the player: Stop and go back to the library at the leading edge,
+/// then Pause or Resume and Reset, and after the design's separator Full screen, at the trailing edge,
+/// each naming its shortcut in its help.
 private struct PlayerToolbar: ToolbarContent {
     let viewModel: PlayerViewModel
 
     var body: some ToolbarContent {
         ToolbarItem(placement: .navigation) {
             Button { viewModel.askToStop() } label: {
-                Label("Stop", systemImage: Symbols.back)
+                Label("Stop and go back to the library", systemImage: Symbols.back)
             }
-            .help("Stop (⌘.)")
+            .help("Stop and go back to the library (⌘.)")
             .disabled(!viewModel.canStop)
         }
         ToolbarItemGroup(placement: .primaryAction) {

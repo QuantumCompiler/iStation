@@ -25,7 +25,7 @@
 **Open calls:**
 - [user] PS2 discs before v2.x: list them and refuse them with the reason (designed), or hide them until PS2 plays?
 - [default: a disc that fails to read is not added, and its result says why] Adding it would put an unplayable row in the library.
-- [default: a disc v0.1.0 listed unread (5d's decision of 2026-11-22) that now fails to read stays listed, Console and Serial "Unknown", Play off with the reason in plain words and the backend's case beside it; Scan Again re-reads such entries without duplicating them and never removes one] Removing what the user added would surprise them; only Remove from Library… removes.
+- [default: a disc v0.1.0 listed unread (5d's decision of 2026-11-22, [Milestone W](../../../assistant/darwin/MILESTONES.md#milestone-w--the-library-of-files)) that now fails to read stays listed, Console and Serial "Unknown", Play off with the reason in plain words and the backend's case beside it; Scan Again re-reads such entries without duplicating them and never removes one] Removing what the user added would surprise them; only Remove from Library… removes.
 
 **Guardrail(s).** View-model tests for each scan outcome and the PS2 refusal; the store's fixture test across the version step.
 

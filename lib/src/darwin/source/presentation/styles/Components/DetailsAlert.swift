@@ -90,8 +90,15 @@ public struct DetailsAlert: View {
 
     @ViewBuilder private var buttonRow: some View {
         #if os(macOS)
-        HStack(spacing: Metrics.space2) {
-            ForEach(actions.indices, id: \.self) { button(actions[$0]) }
+        // Side by side, as macOS lays an alert's buttons out, while every title fits its half; else
+        // stacked, the default button on top, as macOS stacks an alert's long titles, so none is cut short.
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: Metrics.space2) {
+                ForEach(actions.indices, id: \.self) { button(actions[$0]) }
+            }
+            VStack(spacing: Metrics.space2) {
+                ForEach(actions.indices.reversed(), id: \.self) { button(actions[$0]) }
+            }
         }
         #else
         VStack(spacing: Metrics.space2) {
@@ -101,9 +108,13 @@ public struct DetailsAlert: View {
     }
 
     private func button(_ action: Action) -> some View {
-        Button(action.title, action: action.perform)
-            .buttonStyle(SheetButtonStyle(kind(of: action.role), fillsWidth: true))
-            .keyboardShortcut(shortcut(of: action.role))
+        // A title is never cut short: a longer one takes more of the row, as the design's flexed buttons do.
+        Button(action: action.perform) {
+            Text(action.title)
+                .fixedSize()
+        }
+        .buttonStyle(SheetButtonStyle(kind(of: action.role), fillsWidth: true))
+        .keyboardShortcut(shortcut(of: action.role))
     }
 
     private func kind(of role: Action.Role) -> SheetButtonStyle.Kind {
@@ -214,6 +225,18 @@ struct CodeBlock: View {
         details: "Deletes its entry and bookmark from library.json in iStation’s container.\nLeaves ~/Games/PS1/Harbor Lights (USA).cue untouched.",
         tone: .info,
         actions: [DetailsAlert.Action("Cancel", role: .cancel) {}, DetailsAlert.Action("Remove", role: .primary) {}]
+    )
+}
+
+#Preview("Long titles") {
+    // Titles that can't sit side by side in the alert's width stack, the default button on top.
+    DetailsAlert(
+        "Reset the console?", message: "The game starts again from the beginning. Anything you haven’t saved is lost.",
+        details: "PS1Console.powerOn(bios:) with my-console-bios.bin (524,288 bytes)",
+        actions: [
+            DetailsAlert.Action("Cancel", role: .cancel) {}, DetailsAlert.Action("Save a State First…", role: .secondary) {},
+            DetailsAlert.Action("Reset Without Saving", role: .destructive) {},
+        ]
     )
 }
 

@@ -18,7 +18,7 @@ The directory naming follows SwiftPM's freedom of `path:`: lowercase module dire
 | data | `iso9660` | `InfrastructureBytes` |
 | data | `systemcnf` | — |
 | data | `playlists` | — |
-| data | `library` | — |
+| data | `library` | `DataPlaylists` |
 | data | `tracing` | — |
 | business | `r3000a` | — |
 | business | `ps1` | `BusinessR3000A` |
@@ -26,9 +26,10 @@ The directory naming follows SwiftPM's freedom of `path:`: lowercase module dire
 | presentation | `styles` | — |
 | presentation | `player` | `BusinessPS1`, `BusinessSession`, `PresentationStyles` |
 | presentation | `bios` | `BusinessPS1`, `BusinessSession`, `DataLibrary`, `PresentationStyles` |
+| presentation | `library` | `BusinessPS1`, `BusinessSession`, `DataLibrary`, `PresentationStyles` |
 | presentation | `acknowledgements` | `PresentationStyles` |
 
-The table as of 2026-11-22, after v0.0.1's item 3b retired the library app's 17 other modules ([Milestone F](../../assistant/darwin/MILESTONES.md#milestone-f--the-skeleton-and-both-build-routines)), items 3e and 3f ported `r3000a` and `ps1` from ProjectPSX ([Milestone I](../../assistant/darwin/MILESTONES.md#milestone-i--the-r3000a-interpreter), [Milestone J](../../assistant/darwin/MILESTONES.md#milestone-j--the-ps1-console)), v0.1.0's item 5b added `session` ([ADR 0024](four-layers-and-business-holds-the-session.md)), and item 5c `library`, the app's own stored records, with `bios`, the first run and the BIOS pane. The library products the apps link are `PS1Core` (`BusinessR3000A`, `BusinessPS1` and `BusinessSession`) and `EmuKit` (`DataLibrary` and the Presentation modules); `TraceKit` (`DataTracing`, item 3c) is for personal builds only. `BusinessSession` joined `PS1Core` with 5b because the apps build the session, and run the console only through it: it ships with the cores it runs. `DataLibrary` joined `EmuKit` with 5c because the apps build its store and the screens read what it keeps: it ships with them, and the apps, which link `EmuKit` already, needed no change to link it.
+The table as of 2026-11-23, after v0.0.1's item 3b retired the library app's 17 other modules ([Milestone F](../../assistant/darwin/MILESTONES.md#milestone-f--the-skeleton-and-both-build-routines)), items 3e and 3f ported `r3000a` and `ps1` from ProjectPSX ([Milestone I](../../assistant/darwin/MILESTONES.md#milestone-i--the-r3000a-interpreter), [Milestone J](../../assistant/darwin/MILESTONES.md#milestone-j--the-ps1-console)), v0.1.0's item 5b added `session` ([ADR 0024](four-layers-and-business-holds-the-session.md)), item 5c `library`, the app's own stored records, with `bios`, the first run and the BIOS pane, and item 5d Presentation's `library`, the library of games, with Data's `library` using `playlists` for a .cue's tracks and an .m3u's discs. The library products the apps link are `PS1Core` (`BusinessR3000A`, `BusinessPS1` and `BusinessSession`) and `EmuKit` (`DataLibrary` and the Presentation modules); `TraceKit` (`DataTracing`, item 3c) is for personal builds only. `BusinessSession` joined `PS1Core` with 5b because the apps build the session, and run the console only through it: it ships with the cores it runs. `DataLibrary` joined `EmuKit` with 5c because the apps build its store and the screens read what it keeps: it ships with them, and the apps, which link `EmuKit` already, needed no change to link it. `DataPlaylists` ships in `EmuKit` from 5d as `DataLibrary`'s dependency, not as a product target of its own; `DataISO9660` and `DataSystemCNF` join a product with v0.2.0's discs.
 
 ## Consequences
 

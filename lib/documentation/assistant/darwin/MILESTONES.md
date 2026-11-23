@@ -938,3 +938,380 @@ Decided by the hardware (2026-11-14, ps1-tests' `cop` and its `psx.log`, recorde
     - Welcome's and the pane's columns take two new size tokens rather than the sheet's width.
     - C47 stays verify until a `ProjectRulesTests` rule enforces it; a new standing rule needs its own ADR, so none was added here.
   - **What stayed as it was:** `noRealHome` is not widened (ADR 0019 records its four names; the app's `getpwuid` is in `apps/`, which the rule allows); 5b's real-clock floor test is unchanged; ADRs are left as written, so ADR 0024 still names EmuKit as the player and the acknowledgements.
+
+## Milestone W — The library of files
+
+**Goal.** v0.1.0 item 5d: once a BIOS is kept, the design's library is the Mac app's home. Until now the BIOS check's Continue landed on the BIOS pane, the window's one place, and a game could not be added. This item builds the library to the design's Today level: a sidebar (All Games ⌘1, Recently Played ⌘4, BIOS ⌘6), a table and a grid of games, and Game info (⌘I); Add Games… (⌘O) and Add Folder… (⇧⌘O), the latter a job with steps, Stop, and a Scan Again that adds nothing twice; search, rename, Remove from Library… with what it deletes under Details, and Locate… for a file that has gone. Games are kept by bookmark in `library.json`, now at version 2. Disc images (.cue, .iso, .m3u) are listed by name, format and size, with Console and Serial "Unknown" and Play off ("Discs play from v0.2.0."), because the readers of a disc's contents (`iso9660`, `systemcnf`) aren't in a product the app links (G2) and the console has no CD-ROM drive (G9). A PS-EXE plays: a three-step opening job powers the player's session on with the BIOS and the program, then hands the run to the player.
+
+**Built** (5d, 2026-11-23):
+
+- **Data, `library` at version 2** (`lib/src/darwin/source/data/library/`). Its row is now `Module(.data, "Library", uses: ["DataPlaylists"], testSupport: ["SupportSandbox"])`, so `EmuKit` links `DataPlaylists` through it.
+  - `Library.swift`:
+    - `currentVersion` is 2.
+    - `games` decodes to none when absent, so a version-1 file loads with no games.
+    - A record whose id repeats an earlier record's gets an id of its own on load (`identified(_:)`).
+    - `BIOSRecord.moved(to:bookmark:)` is new.
+  - `GameRecord.swift`:
+    - `GameFormat`: `.cue`, `.iso`, `.m3u`, `.psexe` (written "exe") and `.unknown(String)`, which is kept rather than refused. It has `fileExtensions`, and `init?(fileName:)` reads the extension in any case.
+    - `GameRecord`: id, file name, folder, format, size, added, last played, a library-only `name`, bookmark, a .cue's `tracks` and an .m3u's `discs`. Every field decodes with a default. It also has `shownName`, `path` and `standardizedPath(of:)`.
+  - `LibraryGames.swift`: `Library`'s own changes, which the store and the test fakes share: `game(_:)`, `game(at:)`, `add(_:)`, `rename(_:to:)`, `remove(_:)`, `markPlayed(_:at:)`, `relocate(_:to:)`, and `relocate(_:)` for a batch.
+  - `LibraryStore.swift`:
+    - New calls, each one load and at most one atomic save: `addGames(_:)` (returning `Added`: the library and the games added), `renameGame(_:to:)`, `removeGames(_:)`, `markPlayed(_:at:)`, `relocateGame(_:to:)` and `relocateGames(_:)`.
+    - `LibraryStoreError` gains `noSuchGame` and `alreadyKept(path:)`.
+  - `KeptFileReading.swift`:
+    - The `KeptFileReading` protocol (`resolve`, `size(of:)`, `bytes(of:)`) and `KeptFileReader`.
+    - `whereabouts(of:)`: a game's file is `.found`, `.moved` or `.missing`.
+    - The BIOS read that the BIOS pane and the opening job share: `readBIOS(_:expectedSize:)` returns a `KeptBIOS` or throws a `KeptBIOSError` (`cannotFind`, `cannotSize`, `wrongSize`, `cannotRead`).
+  - `GameFiles.swift`:
+    - `find(in:)`: a folder's games in path order, less the files that come with another game (`withoutParts(_:)`, with `ringHeads(of:parts:)` for playlists that list each other). Those are a .cue's tracks, an .m3u's discs and their tracks, matched by file identity.
+    - `record(for:added:)`: a file's record, with the game's whole size and its parts' names, read through `Playlists`.
+    - `playlistLimit` (1 MiB).
+- **Presentation, the new place `library`** (`lib/src/darwin/source/presentation/library/`). Its row is `Module(.presentation, "Library", uses: ["BusinessPS1", "BusinessSession", "DataLibrary", "PresentationStyles"], testSupport: ["SupportSandbox"])`. It is in `EmuKit`, has its own shared scheme `PresentationLibrary`, and its views are macOS-only.
+  - `Models/`:
+    - `LibraryStorage`, which refines `KeptFileReading` and whose `record(for:added:)` is async, and the app's `LibraryStoreStorage`.
+    - `GameRun`, the run the library hands on.
+    - `LibraryPlace`: All Games, Recently Played and BIOS, in the Library and Console sections, at ⌘1, ⌘4 and ⌘6.
+    - `LibraryAlert`.
+    - `LibraryLayout`: the sidebar and the table's columns, from the window's width.
+    - `GameRow` and `GameInfo` (`GamePresentation.swift`).
+    - `GameFileTypes`: the four imported types, and the choosers' list from `offered(imported:lookUp:)`.
+    - `LibraryText`.
+  - `ViewModels/LibraryViewModel.swift`: everything else the window does, over `LibraryStorage`. That covers places, selection, search, list or grid, Game info, the sidebar, Add Games…, rename, remove, Locate…, Show in Finder and the check for files that moved or went missing. Other screens' sheets reach it through `isCovered`, and the window switch reads `playerHoldsWindow(whilePlaying:)`. It builds and owns the other two view-models.
+  - `ViewModels/ScanViewModel.swift`: Add Folder…'s job through `JobSheet`: Find disc images, then Read each disc, then Add them to your library. It has Stop, Scan Again and the design's tally.
+  - `ViewModels/OpeningViewModel.swift`: a PS-EXE's opening job through `JobSheet`: Open the file, then Power on with your BIOS, then Start the program. It runs over 5c's `ConsoleSessionPowerControls`, on the player's session. It has `shellDeadline` (600), `largestProgram` (2,099,200 bytes) and `isStopping`.
+  - `Views/`:
+    - `LibraryView`: a `NavigationSplitView` of `LibrarySidebar`, then either the games or the BIOS pane, which the app hands in through a view builder. The games have their toolbar, `.searchable` and an `.inspector` holding `GameInfoView`.
+    - `GameTable`, `GameGrid` (`LazyVGrid`), `GameInfoView`, `LibraryEmptyView` and `LibrarySheets.swift` (Rename, the alerts, the scan and opening sheets, the choosers).
+    - `LibraryCommands`: the File, View and Edit items. `LibraryMenuItem` puts Play in the Game menu and BIOS in the Console menu.
+  - `Previews/PreviewLibrary.swift`: a scripted preview session and in-memory storage (`PreviewLibrarySession`, `PreviewLibraryStorage`, with `PreviewGate` to hold a scan on a file), and the states the views' 37 named previews draw: every board state and the opening job, each reached through the view-models' initializers and intents.
+- **`styles`**:
+  - `Models/`: `Dates.day`, `Folders.shown` and `Details.threw`, promoted from the BIOS pane now that the library uses them too.
+  - `Metrics.layout` gains thirteen members from thirteen new size tokens, pinned by `TokensTests`:
+    - the Layout page's breakpoints (`formatColumnMinWidth` 880, `lastPlayedColumnMinWidth` 700, `sidebarWithInfoMinWidth` 1,100);
+    - the table's six columns;
+    - Game info's `infoArtHeight` and `factNameWidth`;
+    - the empty library's `emptyWidth`;
+    - `gamesMinWidth`.
+  - `Components/`:
+    - `PresentedJobSheet` moves here from `bios`.
+    - `DetailsAlert` never truncates a button title, and gains the "Long titles" preview.
+    - `JobSheet` gains a "Presented" preview.
+- **`player`**: `PlayerCommands(viewModel:isActive:leading:)` puts the library's Play first in the Game menu. Its own items act only while the player holds the window, and the old initializer is kept. Stop reads "Stop and go back to the library".
+- **`bios`**:
+  - `BIOSStorage` refines `KeptFileReading`.
+  - Run the BIOS reads through `readBIOS(_:expectedSize:)` in one detached task, with its texts unchanged.
+  - `BIOSCommands(check:pane:isPlaying:consoleItems:)` carries ⌘6.
+  - The check's sheet uses `PresentedJobSheet`.
+- **The macOS app** (`apps/macos/Sources/iStationApp.swift`):
+  - The app builds one `LibraryStore` for the BIOS screens and the library alike, and the `LibraryViewModel`. It maps the library's `GameRun` to the player's `PlayerRun`, as it maps `BIOSRun`. `isCovered` is wired to the check's chooser and sheet, the pane's alert, and Run the BIOS while it starts.
+  - The window shows the player while it holds the window, else the library once a BIOS is kept, else Welcome. The library lands on All Games.
+  - `PlayerCommands`, `BIOSCommands` and `LibraryCommands` make the menus.
+  - The new `apps/macos/Info.plist` holds only `UTImportedTypeDeclarations`, set as the macOS target's `INFOPLIST_FILE`, with no `DEVELOPMENT_TEAM`. It imports `local.istation.cue-sheet` (.cue), `local.istation.disc-track` (.bin), `local.istation.disc-playlist` (.m3u) and `local.istation.ps-exe` (.exe).
+  - The iOS app compiles the new modules through `EmuKit` and mounts none of them. The iPhone's library is 5n's.
+- **Tests**:
+  - `tests/data/library/` (`DataLibraryTests` 103, up from 27): `GameRecordTests` (11), `LibraryGamesTests` (20), `KeptFileReadingTests` (13) and `GameFilesTests` (28), with `LibraryStoreTests` grown to 18. The new fixture `Fixtures/library-v2.json` is the recorded version-2 shape.
+  - `tests/presentation/library/` (`PresentationLibraryTests` 101), over `Fakes.swift`: the in-memory `MemoryStorage`, whose held records wait at `HeldCalls` suspended, holding no thread, and the scripted `FakePowerSession`.
+    - `LibraryViewModelTests` (46), `ScanViewModelTests` (17), `OpeningViewModelTests` (21) and `LibraryTextTests` (7).
+    - `LibraryStoreStorageTests` (4), which uses real files in a `Sandbox`.
+    - `GameFileTypesTests` (2), which uses a scripted type lookup and reads `apps/macos/Info.plist`.
+    - `PreviewLibraryTests` (4), debug builds only.
+  - `BIOSPaneViewModelTests` gains one test, so `PresentationBIOSTests` has 51; `DatesTests`, `FoldersTests` and `DetailsTests` join `styles`; `TokensTests` checks the thirteen keys.
+  - `PresentationLibraryTests` joins the `macOS Personal` scheme.
+- **The design**, in its mirror and published to [the canvas](https://claude.ai/artifact/LA2jv631Ar184Dviuju8hu) as this item landed:
+  - `json/tokens.json`: the thirteen size tokens for both platforms, and the `size.*` note. `node tools/sync.mjs` wrote them into `main.html` and the TOKENS copies of the Contract, Exploration, Foundations-Color, Foundations-Components, Foundations-Type, Layout and Processes boards.
+  - `Contract`:
+    - C12, C13, C20, C51, C52 and C53 go from app to ready. C16 and C17 go from gap to ready, keeping their G2 id.
+    - C11 stays verify with a new note. C18, C19 and C47 get new notes, and G2's text says Playlists already ships.
+    - DECISIONS gains three entries and two confirmations, and the call "Scope before discs play." is retired. EVIDENCE gains 5d's block.
+    - Of 54 rows, 30 are ready, 4 app, 17 gaps and 3 verify.
+  - `Processes`: "Add a folder" and "Play a PS-EXE" describe 5d, as do the rows for the library file and bookmarks. `Layout`: the library's Error state reads "File missing".
+  - `main.html`:
+    - Remove has its Today wording.
+    - The missing-file Details are the recorded ones.
+    - The Today scan adds every file not already kept, with three backups as `SCAN_TODAY_GAMES`, and tallies "Added 7 games. 2 already in your library."
+    - `initialState` applies the level before the preset as well as after.
+  - `tools/check.mjs`: the today flow also checks the Today removal wording and the Today scan. There are still eight flows.
+- **The docs**:
+  - CLAUDE.md: what this is, the UI section, the view-model rules' examples, the Codebase Map's Data `library` row and the new Presentation `library` row, the products line and the checklist.
+  - DEVELOPER: the tree, the Data `library` entry, `styles`, `player`, `bios`, the new `library` entry, both apps and the test table. Version 2 is now the persisted-format recipe's worked example.
+  - The Data and Presentation cards and both tests cards.
+  - ADR 0002's rows and its "The table as of" note.
+  - `reference/darwin/README.md` (version 1 is 5c's, version 2 is 5d's).
+  - The root README's Status.
+  - The Seam line for Tools (⌘7) in 5f's `personal-tools.md`.
+
+**Trade-offs.**
+
+- **Discs are listed, not read.** At the Today level a disc has a name, a format and a size, and every file the scan finds that isn't already kept is added, since nothing reads SYSTEM.CNF before 5h. 5h fills in console and serial; 5i plays discs.
+- **The App Store build's access is unproven.** As in 5c, the entitlements hold `com.apple.security.files.user-selected.read-only` but not `com.apple.security.files.bookmarks.app-scope`, so contract row C11 stays verify until the bookmark probe's run. 5d adds two questions for that run:
+  - Does a game's bookmark, made inside a folder's access, survive a relaunch?
+  - Can a .cue chosen alone through Add Games… reach its .bin tracks? If it can't, the game's Size is the cue sheet's own few bytes, because a part that can't be sized counts nothing (the refute pass's P-4).
+  - P-4 is left unfixed. Tests don't run sandboxed, and a fix would change what a record's size means or which types the Info.plist declares. 5h and 5i need sandboxed access to a .cue's tracks anyway, so it goes with C11.
+- **The scan saves once per added file.** Each save is one load and one atomic save of `library.json` on the main actor. With 1,000 games kept, one such change took 15 ms (the second review's `addGames`) to 26 ms (the refute pass's, with real bookmarks), measured. Batching would change what Stop keeps and when each game shows. The file check is different: it stalled the window for 4 seconds over a moved folder of 400 games (measured), so it now keeps every moved game in one save.
+- **Left unfixed, with the reasons:**
+  - **Bookmark calls on the main actor (P-2).** Show in Finder resolves its bookmark there, and the opening job makes a moved BIOS's bookmark again there. Each is one call, on a click or once per moved BIOS, as 5c's pane does. Moving them would change Show in Finder's API with nothing here to test it, so they go with the pane's in a Maintenance pass.
+  - **Keys with another window key (P-3).** Return and ⌘⌫ may act on the main window's library while the Acknowledgements window is key, since AppKit offers a key equivalent the key window doesn't handle to the main menu. The fix needs the window's key state, which the offscreen harness can't give (its window is never key), and a wrong gate would turn Play off everywhere.
+  - **5b's `PreviewPlayer` (invariants F4).** It reaches its states through the player view-model's internal `show(_:)`, against ADR 0021 §3, and ADR 0021's example of it is out of date. It is 5b's code, not 5d's, so it belongs in a Maintenance item.
+  - **Reads that can't be cancelled.** The opening job's program and BIOS reads, the BIOS pane's read and Locate…'s record aren't linked to their owner's cancellation: each is one synchronous read that can't notice a cancel.
+  - **Two layout effects at small widths.** At 800 × 560 with Game info open, the table's four columns need 519 points against 500, so a horizontal scroller shows. Opening Game info under 1,100 leaves the games' inner split at its old width afterwards. The code before the window fix does both, and a plain split view does the second.
+  - **Many hard links to one file.** Choosing among a file's hard links compares a part with each of them, so a playlist listing thousands of names of one file grows quadratically: 10,000 took 7.4 seconds against 3.4 before the fix (measured, release). No real library holds that.
+  - **6c's document.** It still proposes a DiscKit product for the readers and scopes C14–C17. With `playlists` already in `EmuKit`, its default and scope need revisiting.
+- **Never checked in the real app**, which no one launched, by the user's call to check screens by rendered previews:
+  - The real window's title. It should read "All Games": a harness shaped like the app's `Window` scene draws it, and the "Untitled" one harness showed came from how that harness built its window.
+  - The window fix in the real window. The harnesses only approximate SwiftUI's scene window: offscreen, never key, and resized in steps rather than live.
+  - macOS 14, the deployment target: Search off, and Return and ⌘⌫ in the search field. No machine here runs it.
+  - The choosers: whether they gray out a game's file, given that an imported type yields to the system's.
+  - Return and ⌘⌫ while another window is key (P-3).
+  - The App Store sandbox's sizing of a .cue chosen alone (P-4).
+  - The player's frames counting after a PS-EXE's hand-off.
+  - The toolbar's order, the window widening as the sidebar comes back, and how ⌘P is routed under a real sheet (inferred from how SwiftUI enables commands).
+  - The macOS App Store routine wasn't built.
+- **Departures from the boards and the spec** are listed under Decisions consumed, for the user's veto.
+
+**Verified** (2026-11-23):
+
+- **The full run.** `lib/scripts/cicd.sh --app darwin --test` passed (exit 0) on the final tree, after the folder search's last fixes:
+  - the strict build;
+  - `swift test`: 640 tests in 15 runs, up from 456 in 14. Among them are `DataLibraryTests` 103 (up from 27), the new `PresentationLibraryTests` 101, `PresentationBIOSTests` 51 (up from 50), `PresentationStylesTests` 57 (up from 51) and `ArchitectureTests` 34;
+  - both apps' personal routine, for macOS and the iOS Simulator.
+  - The only warnings are xcodebuild's, both of which predate 5d: the AppIntents notices and its choice among matching destinations.
+- **Where the counts come from.** 640 is the sum of that log's fifteen run counts: the last verify pass's 632 (15 runs, passed twice) plus the eight tests the folder search's last fixes added to `GameFilesTests`. Earlier full runs gave 605 after the views were built, 622 after the first fixer and the window fix, 632 after the second fixer, and 636 and 639 along the last fixes.
+- **Builds.** `swift build --build-tests --explicit-target-dependency-import-check=error` and the release build (`swift build -c release --explicit-target-dependency-import-check=error`) are clean on the final tree, with no warnings. `PresentationLibraryTests`, `PresentationStylesTests` and `PresentationBIOSTests` passed in release when the view-models were built (`swift test -c release -Xswiftc -enable-testing`), and weren't run in release again after the fixes; `DataLibraryTests` was never run in release.
+- **Repeat runs.**
+  - The library and BIOS suites passed 12 times in a row when the view-models were built.
+  - The library, data, BIOS and styles suites passed 10 times in a row, then 4 times under 24 busy loops (second review).
+  - The library, BIOS and data suites passed 5 times after the first fixer, and the library and data suites 5 more at the last verify pass.
+  - The second review saw 5b's real-clock test `withTheContinuousClockFramesKeepToTheClockInsteadOfRacing` fail in 2 of 4 full runs of 5d's tree on a loaded machine. It passed in 4 of 4 full runs of the tree before 5d, 3 of 3 runs on its own, and every later full run. 5d touches neither the session nor its tests.
+- **Reviews and verify passes.** The item had two reviews (the item's letter; invariants, concurrency and quality) and a fixer. An agent then took up the AppKit exception, three independent verifiers checked the work (each acceptance criterion, guardrail and decision; the invariants; one told to refute it), and a second fixer followed. A last verifier went over that fix, and its three findings (R1–R3) were fixed.
+  - What mattered among their findings:
+    - the window's AppKit exception;
+    - a file check that stalled the window for seconds;
+    - `PresentationLibrary` importing the `PresentationPlayer` feature, against ADR 0023;
+    - the Game menu acting under the opening sheet;
+    - Return and ⌘⌫ lost after a run when the search field had focus;
+    - in the folder search: parts named in another case, playlists that list each other, rings of playlists, and hard-linked games.
+  - Each is fixed, or recorded under Trade-offs.
+- **Acceptance criteria.**
+  - Met: the discs' "Unknown" and Play off; `swift test` and the strict build.
+  - Met in the view-models, the renders and the harnesses, with the rest needing the app: adding, search, rename, remove, the grid, Game info and Locate… with their keys; a PS-EXE's opening job and hand-off; the breakpoints.
+  - Reset booting the PS-EXE again is the session's, pinned by `ConsoleSessionTests.resetPowersOnAgainAndBootsTheSameEXEAgain`.
+- **The AppKit exception.** A review found that the library, hosted as the app hosts it, made AppKit throw "…more Update Constraints in Window passes than there are views in the window".
+  - The window agent found that it ends the app. AppKit's update-constraints observer rethrows it, ending in SIGABRT, or SIGTRAP on the layout path (seen under lldb), and the app doesn't set `NSApplicationCrashOnExceptions`.
+  - The cause is the least widths. The sidebar (counted twice), Game info and the games' least width summed to 1,080 against an 800-point window. The split view meets that sum for a moment when the window narrows with Game info open, or when Game info closes under 1,100.
+  - With `gamesMinWidth` at 60 and the games' height decoupled, the harness ran clean in every scenario: 24 of 24, 10 of 10 again, and the earlier repros. At 340, narrowing with Game info open, and closing it after such a narrowing, threw in 6 of 6 runs.
+  - The last verifier's app-like host ran clean at 800 and 1,000, while the tree before the fix crashed in 2 of 2 runs at 800.
+  - The least sizes are now 500 × 156 with the sidebar only, 360 × 156 with Game info only, and 800 × 156 with both.
+- **Mutations**, each restored, were caught by the tests:
+  - 2 on the Data side and 9 on the view-models.
+  - The second review ran 21: 14 were caught, and six more once the first fixer's tests were in.
+  - The first fixer ran 20: 19 were caught by a test, and under the twentieth, a preview hold on a thread, the code no longer compiles. The second fixer ran 11, all caught.
+  - The design's today flow caught a Today scan that read discs.
+  - The ones caught included: a hand-off while the boot is pending; discs that play; Remove without asking; a power-on without the EXE; Scan Again re-reading kept games; Stop letting the in-flight file in; the folder's access never ended; Cancel's stop missing or out of order; a cancel while the BIOS is read; a job opened right after a Cancel; the pane's size and read Details; a stale bookmark at its own path; a look that ends after a Locate…; the least-window arithmetic; the breakpoint's hide taken as the person's; another screen's sheet not covering the library; Return and ⌘⌫ in the search field; a second Add Games… choice dropped; the Game menu under a second opening; a file that isn't a game's recorded; the choosers' type list; the previews' Today tallies; a file check saving per game; a Cancel's stop not followed; Return off for a missing game; the look and the preview gate deaf to cancellation; a fake's held record holding its thread; repeated ids kept; parts told apart by spelling; a ring of playlists keeping none.
+  - Not caught, and recorded: no `break` on a stopped snapshot in the opening job. It is equivalent under both the real and the fake session, since a stopped snapshot keeps `bootIsPending`.
+- **The boards, rendered.** A throwaway test, not committed, rendered two things in the light, dark and high-contrast themes: the 26 library screens' previews, composed from their parts; and the real window, a titled `NSWindow` hosting `LibraryView` and captured offscreen, at 800 × 560 and 1280 × 800.
+  - They were compared in the built-in browser with `Mac-LibraryEmpty`, `Mac-TodayLibrary`, `Mac-LibraryGrid`, `Mac-LibraryInspector`, `Mac-LibrarySearchEmpty`, `Mac-LibraryMissing`, `Mac-RemoveConfirm`, `Mac-Rename`, `Mac-LibraryMin`, `Mac-LibraryLight`, `Mac-LibraryContrast`, `Mac-ScanPicker`, `Mac-ScanRunning`, `Mac-ScanStopped`, `Mac-ScanDone`, and the Today flow's opening job.
+  - They match at the Today level. At 800 the table keeps Name, Console, Serial and Size; at 1280 with Game info open, Format goes.
+  - The departures:
+    - Selected rows use the system's selection color, not the boards' amber (a ruling for the user's veto).
+    - At 800 the toolbar's search field collapses to a button, as macOS's toolbar does when it runs out of room.
+    - The composed light render drew the sidebar's selection black. That is an artifact of offscreen drawing: the real light window draws the system's gray.
+  - After the window fix, the window agent rendered the real window again. Against the renders before it, the grid at 800 and the list at 1280 are pixel-identical, and the list and the empty library at 800 differ only in the search button.
+- **Design and docs checks.**
+  - `node tools/check.mjs` passes: eight flows, 29 shortcuts, 73 boards, and 54 contract rows (30 ready, 4 app, 17 gaps, 3 verify). `--render` passed at 139 pages when the design changed. The plain check passed again after every later token change.
+  - The docs validator is clean on a copy of the worktree once the item shipped (23 index rows, 598 links, 94 files).
+- **Searches.** A search of `source/` and `apps/` finds no networking API (URLSession, URLRequest, NWConnection), as contract row C47 says. Neither the diff nor the new files hold a Sony name, a disc image, a BIOS or a real path. Tests write only inside a `Sandbox`, and the previews stay in memory.
+- **Probes**, all on scratch copies with made-up files:
+  - Renaming or moving a file marks its bookmark stale while it still resolves.
+  - Resolution spells the temporary folder `/private/var/…`, which `standardizedFileURL` turns into `/var/…`.
+  - A deleted file's bookmark fails with "The file doesn’t exist." (macOS 27.0.1).
+  - A file nobody may read gets a plain bookmark and a size, but its bytes are refused.
+  - An imported type yields to the system's: `.bin`, `.m3u` and `.exe` resolve to the system's own types.
+  - `addGames` costs 1.9, 8.0 and 15.3 ms with 100, 500 and 1,000 games kept. With real bookmarks (956 bytes), one relocation costs 12.8 ms on a 500-game file and 25.7 ms on a 1,000-game file.
+- **The folder search's last fixes.** The last verifier's R1 (hard-linked games) and R2 (a playlist only a ring lists, kept when its name came first) were fixed, then gone over twice more by agents told to break them:
+  - The first found no wrong answer, but a cubic search for ring heads (4,998 files of rings took 67 seconds against 1.9 before, and one ring of 5,000 playlists 449 MB against 37), quadratic path resolution over hard links, and a part that is a symbolic link never matched, a defect from before 5d. All three were fixed: one strongly-connected-components pass, each hard-linked game's path resolved once, and a linked part followed.
+  - The second re-ran every probe: no wrong answer. `ringHeads(of:parts:)`, copied out, matched a reference Tarjan and a brute-force reachability check on 400,000 random graphs, ran a 100,000-node chain and ring on a 256 KiB stack, and a ring of 1,000,000 in 0.64 seconds. In release, 4,998 files of rings took 1.8 seconds against 1.7 before the fixes, and a ring of 5,000 playlists 39.5 MB against 36.2. Its two remaining costs: resolving every part slowed folders of cue sheets by 16 to 20 per cent, fixed by resolving only a part that is a link; and the hard-link case above, left as it is.
+  - Mutations: R1's revert fails the hard-link tests, R2's the ring tests, and each only those; dropping the link follow fails the linked-disc test, ignoring the rings' outside listers the three ring tests, and reading a linked cue sheet's tracks from the link's folder the linked-sheet test. Not caught: a playlist's linked disc read the same way, which changes nothing `find(in:)` returns unless a sheet's track is itself a game's file; and the case-aside step, which resolving makes unreachable on APFS (twelve lookup orders probed), so it stays only as a guard.
+
+**Decisions consumed.**
+
+- 2026-11-21: the design's Today parts are v0.1.0's, which moves game import from v0.2.0 into v0.1.0 (the user's call). Each screen's gaps get interface items, track 6, and the screens are gated on them (the user's call).
+- 2026-11-21, measured by probe: `PSEXE(bytes:)` threw `tooShort` for 10 bytes and `notAnEXE` for 4,096 zero bytes. The names and sizes the design shows are placeholders: nothing is fetched, and there is no artwork.
+- 2026-11-22 (the defaults, confirmed by the user):
+  - The library is `library.json` in the app's container, through the Data `library` store, with every field defaulted: one versioned file, as save states and cards will be.
+  - Add Folder looks for .cue, .iso, .m3u and .exe files, groups an .m3u's discs under it, and skips the .bin tracks a .cue names.
+  - There is no artwork and no title from a database. A game is named by its file and can be renamed, and nothing leaves the Mac (contract row C47, verify).
+  - Discs are listed today, with Play off and the reason, rather than hidden, so the user sees what they added. 5h fills in console and serial.
+- 2026-11-22 (the user's call, before the group run): each screen is checked against its board by rendering its previews and comparing them with the board in the built-in browser. No app is launched for the check.
+- 2026-11-22, from 5c's landing (Milestone V), for the user's veto:
+  - Continue lands on the empty library, as `Mac-LibraryEmpty` draws it, and the sidebar brings BIOS ⌘6 among its places.
+  - Adding the games raises `Library.currentVersion` to 2, with a recorded version-2 fixture beside version 1's.
+- **2026-11-22 and 2026-11-23, rulings made building and verifying it, each as it now stands.** The Data side's and the view-models' were made on 2026-11-22. The views', the app's, the design's and the docs' were made on 2026-11-23, as was every fix that followed the reviews and the verify pass.
+  - **For the user's veto** (departures from the boards or the spec):
+    - The table's and the sidebar's selection are the system's (`Table(selection:)`, `List(selection:)`), not the boards' amber. That is the person's accent while the window is key and gray otherwise, since the app has no AccentColor. The table shows the system's row separators, and the grid draws its own 2-point accent ring.
+    - Play is on for a PS-EXE whose file is there, told by its .exe extension as the design's `canPlay` tells it. `PSEXE(bytes:)` checks the bytes at "Open the file", which refuses a file that isn't one. The spec's guardrail and the plan said Play is on only for a PS-EXE recognized by its bytes.
+    - A stale bookmark that still finds its file is "moved": `whereabouts(of:)` reports it, and the library keeps the game again quietly where the file now is (measured: macOS marks a renamed or moved file's bookmark stale while still finding it). Only a file that can't be reached shows "File missing" with Locate…. Missing is worked out each time, never stored.
+    - The folder search reuses `Playlists`, so `DataLibrary` uses `DataPlaylists` and `EmuKit` ships it in v0.1.0. C16 and C17 are tagged ready and keep their G2 id.
+    - `GameRecord` keeps a .cue's `tracks` beside an .m3u's `discs`, so Game info's "Cue sheet with N tracks" needs no file read.
+    - At 800 without Game info, the toolbar's search field collapses to a button (macOS's toolbar overflow). `Mac-LibraryMin` draws a field.
+    - When the sidebar comes back, AppKit widens the window: 800 → 1,021 by ⌃⌘S, and 1,000 → 1,221 when Game info closes. A plain split view does the same, so this is left as the system does it.
+    - The sidebar's Tools place (⌘7, personal builds) comes with 5f, since nothing shows in it before then. Its Seam line is in 5f's document.
+    - On macOS 14, the deployment target, Search (⌘F) is off, because SwiftUI can't focus the toolbar's field there. From macOS 15, Play and Remove give way while the search field has focus. On 14, Return and ⌘⌫ typed in the field still play and remove.
+    - The choosers have no titles, since SwiftUI's file chooser takes none. The search field has no "Search games" label, since `.searchable` takes none and VoiceOver names the field by its prompt. The unused texts are removed.
+    - The grid has no arrow-key navigation. The table's arrow keys are the system's.
+    - Recently Played lists the most recently played first, ties in the order added. The prototype keeps library order only because its dates are strings.
+    - The sidebar is fixed at the token's 220. The Layout page's 180 to 280 has no tokens.
+    - Initials and the empty library's disc use existing type styles, as 5c did for Welcome's disc: `Typography.screenSymbol` (48, against the design's 40), and `.largeTitle` in Game info (26, against 32).
+    - The menus: File gets Add Games… ⌘O, Add Folder… ⇧⌘O, Show in Finder and Remove from Library… ⌘⌫, after New. View gets All Games ⌘1, Recently Played ⌘4, as List / as Grid, Show/Hide Sidebar ⌃⌘S and Show/Hide Game Info ⌘I, before the toolbar items. Edit gets Search ⌘F. Game gets Play ↩ first, and Console gets BIOS ⌘6 after Run the BIOS. The Layout page names no menu for ⌘1, ⌘4 or ⌘F.
+    - `main.html` changes what it shows only where 5d's code decided otherwise: the Today removal wording, the missing-file Details, and the Today scan. The scan boards still draw the full level. Its `initialState` also applies the level before the preset, so a preset sees its level.
+    - Sentences the design doesn't draw:
+      - the opening job's "This file isn’t a PS-EXE program, so iStation can’t start it.", "iStation has no BIOS to power on with. Choose your BIOS file first." and "Your BIOS didn’t reach its shell in 600 frames, so the program didn’t start.";
+      - the scan's "iStation couldn’t open this folder." and "iStation couldn’t add this game to your library.";
+      - Add Games…'s and Locate…'s failure alerts, including "That file is already in your library" and the refusals of a file that isn't a game's;
+      - "The library couldn’t be saved".
+  - **The library file:**
+    - Every `GameRecord` field decodes with a default: `""`, the format the file name says (else `.unknown("")`), `0`, `Date.distantPast`, nil for last played and the library's name, empty `Data`, and no tracks or discs. A field of the wrong type is still an error.
+    - A record without an id gets a name-based UUID (version 5's layout) from the SHA-1 of its path and bookmark, so it is the same game on every load until a save writes the id.
+    - A record whose id repeats an earlier one's gets a stable id of its own, made the same way with its place in the file. Identical records stay two games and aren't merged, so no name or date is lost.
+    - `GameFormat` keeps an unknown value as `.unknown(String)`. A PS-EXE is written "exe", as the design's format key is. The four extensions are recognized in any case.
+    - `size` is the whole game: the file, a .cue's tracks, and an .m3u's discs and their tracks. A part that can't be sized counts nothing.
+    - `games` is always written, an empty list when there are none. `lastPlayed` and `name` are written only when present.
+    - A duplicate is the same standardized path, which folds `/private/var` into `/var` (measured). `add` also skips an id the library already has.
+    - A change that changes nothing writes nothing: adding only kept files, removing only ids not kept, or a file check that finds nothing moved.
+      - Remove passes over ids not kept.
+      - Rename, mark-played and relocate on an id not kept throw `noSuchGame`.
+      - Relocating onto another game's file throws `alreadyKept`, keeping one game per file.
+      - `relocateGames(_:)` passes over such a move and over a game no longer kept, and makes the rest in one load and one save.
+    - Rename trims spaces and newlines. An empty or nil name is stored as nil, so the file's name shows.
+    - `Library`'s changes round every date down to the whole second, so what a store call returns equals the next load.
+    - Store calls return the library as the file now holds it, in this build's version. So `keepBIOS` and `forgetBIOS` on a version-1 file return version 2.
+    - `shownName` is the library's own name when it isn't blank, else the file name without its extension, else the whole file name.
+    - The fixture `library-v2.json` holds the BIOS and three made-up games: a .cue with its track, a played .m3u with its discs, and a renamed, played PS-EXE. It is pinned both ways: this build writes the same JSON, every key and value, but not byte for byte, since the fixture ends in a newline the encoder doesn't write. The defaults are tested inline.
+    - Version 1's write test became "saved again, it is written in version 2's shape". The later-version test uses version 3, and the empty-library test compares fields. `Package.swift`'s `testFixtures` needed no change.
+  - **Kept files and the BIOS read:**
+    - The BIOS read is shared as `KeptFileReading.readBIOS(_:expectedSize:)`, which `BIOSStorage` now refines, so the pane's fakes run through it unchanged. The caller passes the size, since Data can't see `PS1Bus.biosSize`.
+    - `KeptBIOSError` keeps size and read failures apart, so Details still name `KeptFile.size(at:)` or `KeptFile.bytes(at:)`.
+      - Each failed call's case carries the `KeptFileError` that was thrown, and `wrongSize` the size found.
+      - An error of another type, which only a fake could throw, is made one from its description.
+    - `readBIOS` doesn't keep a stale bookmark again. It returns `isStale`, and the caller keeps it again with `moved(to:bookmark:)`.
+    - The BIOS pane reads in one detached task instead of three. Its calls, their order and its texts are unchanged.
+  - **Finding games:**
+    - A game's parts are matched by the file system's resource identifier, and by the standardized path for a file that isn't there. So a part spelled in another case is still a part, and a part a sheet or playlist names by a symbolic link is the game it leads to. Only a part that is itself a link is resolved, since resolving every part slowed a folder of cue sheets by about a fifth (measured).
+    - A cue sheet reached by a symbolic link, alone or as a playlist's disc, names its tracks from the folder of the sheet it leads to, so they count toward the game's size.
+    - Of games that are one file by hard links, a part is the one whose path its sheet or playlist spells, symbolic links resolved; resolving gives the file's own spelling, so a part named in another case still spells one. Failing that, it is the one spelled the same but for case, a step kept in case resolving doesn't give the file's spelling; failing both, it is all of them. Each such game's resolved path is worked out once.
+    - Whatever a game that stays lists goes, and so does whatever that lists in turn. A playlist that lists itself stays.
+    - What is left after that is listed only from among itself: rings of playlists, and what they list. One pass finds its strongly connected components (Tarjan's, without recursion), and the first game in path order of each component nothing else left lists is kept. So a ring's head is never a playlist the ring lists, nor a ring that another ring lists, and the pass takes linear time.
+    - Hidden files, package contents, symbolic links and subfolders that can't be read are passed over. Results come in case-insensitive, numeric path order, and a cancelled search ends early with what it has found.
+    - A .cue or .m3u over 1 MiB isn't read for its parts.
+    - A record's file name and folder come from the file's standardized URL, and its bookmark from the URL given.
+    - `record(for:added:)` keeps an unrecognized extension as `.unknown(ext)`. The view-models refuse such a file before recording it.
+  - **Wiring and storage:**
+    - The library owns its scan and opening jobs, which report each change back through a weak relay. So the app builds one view-model.
+    - The library hands a run on as its own `GameRun`: the BIOS file's name and size, and the program's name and file. The app maps it to the player's `PlayerRun`, so `PresentationLibrary` doesn't use `PresentationPlayer`, as ADR 0023 requires.
+    - `playerHoldsWindow(whilePlaying:)` stays in the library's view-model, where it is tested. The player holds the window while a run plays, no opening job shows, and no stop a Cancel sent is still under way. The window switch and the Game menu both read it through `MainWindow.playerShows`.
+    - Writes to `library.json` run on the main actor, one at a time. The user's files are found, recorded, resolved and read in detached tasks.
+    - `LibraryStorage.record(for:added:)` is async, so a stand-in can hold a record without a thread. Every other call stays synchronous.
+    - One `LibraryStore` serves both `LibraryBIOSStorage` and `LibraryStoreStorage`, and the opening job's `onBIOSMoved` goes to the pane's `kept(_:)`.
+    - `isCovered` covers the library while any of these is open: the BIOS check's chooser or sheet, the BIOS pane's alert, or Run the BIOS starting. `canAct` hears it, so nothing in the library powers the session on meanwhile, and Run the BIOS is off under the pane's alert.
+    - File checks and Add Games… stop when the library goes away. They are linked to their task with `withTaskCancellationHandler` and check `Task.isCancelled` between files. A scan's record is linked to the scan.
+  - **The window and its layout:**
+    - The window is a `NavigationSplitView`. The BIOS pane comes in through a view builder, so `library` doesn't import `bios`. `.inspector` stays inside the detail column: with the window fix, moving it onto the split view isn't needed.
+    - The library's views are macOS-only. The iOS app mounts none of them.
+    - `LibraryLayout` follows the design's arithmetic: the content is the window less the sidebar and Game info where they show. So 800 leaves 580, which keeps Name, Console, Serial and Size.
+    - A dropped column is drawn by choosing among three tables, since conditional `TableColumn`s need macOS 14.4.
+    - The split view's sidebar follows the layout worked out for that draw. `splitViewShowsSidebar(_:)` takes a hide while Game info shows as the breakpoint's, never the person's; any other change is the person's. So with Game info open, the sidebar hides only by ⌃⌘S or the toolbar's button, not by dragging.
+    - The split view's own sidebar toggle is removed from the sidebar column, leaving the view-model's one button, "Hide the sidebar" or "Show the sidebar" (⌃⌘S).
+    - `gamesMinWidth` is 60 on the Mac (320 on iOS): the least window less the sidebar, counted twice, and Game info.
+    - The games' frame doesn't follow their content's height (`minHeight` zero, `maxHeight` infinity, top-aligned), so the narrow least width asks the window for no height.
+    - Each chooser and sheet hangs on its own background view. Locate…'s chooser waits until the missing-file alert's sheet has gone.
+    - Library alerts are `DetailsAlert`s in `.sheet(item:)`. Closing one without a button, or Escape, answers Cancel.
+    - `DetailsAlert` never truncates a button title. A longer title takes more of the row, and titles that don't fit side by side stack, the default on top. No existing alert changes, and the "Long titles" preview draws the stack.
+    - The library looks for its games' files at launch and whenever the app becomes active.
+    - The view-model's search-focus flag is cleared when the games view disappears: when the player takes the window, or at the BIOS place. A hosting probe checked this, since no test hosts a view.
+  - **Menus and keys:**
+    - The library's File, Edit and View items show while a BIOS is kept; Game › Play and Console › BIOS always show. Every library menu item, the View menu's included, acts only while the library holds the window and nothing is open over it, whether the library's own sheet or one `isCovered` reports. Play, Show in Finder and Remove are off at the BIOS place.
+    - The Game menu's own items act only while the player holds the window. `PlayerCommands` and `BIOSCommands` gain slots for the library's `LibraryMenuItem`s and keep their old initializers.
+    - Run the BIOS is off while a library sheet, chooser or alert is open.
+    - Play's key is a plain Return, as the design writes it. Play is on for a selected game whose file is missing, whatever its format, so Return opens the missing-file dialog as the design's Return does.
+    - The window shows the player while it holds the window. Otherwise it shows the library once a BIOS is kept, landing on All Games, so the check's Continue reaches `Mac-LibraryEmpty`; otherwise it shows Welcome.
+    - The player's Stop reads "Stop and go back to the library" (⌘.), as the design has it.
+  - **The library's behavior:**
+    - Missing files are looked for at launch, when the app becomes active, and on `checkFiles()`. Every moved game is kept again quietly at its new place, in one store change.
+    - A game whose file Show in Finder can't resolve is flagged missing. A missing game's Size reads "Unknown", as `Mac-LibraryMissing` draws it.
+    - Playing a missing game opens the missing-file dialog whatever its format. Its Details name the call that failed: `KeptFile.resolve(_:)` or `KeptFile.size(at:)`.
+    - At the Today level, Remove's message leaves out save states and memory cards. It says "The program stays on your Mac. You can add it again any time." for a PS-EXE, and the same of "The disc image" for a disc. After a remove, the first game shown is selected.
+    - Search matches the shown name, ignoring case, with the words trimmed.
+    - The first game is selected at launch. A place selects its first game when the selection isn't among them, and the BIOS place closes Game info.
+    - Rename trims the name and does nothing when it is unchanged. Renaming to the file's own name clears the library's name.
+    - Add Games… records the files off the main actor and adds the new ones in one store call.
+      - Files already kept are skipped silently, and the last file chosen is selected.
+      - Failures open one alert, "“x” couldn’t be added" or "N files couldn’t be added", with each call under Details.
+      - A choice made while another is still being recorded is added after it; `isAdding` counts the choices pending.
+    - A file whose extension isn't a game's is refused before it is recorded, since the choosers' system types also carry other extensions.
+      - Add Games… says "iStation’s library keeps .cue, .iso, .m3u and .exe files.", with `GameFormat(fileName:)` returning nil under Details. A mix of failures keeps "iStation couldn’t open these files."
+      - Locate… says "“x” isn’t a game’s file", then that sentence, then "Choose “y” where it is now."
+    - Locate… keeps the game's id, name and dates.
+      - A file another game keeps is refused with "That file is already in your library".
+      - A file that can't be read is refused with "“x” couldn’t be opened".
+      - A game removed meanwhile is skipped, and a look that ends after a Locate… leaves the game as located.
+    - A change `library.json` can't save says "The library couldn’t be saved" / "iStation couldn’t write the change to its library. Your files are as they were.", with OK.
+    - Keys and buttons do nothing while a sheet, chooser or alert is open (`canAct`). The view-model's sidebar and Game info toggles and its view mode don't check it, but their menu items do.
+    - `select(_:)`, `search(for:)` and `showGames(as:)` are intents for the selection, the search's words and the view mode. The previews and the grid's click use them.
+  - **The scan:**
+    - Each file is added as it is read, one `addGames` per file, so the library shows it at once and Stop keeps what was added. "Add them to your library" passes with the last file.
+    - The read step keeps the design's name, its "n of N" detail and its "Reading n of N · file" bar. Its detail about SYSTEM.CNF waits for 5h.
+    - An added file reads "Added · .cue" (or .iso, .m3u), and a PS-EXE "Added · PS-EXE · no serial".
+    - A file that can't be recorded reads "iStation couldn’t open this file.", with `KeptFileError`'s case. A game the library can't keep reads "iStation couldn’t add this game to your library."
+    - Stop drops the file being read when it lands. Scan Again rescans the same folder and checks `Library.game(at:)` before making any bookmark.
+    - A folder that can't be searched fails the scan at its first step, with the call under Details, and Done and Scan Again.
+    - The tally uses the design's words, including "Nothing added yet.", with numbers grouped.
+    - The folder's security-scoped access is held from before the search until the last file is recorded.
+  - **The opening job:**
+    - The run is handed on at the first running snapshot whose `bootIsPending` is false. At frame 600 the job gives up and stops the session.
+    - Cancel closes the sheet at once, and stops the session only if this job may have powered it on. The library keeps the window until that stop lands (`isStopping`), which includes the job's own stop after a power-on that a Cancel interrupted.
+    - A file over 2,099,200 bytes is refused, unread, as not a PS-EXE.
+    - Failures show on the job sheet with a danger summary, the call under Details and Close. The BIOS failures reuse the BIOS pane's sentences.
+    - A stale BIOS bookmark is kept again where the file now is and reported to `onBIOSMoved`.
+    - The game is marked played after the hand-off. A library that can't record it doesn't stop the run.
+    - A session stopped by something else before the hand-off ends the job quietly.
+  - **Words and figures:**
+    - "Playlist of 1 disc" is singular, and counts are grouped.
+    - Sizes follow the design's `fmtBytes`, halves rounding up as JavaScript's `toFixed` does.
+    - Played dates read "Today, 9:41" and "Yesterday, 21:10" (24-hour), then the day. An added date the record didn't keep reads "Unknown".
+  - **Shared code and tokens:**
+    - `Dates.day`, `Folders.shown`, `Details.threw` and `PresentedJobSheet` move into `styles`, now that two modules use them.
+    - The thirteen size tokens go into `tokens.json` first, for both platforms, and are synced, then added to `Metrics.layout` and `TokensTests`. iOS takes the Mac's values where they never apply; its `emptyWidth` is 390 and its `gamesMinWidth` 320. `main.html` keeps its own numbers, as 5c left 460 and 720.
+    - The no-results view's 60-point top inset is `Metrics.space10 + Metrics.space5`.
+    - Alerts are the module's own `LibraryAlert`, answered through `answer(_:)`, so the view-models use no type defined in a SwiftUI file.
+  - **Imported types:**
+    - The four types are imported, not exported, in a merged `apps/macos/Info.plist`, since no `INFOPLIST_KEY_*` setting can declare a type.
+    - The choosers offer them, plus every type the system gives .cue, .iso, .m3u and .exe. The .bin type is declared but never offered.
+    - `GameFileTypes.offered(imported:lookUp:)` is pure. Tests run it over a scripted lookup, never the type database, and read `Info.plist` to pin the declarations.
+  - **Previews:**
+    - Previews reach every state through the initializers and intents, including the selection, the search and the view mode (ADR 0021 §3).
+    - Scanning holds its fifth file's record at a `PreviewGate`, suspended without a thread for as long as the preview lasts, and released when its task is cancelled. Scan Stopped presses Stop after five files.
+    - Scan Done adds every backup ("Added 7 games. 2 already in your library."), as the design's Today scan does.
+    - The missing file's reason is "The file doesn’t exist.", as recorded on macOS 27.0.1.
+    - The "High contrast" preview draws dark in Xcode's canvas, since an app can't put AppKit into high contrast. The renders set `Theme.applied`.
+  - **Tests:**
+    - The fakes print short summaries, so a failing expectation can't stall other tests, and every wait ends within two seconds. They can hold a search, records, resolves, reads, power-ons and stops, as test support only.
+    - `PreviewLibraryTests` runs in debug builds only, where the previews are. It pins them to the Today level, and checks that a held scan holds no thread and ends when stopped.
+    - `MemoryStorage` holds records suspended at `HeldCalls`, without a thread. Its synchronous calls wait on their own threads, since the view-models run them in detached tasks.
+    - Each `@unchecked Sendable` in 5d's fakes carries a one-line reason. 5c's BIOS fakes are unchanged.
+    - Every design sentence is checked against `main.html`, and the new sentences in the view-model tests.
+    - No unit test hosts a view. The least size is pinned by the token arithmetic. The window, the search focus and the app's wiring were checked in throwaway harnesses.
+  - **The design:**
+    - A contract row becomes ready when 5d's code and tests back it. C20 and C53 are ready while naming what they still lack: console and serial, and the PS1 and PS2 filters, both of which need G2.
+    - C11 stays verify. The probe hasn't been run, and 5d adds its two questions.
+    - C19's note says the app wasn't launched, and C47 stays verify until a rule test enforces it.
+    - The answered call "Scope before discs play." is retired.
+    - The Contract board's content now stands 10,151 points tall, but the canvas's frames go up to 8,000, so its frame and preview stay at 8,000 and the canvas shows its top 8,000 (for the user's veto).
+    - Left as they are:
+      - the `Mac-LibraryMissing` board's title, which still says "file moved";
+      - C49's note;
+      - the prototype's Recently Played order;
+      - the Today Format column's ".cue" and ".m3u", in the prototype and the code alike.
+  - **The docs:**
+    - ADR 0002's "The table as of" note is updated, as 5b and 5c did; its decision is unchanged.
+    - "Closing the window leaves the session as it is" now says 5d left it as 5c had it.
+    - The checklist's `library.json` line carries the rule to raise the version with a fixture, linking to DEVELOPER's recipe.
+    - The doc comments of `BIOSPaneViewModel`, `LibraryMenuItem`, `PlayerViewModel.started(_:)` and `LibraryView`'s `sidebarVisibility`, and DEVELOPER's player entry, now say what the code does.

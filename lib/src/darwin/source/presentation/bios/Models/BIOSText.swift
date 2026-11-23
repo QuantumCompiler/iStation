@@ -78,11 +78,8 @@ enum BIOSText {
     }
 
     /// The exact call that failed and what it threw, for Details: "PS1Console.powerOn(bios:) threw
-    /// PS1Error.biosSize(271384)". An error that is a case of an enum is named with its type, as Swift
-    /// writes it; any other is written as it describes itself.
+    /// PS1Error.biosSize(271384)" — `Details.threw(_:_:)`, which the library writes its Details with too.
     static func threw(_ call: String, _ error: any Error) -> String {
-        let described = String(describing: error)
-        guard Mirror(reflecting: error).displayStyle == .enum else { return "\(call) threw \(described)" }
-        return "\(call) threw \(String(describing: type(of: error))).\(described)"
+        Details.threw(call, error)
     }
 }

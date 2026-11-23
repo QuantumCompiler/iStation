@@ -25,7 +25,7 @@ let modules: [Module] = [
     Module(.data, "ISO9660", uses: ["InfrastructureBytes"], testSupport: ["SupportSandbox", "SupportDiscFixtures"]),
     Module(.data, "SystemCNF"),
     Module(.data, "Playlists", testSupport: ["SupportSandbox"]),
-    Module(.data, "Library", testSupport: ["SupportSandbox"]),
+    Module(.data, "Library", uses: ["DataPlaylists"], testSupport: ["SupportSandbox"]),
     Module(.data, "Tracing", testSupport: ["SupportSandbox"]),
 
     Module(.business, "R3000A", testSupport: ["SupportMIPS", "SupportR3000ATrace", "SupportSandbox"], derivedFrom: .projectPSX),
@@ -35,6 +35,7 @@ let modules: [Module] = [
     Module(.presentation, "Styles"),
     Module(.presentation, "Player", uses: ["BusinessPS1", "BusinessSession", "PresentationStyles"]),
     Module(.presentation, "BIOS", uses: ["BusinessPS1", "BusinessSession", "DataLibrary", "PresentationStyles"], testSupport: ["SupportSandbox"]),
+    Module(.presentation, "Library", uses: ["BusinessPS1", "BusinessSession", "DataLibrary", "PresentationStyles"], testSupport: ["SupportSandbox"]),
     Module(.presentation, "Acknowledgements", uses: ["PresentationStyles"]),
 ]
 
@@ -51,7 +52,7 @@ let testSupport: [Support] = [
 /// points: nothing in the package is an executable, and nothing imports an app.
 let products: [Product] = [
     .library(name: "PS1Core", targets: ["BusinessR3000A", "BusinessPS1", "BusinessSession"]),
-    .library(name: "EmuKit", targets: ["DataLibrary", "PresentationStyles", "PresentationPlayer", "PresentationBIOS", "PresentationAcknowledgements"]),
+    .library(name: "EmuKit", targets: ["DataLibrary", "PresentationStyles", "PresentationPlayer", "PresentationBIOS", "PresentationLibrary", "PresentationAcknowledgements"]),
     // Personal builds only: no app links it in its App Store routine (ADR 0016).
     .library(name: "TraceKit", targets: ["DataTracing"]),
 ]

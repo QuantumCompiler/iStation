@@ -9,7 +9,7 @@ import PresentationStyles
 /// The player: what the console session is doing, as the screen, its toolbar and the Game menu show
 /// it, and what a person can do to it — pause, resume, reset, stop, full screen.
 ///
-/// The player doesn't power the console on: whatever starts a run (5c's BIOS check, 5d's opening job)
+/// The player doesn't power the console on: whatever starts a run (5c's Run the BIOS, 5d's opening job)
 /// powers the session on and calls `started(_:)` with the files it used, and from then on the player
 /// follows the session's snapshots, here on the main actor. Reset and Stop ask first, as the
 /// design does: asking pauses a running game, and the alert's Details name the exact call.
@@ -72,9 +72,10 @@ public final class PlayerViewModel {
     /// Tells the player a run has started, or is about to: the session is powered on with `run`'s BIOS
     /// and, for a PS-EXE, booted with its program. From here on the player follows the session's
     /// snapshots, across a stop too: a stop finishes every snapshot stream, so the player then takes the
-    /// session's next one and shows whatever powers on after it. Called by whatever starts the console,
-    /// just before or after it powers the session on; a run started while another plays replaces it,
-    /// whether the starter stops the old run first or not.
+    /// session's next one and shows whatever powers on after it. Called by whatever starts the console
+    /// once it has powered the session on — Run the BIOS right after, the library's opening job once the
+    /// program has booted — or just before; a run started while another plays replaces it, whether the
+    /// starter stops the old run first or not.
     public func started(_ run: PlayerRun) {
         self.run = run
         confirmation = nil

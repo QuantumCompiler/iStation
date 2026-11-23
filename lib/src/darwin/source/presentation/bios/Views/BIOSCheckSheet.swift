@@ -63,26 +63,13 @@ private struct BIOSCheckPresenter: ViewModifier {
 }
 
 /// The check's job sheet, as the design's `Mac-BiosChecking`, `Mac-BiosWrongSize`, `Mac-BiosNoShell`
-/// and `Mac-BiosDone` draw it: `JobSheet` over the check's `JobPresentation`, each button handed back to
-/// the check. While the sheet closes it keeps the last job it showed, so its words don't vanish first.
+/// and `Mac-BiosDone` draw it: `PresentedJobSheet` over the check's `JobPresentation`, each button handed
+/// back to the check. While the sheet closes it keeps the last job it showed, so its words don't vanish first.
 struct BIOSCheckSheet: View {
     let check: BIOSCheckViewModel
-    @State private var shown: JobPresentation?
-
-    init(check: BIOSCheckViewModel) {
-        self.check = check
-        _shown = State(initialValue: check.job)
-    }
 
     var body: some View {
-        Group {
-            if let job = check.job ?? shown {
-                JobSheet(job) { check.perform($0) }
-            }
-        }
-        .onChange(of: check.job) { _, job in
-            if let job { shown = job }
-        }
+        PresentedJobSheet(check.job) { check.perform($0) }
     }
 }
 

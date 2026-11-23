@@ -15,8 +15,8 @@ import PresentationStyles
 ///
 /// Run the BIOS reads the kept file through its bookmark, powers the player's session on with it, and
 /// then hands the run to `onRun`, which the app wires to the player; this module knows nothing of the
-/// player. Until the library (5d) the pane is the window's one place once a BIOS is kept, and Welcome
-/// shows while `hasBIOS` is false.
+/// player. Since the library (5d) the pane is the library's BIOS place (⌘6) once a BIOS is kept, and
+/// Welcome shows while `hasBIOS` is false.
 @MainActor
 @Observable
 public final class BIOSPaneViewModel {
@@ -141,14 +141,7 @@ public final class BIOSPaneViewModel {
     public var checkedText: String {
         let verdict = ": it reached its shell."
         guard let checked = record?.checked, checked != .distantPast else { return "Checked" + verdict }
-        let today = now()
-        if calendar.isDate(checked, inSameDayAs: today) { return "Checked Today" + verdict }
-        var style = Date.FormatStyle().month(.abbreviated).day()
-        if calendar.component(.year, from: checked) != calendar.component(.year, from: today) { style = style.year() }
-        style.locale = Locale(identifier: "en_US")
-        style.calendar = calendar
-        style.timeZone = calendar.timeZone
-        return "Checked " + checked.formatted(style) + verdict
+        return "Checked " + Dates.day(checked, in: calendar, today: now()) + verdict
     }
 
     /// The pane's note on how the file is kept.
@@ -164,50 +157,44 @@ public final class BIOSPaneViewModel {
         defer { isStarting = false }
         let storage = self.storage
         let name = shownName(record)
-        let resolved: KeptFile.Resolved
-        let size: Int
-        do {
-            resolved = try await Task.detached { try storage.resolve(record.bookmark) }.value
-        } catch {
+        let expectedSize = BIOSText.biosSize
+        // The library's own reading of the kept BIOS, off the main actor: found by its bookmark, sized,
+        // and — only when it is still a BIOS's size, as the check reads none of another — read whole.
+        let read = await Task.detached {
+            Result { () throws(KeptBIOSError) -> KeptBIOS in try storage.readBIOS(record, expectedSize: expectedSize) }
+        }.value
+        let kept: KeptBIOS
+        switch read {
+        case .success(let value):
+            kept = value
+        case .failure(.cannotFind(let error)):
             alert = unreadable(name, BIOSText.threw("KeptFile.resolve(_:)", error))
             return
-        }
-        do {
-            size = try await Task.detached { try storage.size(of: resolved.url) }.value
-        } catch {
+        case .failure(.cannotSize(let error)):
             alert = unreadable(name, BIOSText.threw("KeptFile.size(at:)", error))
             return
-        }
-        // A file that is no longer a BIOS's size isn't read whole, as the check doesn't read one.
-        guard size == BIOSText.biosSize else {
+        case .failure(.wrongSize(let size)):
             alert = wrongSize(name, size, BIOSCheckViewModel.powerOnRefusal(size))
             return
-        }
-        let bytes: [UInt8]
-        do {
-            bytes = try await Task.detached { try storage.bytes(of: resolved.url) }.value
-        } catch {
+        case .failure(.cannotRead(let error)):
             alert = unreadable(name, BIOSText.threw("KeptFile.bytes(at:)", error))
             return
         }
-        if resolved.isStale { remake(record, at: resolved.url) }
+        if kept.isStale { remake(record, at: kept.url) }
         do {
-            try await session.powerOn(bios: bytes, exe: nil)
+            try await session.powerOn(bios: kept.bytes, exe: nil)
         } catch {
-            alert = wrongSize(name, bytes.count, BIOSText.threw("PS1Console.powerOn(bios:)", error))
+            alert = wrongSize(name, kept.bytes.count, BIOSText.threw("PS1Console.powerOn(bios:)", error))
             return
         }
-        onRun(BIOSRun(fileName: resolved.url.lastPathComponent, size: bytes.count))
+        onRun(BIOSRun(fileName: kept.url.lastPathComponent, size: kept.bytes.count))
     }
 
     /// Keeps `record` again with a new bookmark to the file where it is now — it moved or was renamed —
     /// and its name and folder there. Left as it was if either can't be made.
     private func remake(_ record: BIOSRecord, at url: URL) {
         guard let bookmark = try? storage.bookmark(for: url) else { return }
-        var moved = record
-        moved.bookmark = bookmark
-        moved.fileName = url.lastPathComponent
-        moved.folder = url.deletingLastPathComponent().path
+        let moved = record.moved(to: url, bookmark: bookmark)
         guard (try? storage.keep(moved)) != nil else { return }
         self.record = moved
     }
@@ -237,11 +224,7 @@ public final class BIOSPaneViewModel {
 
     /// `folder`, from "~" when it is the home folder or inside it.
     private func shown(_ folder: String) -> String {
-        guard var home, !home.isEmpty else { return folder }
-        while home.count > 1 && home.hasSuffix("/") { home.removeLast() }
-        if folder == home { return "~" }
-        guard folder.hasPrefix(home + "/") else { return folder }
-        return "~" + folder.dropFirst(home.count)
+        Folders.shown(folder, home: home)
     }
 
     /// Waits until the last Run the BIOS has finished; the tests' way to know.

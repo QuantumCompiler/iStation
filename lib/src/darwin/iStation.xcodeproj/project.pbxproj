@@ -33,6 +33,7 @@
 		864FEB15C2523DE68F3690AB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		875AFCAB9A090DA68F00CACA /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		88BD3A181616833AB9BEF9E5 /* Personal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Personal.entitlements; sourceTree = "<group>"; };
+		5D0A1B2C3D4E5F6071829304 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8FD962B3E5E8ADFA2AAFA4B2 /* Personal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Personal.entitlements; sourceTree = "<group>"; };
 		93C35005D98FB9608FCA73A8 /* Acknowledgements.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Acknowledgements.json; sourceTree = "<group>"; };
 		9B14CD9CB122FAFD8E5199F1 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -285,6 +286,7 @@
 				02CF4A6A559AF871FADAF192 /* Sources */,
 				810518D886B08192A47FF3ED /* AppStore.entitlements */,
 				88BD3A181616833AB9BEF9E5 /* Personal.entitlements */,
+				5D0A1B2C3D4E5F6071829304 /* Info.plist */,
 			);
 			name = macOS;
 			path = apps/macos;
@@ -513,6 +515,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = apps/macos/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -546,6 +549,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = apps/macos/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
