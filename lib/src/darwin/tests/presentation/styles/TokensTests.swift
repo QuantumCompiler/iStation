@@ -155,6 +155,7 @@ struct TokensTests {
         "windowWidth": \.windowWidth, "windowHeight": \.windowHeight,
         "pictureMinWidth": \.pictureMinWidth, "pictureMinHeight": \.pictureMinHeight,
         "sheetWidth": \.sheetWidth, "alertWidth": \.alertWidth, "resultsMaxHeight": \.resultsMaxHeight,
+        "welcomeWidth": \.welcomeWidth, "paneMaxWidth": \.paneMaxWidth,
     ]
 
     @Test("Every space has its Metrics member")

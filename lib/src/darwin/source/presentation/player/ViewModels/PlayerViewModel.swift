@@ -4,6 +4,7 @@
 import BusinessPS1
 import BusinessSession
 import Observation
+import PresentationStyles
 
 /// The player: what the console session is doing, as the screen, its toolbar and the Game menu show
 /// it, and what a person can do to it — pause, resume, reset, stop, full screen.
@@ -202,7 +203,7 @@ public final class PlayerViewModel {
     public var statusText: String { state == .paused ? "Paused" : "Running" }
 
     /// The frame count, grouped by thousands: "1,234".
-    public var frameText: String { Self.grouped(frame) }
+    public var frameText: String { Figures.grouped(frame) }
 
     /// The HUD's frame counter: "Frame 1,234".
     public var hudFrameText: String { "Frame " + frameText }
@@ -240,7 +241,7 @@ public final class PlayerViewModel {
             return PlayerAlert(
                 title: "Reset the console?",
                 message: (run.program == nil ? "The game" : "The program") + " starts again from the beginning. Anything you haven’t saved is lost.",
-                details: "PS1Console.powerOn(bios:) with \(run.biosFileName) (\(Self.grouped(run.biosSize)) bytes)" + boot,
+                details: "PS1Console.powerOn(bios:) with \(run.biosFileName) (\(Figures.grouped(run.biosSize)) bytes)" + boot,
                 confirmTitle: "Reset"
             )
         case .stop:
@@ -285,17 +286,6 @@ public final class PlayerViewModel {
     /// The frames per second as a whole number, once the session has measured a second.
     private var measuredRate: Int? {
         framesPerSecond > 0 ? Int(framesPerSecond.rounded()) : nil
-    }
-
-    /// `value` with its digits grouped by thousands with commas, as the design writes numbers: "524,288".
-    static func grouped(_ value: Int) -> String {
-        let digits = Array(String(value.magnitude))
-        var text = ""
-        for (index, digit) in digits.enumerated() {
-            if index > 0 && (digits.count - index) % 3 == 0 { text.append(",") }
-            text.append(digit)
-        }
-        return value < 0 ? "-" + text : text
     }
 
     /// Opens `question`, pausing the game while it asks, as the design does. The pause goes even when

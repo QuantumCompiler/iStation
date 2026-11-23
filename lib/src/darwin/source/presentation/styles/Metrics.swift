@@ -36,13 +36,20 @@ public struct LayoutSizes: Sendable, Equatable {
     public let alertWidth: CGFloat
     /// The tallest a sheet's list of results grows before it scrolls.
     public let resultsMaxHeight: CGFloat
+    /// The first run's column of text, Welcome's. On iOS a screen's column spans the screen, so size.ios
+    /// gives the iPhone's width the design draws it at.
+    public let welcomeWidth: CGFloat
+    /// The widest a pane's content grows, its inset included, as the BIOS pane's does. On iOS, the
+    /// iPhone's width, as `welcomeWidth` is.
+    public let paneMaxWidth: CGFloat
 
     /// A platform's sizes as tokens.json gives them.
     public init(
         control: CGFloat, toolbar: CGFloat, sidebar: CGFloat, inspector: CGFloat, row: CGFloat, tile: CGFloat,
         windowMinWidth: CGFloat, windowMinHeight: CGFloat, windowWidth: CGFloat, windowHeight: CGFloat,
         pictureMinWidth: CGFloat, pictureMinHeight: CGFloat,
-        sheetWidth: CGFloat, alertWidth: CGFloat, resultsMaxHeight: CGFloat
+        sheetWidth: CGFloat, alertWidth: CGFloat, resultsMaxHeight: CGFloat,
+        welcomeWidth: CGFloat, paneMaxWidth: CGFloat
     ) {
         self.control = control
         self.toolbar = toolbar
@@ -59,6 +66,8 @@ public struct LayoutSizes: Sendable, Equatable {
         self.sheetWidth = sheetWidth
         self.alertWidth = alertWidth
         self.resultsMaxHeight = resultsMaxHeight
+        self.welcomeWidth = welcomeWidth
+        self.paneMaxWidth = paneMaxWidth
     }
 }
 
@@ -105,7 +114,8 @@ public enum Metrics {
         control: 28, toolbar: 52, sidebar: 220, inspector: 300, row: 30, tile: 168,
         windowMinWidth: 800, windowMinHeight: 560, windowWidth: 1280, windowHeight: 800,
         pictureMinWidth: 640, pictureMinHeight: 480,
-        sheetWidth: 520, alertWidth: 320, resultsMaxHeight: 220
+        sheetWidth: 520, alertWidth: 320, resultsMaxHeight: 220,
+        welcomeWidth: 460, paneMaxWidth: 720
     )
 
     /// The iOS app's layout sizes.
@@ -113,7 +123,8 @@ public enum Metrics {
         control: 44, toolbar: 52, sidebar: 320, inspector: 320, row: 64, tile: 160,
         windowMinWidth: 320, windowMinHeight: 568, windowWidth: 390, windowHeight: 844,
         pictureMinWidth: 320, pictureMinHeight: 240,
-        sheetWidth: 390, alertWidth: 290, resultsMaxHeight: 220
+        sheetWidth: 390, alertWidth: 290, resultsMaxHeight: 220,
+        welcomeWidth: 390, paneMaxWidth: 390
     )
 
     /// This platform's layout sizes.

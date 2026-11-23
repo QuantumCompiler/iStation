@@ -450,13 +450,12 @@ private func playing(_ run: PlayerRun = biosRun, on session: FakeSession) async 
 
     // MARK: - Numbers
 
-    @Test func numbersAreGroupedByThousandsAsTheDesignWritesThem() {
-        #expect(PlayerViewModel.grouped(0) == "0")
-        #expect(PlayerViewModel.grouped(999) == "999")
-        #expect(PlayerViewModel.grouped(1_000) == "1,000")
-        #expect(PlayerViewModel.grouped(524_288) == "524,288")
-        #expect(PlayerViewModel.grouped(1_048_576) == "1,048,576")
-        #expect(PlayerViewModel.grouped(-12_345) == "-12,345")
+    @Test func theFrameCountIsGroupedByThousandsAsTheDesignWritesIt() async {
+        let session = FakeSession()
+        let player = await playing(on: session)
+        await session.send(ConsoleSessionSnapshot(state: .running, frame: 1_234_567))
+        #expect(await eventually { player.frameText == "1,234,567" })
+        #expect(player.hudFrameText == "Frame 1,234,567")
     }
 
     @Test func resetsDetailsNameTheKeptFileNotThePlaceholder() async {

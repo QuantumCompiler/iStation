@@ -7,7 +7,9 @@ import SwiftUI
 /// The player's screen, as the design's Today player draws it: while a run plays, the "No picture
 /// yet" panel counting its frames — the picture is 5g's — under the HUD, with the paused overlay
 /// while paused; while nothing plays, what's happening. Reset and Stop ask in a `DetailsAlert`. On
-/// macOS the app adds the window's title, toolbar and full screen with `playerWindow(_:idleTitle:)`.
+/// macOS the app adds the window's title and toolbar with `playerChrome(_:idleTitle:)`, and keeps
+/// full screen with `playerFullScreen(_:)` at its window's root; `playerWindow(_:idleTitle:)` is the
+/// two together, for a window the player has to itself.
 public struct PlayerView: View {
     private let viewModel: PlayerViewModel
 

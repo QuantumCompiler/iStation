@@ -135,8 +135,9 @@ struct Ticks {
     func instant(_ ticks: Int) -> ManualClock.Instant { start.advanced(by: .seconds(ticks) / 60) }
 
     /// Moves the clock `ticks` sixtieths on, one at a time, each time waiting until the session has run
-    /// the frame it brings; false when one didn't come within the timeout.
-    mutating func run(_ ticks: Int = 1, _ session: ConsoleSession<ManualClock>) async -> Bool {
+    /// the frame it brings; false when one didn't come within the timeout. The session is reached only
+    /// through `ConsoleSessionPowerControls`, so a test can drive one as a starter does.
+    mutating func run(_ ticks: Int = 1, _ session: some ConsoleSessionPowerControls) async -> Bool {
         for _ in 0..<ticks {
             let frame = await session.snapshot.frame
             count += 1
@@ -153,9 +154,9 @@ struct Ticks {
 let timeout = Duration.seconds(5)
 
 /// The session's snapshot once `condition` holds, or nil after `timeout` of real time.
-func eventually<SessionClock: Clock>(
-    _ session: ConsoleSession<SessionClock>, _ condition: (ConsoleSessionSnapshot) -> Bool
-) async -> ConsoleSessionSnapshot? where SessionClock.Duration == Duration {
+func eventually(
+    _ session: some ConsoleSessionPowerControls, _ condition: (ConsoleSessionSnapshot) -> Bool
+) async -> ConsoleSessionSnapshot? {
     let deadline = ContinuousClock.now.advanced(by: timeout)
     repeat {
         let snapshot = await session.snapshot

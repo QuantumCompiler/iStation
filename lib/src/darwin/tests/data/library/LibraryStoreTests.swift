@@ -1,0 +1,188 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2026 iStation contributors
+
+import DataLibrary
+import Foundation
+import SupportSandbox
+import Testing
+
+/// `library.json` through `LibraryStore`, every file inside a `Sandbox`: the round trip, an empty
+/// library before the first save, corrupt, foreign and newer files refused and left as they are, and
+/// the recorded shapes in `Fixtures/` decoding with defaults (ADR 0016 §5).
+@Suite struct LibraryStoreTests {
+    /// The recorded fixtures, beside this file: read from the repository, never written.
+    static let fixtures = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("Fixtures")
+
+    /// A whole-second date, as the file keeps one.
+    static let checked = Date(timeIntervalSince1970: 1_795_343_400) // 2026-11-22T10:30:00Z
+
+    /// A BIOS record of made-up values: no real file is behind it.
+    static let record = BIOSRecord(fileName: "my-console-bios.bin", folder: "/Volumes/Archive/Console", size: 524_288,
+                                   sha1: "6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c", checked: checked, bookmark: Data("bookmark".utf8))
+
+    // MARK: Round trip
+
+    @Test func aKeptBIOSRoundTripsThroughTheFile() throws {
+        let sandbox = try Sandbox()
+        let url = sandbox.url("Container/Library/library.json") // its folders aren't there yet
+        let store = LibraryStore(url: url)
+        let saved = try store.keepBIOS(Self.record)
+        #expect(saved == Library(bios: Self.record))
+        #expect(FileManager.default.fileExists(atPath: url.path))
+        let loaded = try LibraryStore(url: url).load() // a fresh store: everything came from the file
+        #expect(loaded == saved)
+        #expect(loaded.version == Library.currentVersion)
+        #expect(loaded.bios == Self.record)
+    }
+
+    @Test func savingReplacesTheFileAndLeavesNothingElseBeside() throws {
+        let sandbox = try Sandbox()
+        let folder = try sandbox.makeFolder("Library")
+        let store = LibraryStore(url: folder.appendingPathComponent("library.json"))
+        try store.save(Library())
+        try store.save(Library(bios: Self.record))
+        #expect(try store.load().bios == Self.record)
+        #expect(try FileManager.default.contentsOfDirectory(atPath: folder.path) == ["library.json"])
+    }
+
+    @Test func keepingABIOSReplacesTheOneBefore() throws {
+        let sandbox = try Sandbox()
+        let store = LibraryStore(url: sandbox.url("library.json"))
+        try store.keepBIOS(Self.record)
+        var another = Self.record
+        another.fileName = "bios-backup.bin"
+        another.sha1 = "a9993e364706816aba3e25717850c26c9cd0d89d"
+        try store.keepBIOS(another)
+        #expect(try store.load().bios == another)
+    }
+
+    @Test func forgettingTheBIOSLeavesAnEmptyLibrary() throws {
+        let sandbox = try Sandbox()
+        let store = LibraryStore(url: sandbox.url("library.json"))
+        try store.keepBIOS(Self.record)
+        let forgotten = try store.forgetBIOS()
+        #expect(forgotten == Library())
+        #expect(try store.load() == Library())
+        #expect(try store.load().bios == nil)
+    }
+
+    // MARK: Before the first save
+
+    @Test func aMissingFileIsAnEmptyLibraryAndWritesNothing() throws {
+        let sandbox = try Sandbox()
+        let url = sandbox.url("Library/library.json")
+        let library = try LibraryStore(url: url).load()
+        #expect(library == Library())
+        #expect(library.version == Library.currentVersion)
+        #expect(library.bios == nil)
+        #expect(!FileManager.default.fileExists(atPath: url.path))
+        #expect(!FileManager.default.fileExists(atPath: url.deletingLastPathComponent().path))
+    }
+
+    // MARK: Bad files
+
+    @Test(arguments: [
+        "not json {",
+        "",
+        "[1, 2, 3]",
+        #"{"name": "a library from somewhere else"}"#,
+        #"{"version": "one"}"#,
+        #"{"version": 0}"#,
+        #"{"version": 1, "bios": {"size": "big"}}"#,
+        #"{"version": 1, "bios": [1]}"#,
+    ])
+    func aCorruptOrForeignFileIsRefusedAndLeftAsItIs(text: String) throws {
+        let sandbox = try Sandbox()
+        let url = try sandbox.write(text, to: "library.json")
+        let store = LibraryStore(url: url)
+        let error = #expect(throws: LibraryStoreError.self) { try store.load() }
+        guard case .notALibrary(let path, _)? = error else {
+            Issue.record("\(String(describing: error)) is not notALibrary")
+            return
+        }
+        #expect(path == url.path)
+        // Keeping a BIOS loads first, so it is refused too, and the file is never saved over.
+        #expect(throws: LibraryStoreError.self) { try store.keepBIOS(Self.record) }
+        #expect(throws: LibraryStoreError.self) { try store.forgetBIOS() }
+        #expect(try String(contentsOf: url, encoding: .utf8) == text)
+    }
+
+    @Test func aLibraryFromALaterVersionIsRefusedAndLeftAsItIs() throws {
+        let sandbox = try Sandbox()
+        let text = #"{"version": 2, "bios": {"fileName": "my-console-bios.bin"}, "games": []}"#
+        let url = try sandbox.write(text, to: "library.json")
+        let store = LibraryStore(url: url)
+        #expect(throws: LibraryStoreError.newerVersion(2, path: url.path)) { try store.load() }
+        #expect(throws: LibraryStoreError.newerVersion(2, path: url.path)) { try store.keepBIOS(Self.record) }
+        #expect(try String(contentsOf: url, encoding: .utf8) == text)
+    }
+
+    @Test func aFolderWhereTheFileShouldBeCannotBeRead() throws {
+        let sandbox = try Sandbox()
+        let url = try sandbox.makeFolder("library.json")
+        let error = #expect(throws: LibraryStoreError.self) { try LibraryStore(url: url).load() }
+        guard case .cannotRead(let path, _)? = error else {
+            Issue.record("\(String(describing: error)) is not cannotRead")
+            return
+        }
+        #expect(path == url.path)
+    }
+
+    @Test func aLibraryThatCannotBeWrittenThrows() throws {
+        let sandbox = try Sandbox()
+        try sandbox.write("a file, not a folder", to: "Library")
+        let url = sandbox.url("Library/library.json") // its folder can't be made: a file is in the way
+        let error = #expect(throws: LibraryStoreError.self) { try LibraryStore(url: url).save(Library(bios: Self.record)) }
+        guard case .cannotWrite(let path, _)? = error else {
+            Issue.record("\(String(describing: error)) is not cannotWrite")
+            return
+        }
+        #expect(path == url.path)
+    }
+
+    // MARK: Recorded shapes (never edited)
+
+    @Test func theRecordedVersion1ShapeLoads() throws {
+        let sandbox = try Sandbox()
+        let url = try sandbox.write(Data(contentsOf: Self.fixtures.appendingPathComponent("library-v1.json")), to: "library.json")
+        let library = try LibraryStore(url: url).load()
+        #expect(library.version == 1)
+        #expect(library.bios == Self.record)
+    }
+
+    @Test func thisBuildWritesTheRecordedVersion1Shape() throws {
+        let sandbox = try Sandbox()
+        let url = sandbox.url("library.json")
+        try LibraryStore(url: url).save(Library(bios: Self.record))
+        let written = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? NSDictionary
+        let recorded = try JSONSerialization.jsonObject(with: Data(contentsOf: Self.fixtures.appendingPathComponent("library-v1.json"))) as? NSDictionary
+        #expect(written != nil)
+        #expect(written == recorded)
+    }
+
+    @Test func aRecordWithoutItsCheckedDateLoadsWithTheDefault() throws {
+        let sandbox = try Sandbox()
+        let url = try sandbox.write(Data(contentsOf: Self.fixtures.appendingPathComponent("library-v1-no-checked.json")), to: "library.json")
+        let bios = try #require(try LibraryStore(url: url).load().bios)
+        #expect(bios.checked == .distantPast)
+        #expect(bios.fileName == "bios-backup.bin")
+        #expect(bios.folder == "/Volumes/Archive/Console")
+        #expect(bios.size == 524_288)
+        #expect(bios.sha1 == "6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c")
+        #expect(bios.bookmark == Data("bookmark".utf8))
+    }
+
+    @Test func everyFieldOfARecordHasItsDefault() throws {
+        let sandbox = try Sandbox()
+        let url = try sandbox.write(#"{"version": 1, "bios": {}, "aFieldALaterVersionAdds": true}"#, to: "library.json")
+        let library = try LibraryStore(url: url).load()
+        #expect(library.version == 1)
+        #expect(library.bios == BIOSRecord(fileName: "", folder: "", size: 0, sha1: "", checked: .distantPast, bookmark: Data()))
+    }
+
+    @Test func aLibraryWithoutABIOSLoadsEmpty() throws {
+        let sandbox = try Sandbox()
+        let url = try sandbox.write(#"{"version": 1}"#, to: "library.json")
+        #expect(try LibraryStore(url: url).load() == Library())
+    }
+}

@@ -6,6 +6,6 @@
 
 **Support:** `SupportSandbox` (infrastructure) and `SupportDiscFixtures` (`tests/support/discfixtures/`) — `makeISO(files:raw:)` builds a tiny ISO 9660 image, cooked or raw 2352-byte. Tests never use real disc images.
 
-**Conventions:** hermetic — no network, files only inside a `Sandbox`, never the real home folder. A persisted format gets a recorded fixture of each released shape, never edited ([ADR 0016](../../../../documentation/adrs/darwin/two-build-routines-and-a-fresh-start.md) §5).
+**Conventions:** hermetic — no network, files only inside a `Sandbox`, never the real home folder. A persisted format gets a recorded fixture of each released shape, never edited ([ADR 0016](../../../../documentation/adrs/darwin/two-build-routines-and-a-fresh-start.md) §5): a module's fixtures sit in its test directory's `Fixtures/`, read from the repository by `#filePath` and named in `Package.swift`'s `testFixtures`, which keeps them out of the test target. Today that is `library/Fixtures/`: `library-v1.json`, the recorded shape `library.json`'s version 1 is written in, and `library-v1-no-checked.json`, a made-up version-1 record missing a field, which no build writes — it stands in for an older shape, since none exists yet, so its defaults are tested.
 
 **Depth:** [ADR 0019](../../../../documentation/adrs/darwin/tests-live-in-the-layer-of-what-they-test.md) · [ADR 0024](../../../../documentation/adrs/darwin/four-layers-and-business-holds-the-session.md) · [DEVELOPER.md](../../../../documentation/assistant/darwin/DEVELOPER.md) (the test table).

@@ -8,7 +8,7 @@ The design of the macOS app (SwiftUI, first) and the iOS app (SwiftUI, from v0.4
 
 | Page | Holds |
 |---|---|
-| **Build** | **App**: one interactive prototype of both apps, driven by a clock so jobs progress and frames count. **One board per screen and state** (65), each mounting the prototype at a named start preset with the clock stopped. **Contract**: every part mapped to what backs it, tagged ready, app, gap or verify; the 13 gaps with their change, fallback and version; the decisions and the calls left open. **Layout**: regions and sizes, minimums and breakpoints, navigation, every keyboard shortcut and menu, the states each screen draws, each piece in SwiftUI. **Processes**: the app, its console thread, the frameworks and the files it reads and writes. |
+| **Build** | **App**: one interactive prototype of both apps, driven by a clock so jobs progress and frames count. **One board per screen and state** (66), each mounting the prototype at a named start preset with the clock stopped. **Contract**: every part mapped to what backs it, tagged ready, app, gap or verify; the 13 gaps with their change, fallback and version; the decisions and the calls left open. **Layout**: regions and sizes, minimums and breakpoints, navigation, every keyboard shortcut and menu, the states each screen draws, each piece in SwiftUI. **Processes**: the app, its console thread, the frameworks and the files it reads and writes. |
 | **Foundations** | Color tokens in dark, light and high-contrast themes with each pair's contrast computed; type, spacing, radii and motion; every component in its states. |
 | **Exploration** | The three early directions and three accents, kept for reference. |
 

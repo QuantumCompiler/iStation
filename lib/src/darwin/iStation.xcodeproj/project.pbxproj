@@ -39,6 +39,11 @@
 		9DA34DB9C0D5DC06B370C7E4 /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>"; };
 		A30E39450C380D2CDC6CD682 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A40ED5F030BA3FCD8229A0E3 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		B0A7E1C2D3F4A5B6C7D8E9F1 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		B0A7E1C2D3F4A5B6C7D8E9F2 /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
+		B0A7E1C2D3F4A5B6C7D8E9F3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B0A7E1C2D3F4A5B6C7D8E9F4 /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppStore.entitlements; sourceTree = "<group>"; };
+		B0A7E1C2D3F4A5B6C7D8E9F5 /* AppScope.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppScope.entitlements; sourceTree = "<group>"; };
 		C93B50687CCA325E43FBE332 /* istation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = istation; path = .; sourceTree = "<group>"; };
 		CA40BD3FDD20857ACBA75FC5 /* iStation Personal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iStation Personal.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CCDA0073D61BBB7F3097E139 /* run.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = run.sh; sourceTree = "<group>"; };
@@ -85,6 +90,11 @@
 		91C209E285D39CF19B111FF8 /* documentation */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = documentation;
+			sourceTree = "<group>";
+		};
+		B0A7E1C2D3F4A5B6C7D8E9F6 /* Sources */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Sources;
 			sourceTree = "<group>";
 		};
 		B30F8CCFE9400406E6DE2819 /* .github */ = {
@@ -234,6 +244,7 @@
 		926D2629A3CE7C67880DE5DC /* tools */ = {
 			isa = PBXGroup;
 			children = (
+				B0A7E1C2D3F4A5B6C7D8E9F0 /* bookmark-probe */,
 				EBB960E4A172BF5F4A17D2D7 /* gate */,
 				5294CE81026D3B7C55B6FA4A /* istation-run */,
 				641BE41984AE489D4165FF82 /* jit-probe */,
@@ -277,6 +288,19 @@
 			);
 			name = macOS;
 			path = apps/macos;
+			sourceTree = "<group>";
+		};
+		B0A7E1C2D3F4A5B6C7D8E9F0 /* bookmark-probe */ = {
+			isa = PBXGroup;
+			children = (
+				B0A7E1C2D3F4A5B6C7D8E9F1 /* README.md */,
+				B0A7E1C2D3F4A5B6C7D8E9F2 /* build.sh */,
+				B0A7E1C2D3F4A5B6C7D8E9F3 /* Info.plist */,
+				B0A7E1C2D3F4A5B6C7D8E9F4 /* AppStore.entitlements */,
+				B0A7E1C2D3F4A5B6C7D8E9F5 /* AppScope.entitlements */,
+				B0A7E1C2D3F4A5B6C7D8E9F6 /* Sources */,
+			);
+			path = "bookmark-probe";
 			sourceTree = "<group>";
 		};
 		C02F602F235BEE96322611AB /* iStation repository */ = {

@@ -18,8 +18,9 @@ typealias SessionConsole = PS1Console
 /// call into it — the frames and the controls — is made here, one at a time and between frames, never
 /// from two places at once (ADR 0015 §4). The apps pace it by `ContinuousClock`; tests give it a clock
 /// they move. In personal builds it runs `PS1TracingConsole`, counting instructions; in App Store
-/// builds `PS1Console`.
-public actor ConsoleSession<SessionClock: Clock>: ConsoleSessionControls where SessionClock.Duration == Duration {
+/// builds `PS1Console`. The player drives it through `ConsoleSessionControls`, a starter through
+/// `ConsoleSessionPowerControls`.
+public actor ConsoleSession<SessionClock: Clock>: ConsoleSessionPowerControls where SessionClock.Duration == Duration {
     private let clock: SessionClock
 
     /// The console, from power-on until stop.

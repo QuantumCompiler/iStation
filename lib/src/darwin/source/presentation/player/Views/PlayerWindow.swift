@@ -7,14 +7,28 @@ import PresentationStyles
 import SwiftUI
 
 extension View {
-    /// The player's window on macOS, as the design draws it: the toolbar's Stop, Pause or Resume,
-    /// Reset and Full screen, hidden in full screen; the window's title, the run's name while it plays
-    /// and `idleTitle` otherwise, with the run's status line under it; and the window itself taken
-    /// into and out of full screen with the player. The app applies it to its main window; the
-    /// previews apply only the chrome, so no preview moves a window.
+    /// The player's window on macOS, as the design draws it: `playerChrome(_:idleTitle:)` and
+    /// `playerFullScreen(_:)` together, for a window the player has to itself. The previews apply only
+    /// the chrome, so no preview moves a window.
     public func playerWindow(_ viewModel: PlayerViewModel, idleTitle: String) -> some View {
+        playerChrome(viewModel, idleTitle: idleTitle)
+            .playerFullScreen(viewModel)
+    }
+
+    /// What the window draws around the player while it shows: the toolbar's Stop, Pause or Resume,
+    /// Reset and Full screen, hidden in full screen; and the window's title, the run's name while it
+    /// plays and `idleTitle` otherwise, with the run's status line under it. A window the player shares
+    /// with other places (5c's Welcome and BIOS pane) applies it to the player alone.
+    public func playerChrome(_ viewModel: PlayerViewModel, idleTitle: String) -> some View {
         modifier(PlayerChrome(viewModel: viewModel, idleTitle: idleTitle))
-            .modifier(PlayerWindowSync(viewModel: viewModel))
+    }
+
+    /// The window itself taken into and out of full screen with the player, and the player told when
+    /// the system takes it there. Applied where it stays in the window whatever the window shows, so a
+    /// run that ends in full screen still takes the window out of it when the player gives the window
+    /// back.
+    public func playerFullScreen(_ viewModel: PlayerViewModel) -> some View {
+        modifier(PlayerWindowSync(viewModel: viewModel))
     }
 }
 

@@ -65,8 +65,16 @@
       "title": "A file of the wrong size (refused)",
       "page": "build"
     },
-    "Mac-BiosDone.dc.html": {
+    "Mac-BiosNoShell.dc.html": {
       "x": 5440,
+      "y": 1220,
+      "w": 1280,
+      "h": 800,
+      "title": "A BIOS that never reaches its shell (refused)",
+      "page": "build"
+    },
+    "Mac-BiosDone.dc.html": {
+      "x": 6800,
       "y": 1220,
       "w": 1280,
       "h": 800,
@@ -74,8 +82,8 @@
       "page": "build"
     },
     "Mac-LibraryEmpty.dc.html": {
-      "x": 6800,
-      "y": 1220,
+      "x": 0,
+      "y": 2140,
       "w": 1280,
       "h": 800,
       "title": "An empty library",
@@ -83,7 +91,7 @@
     },
     "Mac-Library.dc.html": {
       "x": 0,
-      "y": 2440,
+      "y": 3360,
       "w": 1280,
       "h": 800,
       "title": "Library as a list",
@@ -91,7 +99,7 @@
     },
     "Mac-LibraryGrid.dc.html": {
       "x": 1360,
-      "y": 2440,
+      "y": 3360,
       "w": 1280,
       "h": 800,
       "title": "Library as a grid",
@@ -99,7 +107,7 @@
     },
     "Mac-LibraryInspector.dc.html": {
       "x": 2720,
-      "y": 2440,
+      "y": 3360,
       "w": 1280,
       "h": 800,
       "title": "Game info",
@@ -107,7 +115,7 @@
     },
     "Mac-LibrarySearchEmpty.dc.html": {
       "x": 4080,
-      "y": 2440,
+      "y": 3360,
       "w": 1280,
       "h": 800,
       "title": "Search with no results",
@@ -115,7 +123,7 @@
     },
     "Mac-LibraryMissing.dc.html": {
       "x": 5440,
-      "y": 2440,
+      "y": 3360,
       "w": 1280,
       "h": 800,
       "title": "A game whose file moved",
@@ -123,7 +131,7 @@
     },
     "Mac-LibraryPs2.dc.html": {
       "x": 6800,
-      "y": 2440,
+      "y": 3360,
       "w": 1280,
       "h": 800,
       "title": "A PS2 game, before PS2 plays",
@@ -131,7 +139,7 @@
     },
     "Mac-Ps2Refused.dc.html": {
       "x": 0,
-      "y": 3360,
+      "y": 4280,
       "w": 1280,
       "h": 800,
       "title": "Playing a PS2 game (refused)",
@@ -139,7 +147,7 @@
     },
     "Mac-RemoveConfirm.dc.html": {
       "x": 1360,
-      "y": 3360,
+      "y": 4280,
       "w": 1280,
       "h": 800,
       "title": "Remove from Library (confirm)",
@@ -147,7 +155,7 @@
     },
     "Mac-Rename.dc.html": {
       "x": 2720,
-      "y": 3360,
+      "y": 4280,
       "w": 1280,
       "h": 800,
       "title": "Rename a game",
@@ -155,7 +163,7 @@
     },
     "Mac-LibraryMin.dc.html": {
       "x": 4080,
-      "y": 3360,
+      "y": 4280,
       "w": 800,
       "h": 560,
       "title": "Library at the minimum window size",
@@ -163,7 +171,7 @@
     },
     "Mac-LibraryLight.dc.html": {
       "x": 4960,
-      "y": 3360,
+      "y": 4280,
       "w": 1280,
       "h": 800,
       "title": "Library, light theme",
@@ -171,7 +179,7 @@
     },
     "Mac-LibraryContrast.dc.html": {
       "x": 6320,
-      "y": 3360,
+      "y": 4280,
       "w": 1280,
       "h": 800,
       "title": "Library, high-contrast theme",
@@ -179,7 +187,7 @@
     },
     "Mac-ScanPicker.dc.html": {
       "x": 0,
-      "y": 4580,
+      "y": 5500,
       "w": 1280,
       "h": 800,
       "title": "Choosing a folder",
@@ -187,7 +195,7 @@
     },
     "Mac-ScanRunning.dc.html": {
       "x": 1360,
-      "y": 4580,
+      "y": 5500,
       "w": 1280,
       "h": 800,
       "title": "Scanning (running)",
@@ -195,7 +203,7 @@
     },
     "Mac-ScanStopped.dc.html": {
       "x": 2720,
-      "y": 4580,
+      "y": 5500,
       "w": 1280,
       "h": 800,
       "title": "Scan stopped",
@@ -203,7 +211,7 @@
     },
     "Mac-ScanDone.dc.html": {
       "x": 4080,
-      "y": 4580,
+      "y": 5500,
       "w": 1280,
       "h": 800,
       "title": "Scan done",
@@ -211,7 +219,7 @@
     },
     "Mac-PlayerOpening.dc.html": {
       "x": 0,
-      "y": 5800,
+      "y": 6720,
       "w": 1280,
       "h": 800,
       "title": "Opening a game (loading)",
@@ -219,7 +227,7 @@
     },
     "Mac-PlayerRunning.dc.html": {
       "x": 1360,
-      "y": 5800,
+      "y": 6720,
       "w": 1280,
       "h": 800,
       "title": "Running",
@@ -227,7 +235,7 @@
     },
     "Mac-PlayerPaused.dc.html": {
       "x": 2720,
-      "y": 5800,
+      "y": 6720,
       "w": 1280,
       "h": 800,
       "title": "Paused (stopped)",
@@ -235,7 +243,7 @@
     },
     "Mac-PlayerFullscreen.dc.html": {
       "x": 4080,
-      "y": 5800,
+      "y": 6720,
       "w": 1280,
       "h": 800,
       "title": "Full screen",
@@ -243,7 +251,7 @@
     },
     "Mac-ResetConfirm.dc.html": {
       "x": 5440,
-      "y": 5800,
+      "y": 6720,
       "w": 1280,
       "h": 800,
       "title": "Reset (confirm)",
@@ -251,7 +259,7 @@
     },
     "Mac-StopConfirm.dc.html": {
       "x": 6800,
-      "y": 5800,
+      "y": 6720,
       "w": 1280,
       "h": 800,
       "title": "Stop playing (confirm)",
@@ -259,7 +267,7 @@
     },
     "Mac-PlayerDebug.dc.html": {
       "x": 0,
-      "y": 6720,
+      "y": 7640,
       "w": 1280,
       "h": 800,
       "title": "Debug drawer, personal build",
@@ -267,7 +275,7 @@
     },
     "Mac-PlayerMin.dc.html": {
       "x": 1360,
-      "y": 6720,
+      "y": 7640,
       "w": 800,
       "h": 560,
       "title": "Player at the minimum window size",
@@ -275,7 +283,7 @@
     },
     "Mac-StatesSave.dc.html": {
       "x": 0,
-      "y": 7940,
+      "y": 8860,
       "w": 1280,
       "h": 800,
       "title": "Save State",
@@ -283,7 +291,7 @@
     },
     "Mac-StatesOverwrite.dc.html": {
       "x": 1360,
-      "y": 7940,
+      "y": 8860,
       "w": 1280,
       "h": 800,
       "title": "Replace a save (confirm)",
@@ -291,7 +299,7 @@
     },
     "Mac-StatesLoad.dc.html": {
       "x": 2720,
-      "y": 7940,
+      "y": 8860,
       "w": 1280,
       "h": 800,
       "title": "Load State",
@@ -299,7 +307,7 @@
     },
     "Mac-StatesVersionError.dc.html": {
       "x": 4080,
-      "y": 7940,
+      "y": 8860,
       "w": 1280,
       "h": 800,
       "title": "A save in an older format (error)",
@@ -307,7 +315,7 @@
     },
     "Mac-Cards.dc.html": {
       "x": 0,
-      "y": 9160,
+      "y": 10080,
       "w": 1280,
       "h": 800,
       "title": "Memory cards",
@@ -315,7 +323,7 @@
     },
     "Mac-CardsEmpty.dc.html": {
       "x": 1360,
-      "y": 9160,
+      "y": 10080,
       "w": 1280,
       "h": 800,
       "title": "No memory cards yet (empty)",
@@ -323,7 +331,7 @@
     },
     "Mac-CardDelete.dc.html": {
       "x": 2720,
-      "y": 9160,
+      "y": 10080,
       "w": 1280,
       "h": 800,
       "title": "Move a card to the Trash (confirm)",
@@ -331,7 +339,7 @@
     },
     "Mac-BiosPane.dc.html": {
       "x": 4080,
-      "y": 9160,
+      "y": 10080,
       "w": 1280,
       "h": 800,
       "title": "BIOS",
@@ -339,7 +347,7 @@
     },
     "Mac-SettingsControllers.dc.html": {
       "x": 0,
-      "y": 10380,
+      "y": 11300,
       "w": 1280,
       "h": 800,
       "title": "Settings: Controllers",
@@ -347,7 +355,7 @@
     },
     "Mac-SettingsNoControllers.dc.html": {
       "x": 1360,
-      "y": 10380,
+      "y": 11300,
       "w": 1280,
       "h": 800,
       "title": "Settings: no controller connected (empty)",
@@ -355,7 +363,7 @@
     },
     "Mac-SettingsVideo.dc.html": {
       "x": 2720,
-      "y": 10380,
+      "y": 11300,
       "w": 1280,
       "h": 800,
       "title": "Settings: Video",
@@ -363,7 +371,7 @@
     },
     "Mac-SettingsAudio.dc.html": {
       "x": 4080,
-      "y": 10380,
+      "y": 11300,
       "w": 1280,
       "h": 800,
       "title": "Settings: Audio",
@@ -371,7 +379,7 @@
     },
     "Mac-SettingsCards.dc.html": {
       "x": 5440,
-      "y": 10380,
+      "y": 11300,
       "w": 1280,
       "h": 800,
       "title": "Settings: Memory Cards",
@@ -379,7 +387,7 @@
     },
     "Mac-SettingsAppearance.dc.html": {
       "x": 6800,
-      "y": 10380,
+      "y": 11300,
       "w": 1280,
       "h": 800,
       "title": "Settings: Appearance",
@@ -387,7 +395,7 @@
     },
     "Mac-SettingsPersonal.dc.html": {
       "x": 0,
-      "y": 11300,
+      "y": 12220,
       "w": 1280,
       "h": 800,
       "title": "Settings: Personal (personal build)",
@@ -395,7 +403,7 @@
     },
     "Mac-Acknowledgements.dc.html": {
       "x": 1360,
-      "y": 11300,
+      "y": 12220,
       "w": 1280,
       "h": 800,
       "title": "Acknowledgements",
@@ -403,7 +411,7 @@
     },
     "Mac-About.dc.html": {
       "x": 2720,
-      "y": 11300,
+      "y": 12220,
       "w": 1280,
       "h": 800,
       "title": "About iStation",
@@ -411,7 +419,7 @@
     },
     "Mac-Shortcuts.dc.html": {
       "x": 4080,
-      "y": 11300,
+      "y": 12220,
       "w": 1280,
       "h": 800,
       "title": "Keyboard Shortcuts",
@@ -419,7 +427,7 @@
     },
     "Mac-ToolsConsole.dc.html": {
       "x": 0,
-      "y": 12520,
+      "y": 13440,
       "w": 1280,
       "h": 800,
       "title": "Tools: Console",
@@ -427,7 +435,7 @@
     },
     "Mac-ToolsTty.dc.html": {
       "x": 1360,
-      "y": 12520,
+      "y": 13440,
       "w": 1280,
       "h": 800,
       "title": "Tools: TTY (empty)",
@@ -435,7 +443,7 @@
     },
     "Mac-ToolsTraceRunning.dc.html": {
       "x": 2720,
-      "y": 12520,
+      "y": 13440,
       "w": 1280,
       "h": 800,
       "title": "Recording a trace (running)",
@@ -443,7 +451,7 @@
     },
     "Mac-ToolsTraceDone.dc.html": {
       "x": 4080,
-      "y": 12520,
+      "y": 13440,
       "w": 1280,
       "h": 800,
       "title": "Trace recorded (done)",
@@ -451,7 +459,7 @@
     },
     "Mac-ToolsCompare.dc.html": {
       "x": 5440,
-      "y": 12520,
+      "y": 13440,
       "w": 1280,
       "h": 800,
       "title": "Comparing traces (a divergence)",
@@ -459,7 +467,7 @@
     },
     "Mac-ToolsVram.dc.html": {
       "x": 6800,
-      "y": 12520,
+      "y": 13440,
       "w": 1280,
       "h": 800,
       "title": "Tools: VRAM",
@@ -467,7 +475,7 @@
     },
     "Mac-TodayLibrary.dc.html": {
       "x": 0,
-      "y": 13740,
+      "y": 14660,
       "w": 1280,
       "h": 800,
       "title": "Library before discs can be read",
@@ -475,7 +483,7 @@
     },
     "Mac-TodayBiosDone.dc.html": {
       "x": 1360,
-      "y": 13740,
+      "y": 14660,
       "w": 1280,
       "h": 800,
       "title": "BIOS check, today’s wording",
@@ -483,7 +491,7 @@
     },
     "Mac-TodayPlayer.dc.html": {
       "x": 2720,
-      "y": 13740,
+      "y": 14660,
       "w": 1280,
       "h": 800,
       "title": "Running the BIOS, no picture yet",
@@ -491,7 +499,7 @@
     },
     "Mac-TodayTools.dc.html": {
       "x": 4080,
-      "y": 13740,
+      "y": 14660,
       "w": 1280,
       "h": 800,
       "title": "Tools: the istation-run commands",
@@ -499,7 +507,7 @@
     },
     "iOS-Welcome.dc.html": {
       "x": 0,
-      "y": 14960,
+      "y": 15880,
       "w": 390,
       "h": 844,
       "title": "iPhone: welcome",
@@ -507,7 +515,7 @@
     },
     "iOS-Library.dc.html": {
       "x": 470,
-      "y": 14960,
+      "y": 15880,
       "w": 390,
       "h": 844,
       "title": "iPhone: library",
@@ -515,7 +523,7 @@
     },
     "iOS-Opening.dc.html": {
       "x": 940,
-      "y": 14960,
+      "y": 15880,
       "w": 390,
       "h": 844,
       "title": "iPhone: opening a game",
@@ -523,7 +531,7 @@
     },
     "iOS-Player.dc.html": {
       "x": 1410,
-      "y": 14960,
+      "y": 15880,
       "w": 844,
       "h": 390,
       "title": "iPhone: playing",
@@ -531,7 +539,7 @@
     },
     "iOS-Pause.dc.html": {
       "x": 2334,
-      "y": 14960,
+      "y": 15880,
       "w": 844,
       "h": 390,
       "title": "iPhone: paused",
@@ -539,7 +547,7 @@
     },
     "iOS-States.dc.html": {
       "x": 3258,
-      "y": 14960,
+      "y": 15880,
       "w": 844,
       "h": 390,
       "title": "iPhone: Load State",
@@ -547,7 +555,7 @@
     },
     "iOS-Settings.dc.html": {
       "x": 0,
-      "y": 15924,
+      "y": 16844,
       "w": 390,
       "h": 844,
       "title": "iPhone: Settings",
@@ -557,7 +565,7 @@
       "x": 8400,
       "y": 0,
       "w": 1440,
-      "h": 7000,
+      "h": 8000,
       "title": "Contract: every part mapped, the gaps, the calls",
       "page": "build",
       "expand": "fill"
@@ -623,6 +631,7 @@
     "Mac-BiosPicker.dc.html",
     "Mac-BiosChecking.dc.html",
     "Mac-BiosWrongSize.dc.html",
+    "Mac-BiosNoShell.dc.html",
     "Mac-BiosDone.dc.html",
     "Mac-LibraryEmpty.dc.html",
     "Mac-Library.dc.html",
@@ -720,7 +729,7 @@
     },
     "t-library": {
       "x": 0,
-      "y": 2140,
+      "y": 3060,
       "text": "Library",
       "kind": "title1",
       "maxW": 8080,
@@ -728,7 +737,7 @@
     },
     "t-scan": {
       "x": 0,
-      "y": 4280,
+      "y": 5200,
       "text": "Add a folder: a job",
       "kind": "title1",
       "maxW": 8080,
@@ -736,7 +745,7 @@
     },
     "t-player": {
       "x": 0,
-      "y": 5500,
+      "y": 6420,
       "text": "Playing",
       "kind": "title1",
       "maxW": 8080,
@@ -744,7 +753,7 @@
     },
     "t-states": {
       "x": 0,
-      "y": 7640,
+      "y": 8560,
       "text": "Save states",
       "kind": "title1",
       "maxW": 8080,
@@ -752,7 +761,7 @@
     },
     "t-cards": {
       "x": 0,
-      "y": 8860,
+      "y": 9780,
       "text": "Memory cards and BIOS",
       "kind": "title1",
       "maxW": 8080,
@@ -760,7 +769,7 @@
     },
     "t-settings": {
       "x": 0,
-      "y": 10080,
+      "y": 11000,
       "text": "Settings and other windows",
       "kind": "title1",
       "maxW": 8080,
@@ -768,7 +777,7 @@
     },
     "t-tools": {
       "x": 0,
-      "y": 12220,
+      "y": 13140,
       "text": "Personal build: Tools",
       "kind": "title1",
       "maxW": 8080,
@@ -776,7 +785,7 @@
     },
     "t-today": {
       "x": 0,
-      "y": 13440,
+      "y": 14360,
       "text": "Today: what v0.1.0’s backend supports",
       "kind": "title1",
       "maxW": 8080,
@@ -784,7 +793,7 @@
     },
     "t-ios": {
       "x": 0,
-      "y": 14660,
+      "y": 15580,
       "text": "iPhone (v0.4.0)",
       "kind": "title1",
       "maxW": 8080,

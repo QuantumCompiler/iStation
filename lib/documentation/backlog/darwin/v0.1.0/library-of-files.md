@@ -34,6 +34,7 @@ v0.1.0 builds it to the design's **Today** level. Disc images (.cue, .iso, .m3u)
 - 2026-11-22: no artwork and no titles from a database: a game is named by its file and can be renamed, and nothing leaves the Mac (contract row C47, verify), as the design has it (the default, confirmed by the user).
 - 2026-11-22: discs are listed today, with Play off and the reason, rather than hidden, so the user sees what they added; 5h fills in console and serial (the default, confirmed by the user).
 - 2026-11-22: each screen is checked against its board by rendering its previews to images and comparing them with the board in the built-in browser; no app is launched for the check (the user's call, before the group run).
+- 2026-11-22, from 5c's landing ([Milestone V](../../../assistant/darwin/MILESTONES.md#milestone-v--first-run-and-the-bios)), for the user's veto: until this item the macOS window's one place, once a BIOS is kept, is the BIOS pane, and the check's Continue lands there; this item brings the sidebar (BIOS ⌘6 among its places) and lands Continue on the empty library, as `Mac-LibraryEmpty` draws it. Adding the games to `library.json` raises `Library.currentVersion` to 2 with a recorded version-2 fixture beside version 1's, since a save writes the build's own version and drops keys it doesn't know.
 
 **Open calls:** none — all answered 2026-11-22.
 

@@ -825,3 +825,116 @@ Decided by the hardware (2026-11-14, ps1-tests' `cop` and its `psx.log`, recorde
   - **The layer law's citations:** every live citation points at ADR 0024. ADR 0023's account of what the apps build is corrected in ADR 0024's Consequences rather than by a superseding record. Superseded ADRs keep their own references as history.
   - **The real-time test** asserts at most 60 frames a second (+2) and at least 15 over half a second after the first frame. The exact 60 is the `ManualClock` tests' proof.
   - **A Sony file's name** is never used in a test: the kept-file test uses `bios-backup.bin`.
+
+## Milestone V — First run and the BIOS
+
+**Goal.** v0.1.0 item 5c: the first thing the Mac app needs is the user's own BIOS. Until now the app opened on a player that said "Nothing to play yet." and offered no way to choose one. This item builds the design's first run: Welcome, written for someone who has never heard of a BIOS; the BIOS check job (read the file, check its size, work out its SHA-1, power on and run 60 frames, then run on until the BIOS reaches its shell, refused at frame 600), with its Stop; the wrong-size and no-shell refusals; and the BIOS pane, with Run the BIOS. The BIOS is kept by a bookmark, never copied, and the App Store bookmark question (contract row C11) is prepared as a probe for the user to run.
+
+**Built** (5c, 2026-11-22):
+
+- **Data, the new module `library`** (`lib/src/darwin/source/data/library/`, iStation's own code, `Module(.data, "Library", testSupport: ["SupportSandbox"])`; `DataLibrary` joins the `EmuKit` product):
+  - `Library.swift`: `Library` (`currentVersion` 1; `version`, required; `bios: BIOSRecord?`) and `BIOSRecord` (file name, folder, size, SHA-1, checked date, bookmark), every field decoding with a default.
+  - `LibraryStore.swift`: `LibraryStore(url:)`, a synchronous, stateless `Sendable` struct over a versioned `library.json` at the URL the app hands in: `load()`, `save(_:)` (atomic, its folder made), `keepBIOS(_:)`, `forgetBIOS()` and `LibraryStoreError`. A corrupt, foreign, version-less or later-version file is refused and never saved over.
+  - `Fingerprint.swift`: `Fingerprint.sha1(of:)`, CryptoKit's `Insecure.SHA1` as 40 lowercase hexadecimal digits.
+  - `KeptFile.swift`: `bookmark(for:)`, `resolve(_:)` (with a stale flag), `size(at:)` (without reading, a symbolic link sized as its target) and `bytes(at:)`, each inside the file's security-scoped access; on macOS a security-scoped bookmark first and a plain one when the sandbox refuses it, plain on iOS.
+- **Business, `session`**: `ConsoleSessionPowerControls.swift`, the protocol a starter drives (`ConsoleSessionControls` plus `powerOn(bios:exe:) async throws(PS1Error)` and `snapshot`); `ConsoleSession` conforms. The session harness's `Ticks` and `eventually` take any conforming session.
+- **Presentation, the new place `bios`** (`lib/src/darwin/source/presentation/bios/`, `Module(.presentation, "BIOS", uses: ["BusinessPS1", "BusinessSession", "DataLibrary", "PresentationStyles"], testSupport: ["SupportSandbox"])`, in `EmuKit`, with its own shared scheme `PresentationBIOS`):
+  - `Models/`: `BIOSStorage` and the app's `LibraryBIOSStorage` (the one way both view-models reach files), `BIOSRun`, `BIOSAlert`, and `BIOSText` (every sentence as `html/main.html` has it).
+  - `ViewModels/BIOSCheckViewModel.swift`: the check over a console session of its own, never the player's, driving `JobSheet`'s `JobPresentation`; the chooser is the `Bool` `isChoosingFile`, bound to `.fileImporter`.
+  - `ViewModels/BIOSPaneViewModel.swift`: the kept BIOS, its texts, Run the BIOS (the player's session powered on from frame 0, then the run handed to the player) and Show in Finder.
+  - `Views/`: `WelcomeView`, `BIOSCheckSheet.swift` (`biosCheck(_:)`: the system's chooser, with the design's message and "Choose", and the job sheet), `BIOSPaneView` and, on macOS, `BIOSCommands` (File › Choose BIOS File… ⌘O while no BIOS is kept; Console › Run the BIOS).
+  - `Previews/PreviewBIOS.swift`: a scripted preview session (no console; it sends the snapshots a preview asks for) and in-memory storage (a file of the size a preview asks for, whose read or keep can fail), and fifteen named previews, each reached through the view-models' initializers and intents: Welcome, Picker, Minimum size, Checking, Reaching the shell, Wrong size, No shell, Done, Stopped, Couldn’t read, Couldn’t keep, and four of the pane.
+- **`styles`**:
+  - `Models/Figures.swift`: `Figures.grouped(_:)`, the design's grouping of numbers by thousands, promoted from the player now that the BIOS screens use it too.
+  - `Metrics.layout` gains `welcomeWidth` (460) and `paneMaxWidth` (720), from two new tokens in the design's `json/tokens.json` (`size.mac`, and 390 for both in `size.ios`), pinned by `TokensTests`.
+- **`player`**: `playerWindow(_:idleTitle:)` is split into `playerChrome(_:idleTitle:)` and `playerFullScreen(_:)`, so the macOS app keeps full screen at the window's root while Welcome, the pane or the player shows; `playerWindow` is still the two together.
+- **The macOS app** (`apps/macos/Sources/iStationApp.swift`): it builds the library at `<Application Support>/<bundle id>/library.json`, the player's session, a second session for the check, and the view-models. The window shows the player while a run plays, else the BIOS pane once a BIOS is kept, else Welcome; the check's chooser and sheet and the player's full screen sit around them. The File menu's empty New group gives way to Choose BIOS File…. The iOS app compiles the new modules through `EmuKit` and mounts neither: the iPhone's first run is 5n's.
+- **The bookmark probe** (`lib/src/darwin/tools/bookmark-probe/`, never shipped): a one-file sandboxed SwiftUI app (`Sources/BookmarkProbe.swift`) that keeps a security-scoped bookmark to a file the user picks and reports, after a relaunch, whether it still opens. `build.sh [appstore|appscope]` signs it ad-hoc under its own identifier, `local.istation.bookmark-probe` (the control, `….appscope`, adds `com.apple.security.files.bookmarks.app-scope`), and refuses to build while its `AppStore.entitlements` differs from the app's. Its README holds the user's run and its results table. The Xcode project's `tools` group shows it.
+- **Tests**:
+  - `tests/data/library/`: `LibraryStoreTests`, `FingerprintTests` and `KeptFileTests` (27, in a `Sandbox`), with two fixtures in `Fixtures/`: `library-v1.json`, the recorded version-1 shape, and `library-v1-no-checked.json`, a version-1 record missing a field. `Package.swift`'s new `testFixtures` table keeps them out of the test target; the tests read them by `#filePath`.
+  - `tests/business/session/PowerControlsTests.swift` (6), through the protocol alone.
+  - `tests/presentation/bios/`: `BIOSCheckViewModelTests`, `BIOSPaneViewModelTests`, `BIOSTextTests` and `LibraryBIOSStorageTests` (50), over `Fakes.swift`'s scripted `FakePowerSession` (which can hold a power-on or a stop) and in-memory `FakeStorage`; every wait ends after two seconds.
+  - `tests/presentation/styles/FiguresTests.swift`.
+  - `DataLibraryTests` and `PresentationBIOSTests` join the `macOS Personal` scheme.
+- **The design**, in its mirror and published to [the canvas](https://claude.ai/artifact/LA2jv631Ar184Dviuju8hu) as this item landed:
+  - `Mac-Welcome`'s copy and `Mac-BiosPane`'s note take the decided wording: what a BIOS is, and the one sentence of guidance.
+  - The no-shell refusal: the `bios-no-shell` preset, a third file in the picker (`bios-copy.bin`), the failed job's summary and Details, and the new board `Mac-BiosNoShell` (66 boards); the First run flow in `tools/check.mjs` runs it to its refusal.
+  - `Layout`'s First run row has "No shell in 600 frames" as its Refused cell; `Processes`' "Check a BIOS" runs until `reachedShell`, refused at frame 600.
+  - `Contract`: C09 is tagged ready; C01, C02, C05 and C10 name 5c's calls; C11 and C47 stay verify; C38's note is narrowed to Welcome; CALLS drop Audience and BIOS guidance; DECISIONS and EVIDENCE gain 5c's. Of 54 rows, 22 are ready, 10 app, 19 gaps and 3 verify.
+- **The docs**: CLAUDE.md (what this is, the UI section, the Codebase Map's `library` and `bios` rows, the products, the checklist), DEVELOPER (the tree, `library`, `session`, `styles`, `player`, `bios`, both apps, the test table, the persisted-format recipe), the Data, Business and Presentation cards and their tests cards, ADR 0002's table, `reference/darwin/README.md`'s note that today's `library.json` is a new format, and the root README's Status.
+
+**Trade-offs.**
+
+- **The App Store build's bookmarks are unproven.** Its entitlements hold `com.apple.security.files.user-selected.read-only` but not `com.apple.security.files.bookmarks.app-scope`. `KeptFile` makes a security-scoped bookmark and, when the sandbox refuses one, a plain one, so the App Store build may lose the BIOS across a relaunch until the probe's run settles C11. The personal build is unsandboxed, where both kinds of bookmark resolve.
+- **The check runs on its own console session.** The player follows its session across a stop (5b), so a check on that session would hand the window to the player. The macOS app builds a second `ConsoleSession` for it, released at every ending.
+- **A no-shell BIOS keeps the check running for about nine seconds** after frame 60, until frame 600, at 60 frames a second. The design shows a spinner on "Reach the BIOS’s shell" for that time. In the personal build, compiled at `-Onone` (Milestone U), it can take longer.
+- **Departures from the boards, at the Today level:**
+  - Continue lands on the BIOS pane, not the empty library (`Mac-LibraryEmpty`): the library is 5d's. Until then the pane is the window's one place, so there is no sidebar and no ⌘6, and the Console menu holds only Run the BIOS.
+  - The chooser is the system's: it shows the design's message and "Choose", but no title, since SwiftUI's file chooser takes none.
+  - Welcome's disc and the pane's chip have no size tokens; they use `Typography.screenSymbol` and `.largeTitle`, so they draw a little larger than the boards'.
+  - A wrong-size file is refused before it is read, so its Details are built from the console's own error for that size rather than thrown by a call; a test pins the text to what a real `ConsoleSession` throws.
+
+**Verified** (2026-11-22):
+
+- `lib/scripts/cicd.sh --app darwin --test` in the item's worktree passed (exit 0): the strict build, `swift test` (456 tests in 14 runs, up from 372 in 12; `DataLibraryTests` 27, `PresentationBIOSTests` 50, `BusinessSessionTests` 32, up from 26) and both apps' personal routine, for macOS and the iOS Simulator.
+- `swift build -c release --explicit-target-dependency-import-check=error` is clean, and the new suites pass in release (`swift test -c release -Xswiftc -enable-testing`).
+- Repeat runs: the new suites passed 12 times in a row, and 6 more with 32 busy loops loading a 16-core machine.
+- Two reviews (the item's letter; invariants, concurrency and quality), a fixer, then three independent verifiers (the fixer's changes; each acceptance criterion, guardrail and decision; the invariants). They found no regression. The one Important finding of the last pass, previews that assigned the check's state (ADR 0021 §3), was fixed and checked again by an agent told to refute the fix.
+- The bookmark probe: `build.sh` and `build.sh appscope` sign their bundles (exit 0) with the expected identifiers and entitlements, and an unknown variant exits 2. Neither was launched.
+- Mutations, each restored, were caught by the tests: the check's releases of its console, the store's refusals, the done sheet's hand-off, the chooser behind a sheet, Stop while reading, while powering on and while the console is released, a check waiting for the stop before it, and the symbolic-link sizing. Not caught, and recorded: the atomic save, the security-scoped access while unsandboxed (the probe's question), a Stop during the fingerprint, and the version stamp while only version 1 exists.
+- **The boards, rendered.** A throwaway test, not committed, rendered Welcome, the pane and every state of the check in the light, dark and high-contrast themes. They were compared in the built-in browser with `Mac-Welcome`, `Mac-BiosChecking`, `Mac-BiosWrongSize`, `Mac-BiosNoShell`, `Mac-BiosDone` and `Mac-BiosPane`: the words, their wrapping, the column widths, the steps, the summaries, the Details and the buttons match, with the departures above; Welcome and the pane fit the window's minimum of 800 × 560.
+- `node tools/check.mjs` and `--render` pass: 66 presets, eight flows, 29 shortcuts, 73 boards, 139 pages, 54 contract rows (22 ready, 10 app, 19 gaps, 3 verify). The docs validator is clean on a copy of the worktree.
+- A search of `source/` and `apps/` finds no networking API (URLSession, URLRequest, NWConnection), as contract row C47 says.
+
+**Decisions consumed.**
+
+- 2026-11-21: the design's Today parts are v0.1.0's, moving BIOS import from v0.2.0 into v0.1.0; each screen's gaps get interface items, and the screens are gated on them (the user's calls).
+- 2026-11-22 (the user's calls): the welcome copy is for App Store strangers, as the design has it; the BIOS guidance is one plain sentence (the file comes from your own console, iStation can't provide one, and it expects a 512 KB file), naming no tool, method or link.
+- 2026-11-22 (the defaults, confirmed by the user):
+  - a bookmark is probed across relaunches under the App Store routine first, and `com.apple.security.files.bookmarks.app-scope` joins the macOS App Store entitlements only if the probe needs it, which closes C11's verify for macOS;
+  - the app's fingerprint is SHA-1, shown in groups of four; the gate's reports keep a BIOS's size and SHA-256;
+  - a BIOS that hasn't reached its shell by frame 600 is refused with "Your BIOS powered on but didn’t reach its shell in 600 frames. Choose another file." and nothing is kept, and the design gains its preset and board.
+- 2026-11-22 (the user's calls, before the group run): the design is published as the item lands; screens are checked against their boards by rendered previews; the bookmark probe is prepared, not run, and the item ships with the app-scope entitlement off, the user's run deciding it.
+- 2026-11-22, rulings made building it:
+  - **The library file:**
+    - Every `BIOSRecord` field decodes with a default (`""`, `0`, `Date.distantPast` for `checked`, empty `Data`); a field of the wrong type is still an error.
+    - `version` is required. Missing, not an integer, or below 1 is `notALibrary`; above `currentVersion` is `newerVersion`, and the file is never saved over. `keepBIOS` and `forgetBIOS` load first, so they refuse too; `save` writes unconditionally.
+    - A save writes `currentVersion` whatever version was read and drops keys the build doesn't know, so a change that adds a field raises `currentVersion` and a build from before it refuses the file instead of erasing the field (5d's games are the first).
+    - Dates are kept to the whole second.
+    - The fixtures: `library-v1.json` is the recorded shape, pinned both ways; `library-v1-no-checked.json` is a made-up version-1 record standing in for an older shape, since none exists yet.
+  - **Kept files:**
+    - On macOS a bookmark is made with the security scope, and plainly when the sandbox refuses that; resolving tries the scope first, then plainly (a plain bookmark fails with the scope as Cocoa error 259, measured). These stay as they are until the probe's run; its README says what follows each outcome.
+    - `size(at:)` sizes a file without reading it, a symbolic link as the file it leads to.
+  - **The session protocol** has no default `exe:` and no overload, so it never clashes with `ConsoleSession`'s own `powerOn`: callers through it pass `exe: nil`.
+  - **The bookmark probe:**
+    - The control has its own identifier, `local.istation.bookmark-probe.appscope`, so the two variants' containers never mix.
+    - The first attempt is `.withSecurityScope`, as `KeptFile` makes it; the read-only option is tried second, as a diagnostic.
+    - If both variants open, C11's macOS verify is dropped; both stay as they are only if the run is inconclusive.
+    - Its version is `1.0`, so release sweeps don't take it for a carrier.
+  - **The check:**
+    - A file of another size is refused before it is read, by comparing `KeptFile.size(at:)` with `PS1Bus.biosSize`, so a disc image picked by mistake is never read whole.
+    - "Read the file" shows its detail once the size is known.
+    - A shell reached before frame 60 waits for the 60; a shell reached in the snapshot that reaches frame 600 counts; the refusal comes at the first snapshot at or past frame 600.
+    - Three failed states the design doesn't draw use the same sheet, with Cancel and Choose Another File…: a file that can't be read ("The BIOS couldn’t be read. Choose another file."), a BIOS the library can't keep, and so an unreadable `library.json`.
+    - The record is written at Done, right after the check's console is released with no suspension between, and handed on at Continue; its checked date is rounded down to the second, its folder the file's parent and its name the last path component.
+    - Behind the sheet, Choose BIOS File… (⌘O), Welcome's button and Choose Another BIOS… do nothing, as the design's keys do nothing under a sheet; the sheet's own buttons choose again, and choosing from the Done sheet hands the kept BIOS on first.
+    - The menus and the presenter read `isShowingJob`, from the state alone, so they aren't redrawn every frame.
+    - The sheet keeps its last job while it closes, and the chooser opens only once no sheet is on screen, so a refusal's Choose Another File… and a stop's Check Again open it after their sheet has gone. Whether SwiftUI would have opened it while the sheet closed couldn't be seen without launching the app.
+    - The previews reach every state through the view-models' intents over scripted preview fakes, never by setting it (ADR 0021 §3); a fingerprint they show is worked out from the preview's own bytes.
+  - **The pane:**
+    - Dates are written en-US ("Nov 20"; "Today" on the day; another year's with its year); a check the library didn't date reads "Checked: it reached its shell."; a missing fingerprint "SHA-1 unknown"; a missing folder "In an unknown folder".
+    - Folders under the account's home are written from "~"; the app reads home with `getpwuid`, since the sandbox reports its container as home.
+    - Run the BIOS sizes the file before reading it. A file that can't be found or read, or is no longer a BIOS's size, opens an alert with OK and powers nothing on. A stale bookmark is made again and the record kept again with the file's name and folder now.
+    - Run the BIOS is disabled while a run plays, the chooser or the check's sheet is open, or a start is under way.
+    - The previews' Show in Finder reaches nothing.
+  - **The window:** Continue lands on the BIOS pane until 5d's library; there is no ⌘6 until 5d's sidebar and 5e's menus; a run's end still leaves full screen, as 5b has it, even when the person put the pane there.
+  - **The design:**
+    - Welcome keeps "iStation plays PS1 games on your Mac." as its lead, and the guidance is its own paragraph.
+    - `iOS-Welcome` keeps its old copy, "a 512 KB file you copy from a console you own", until 5n, whose document already gives it 5c's words.
+    - At the Today level a no-shell file is accepted and kept, since the Today backend can't tell.
+    - The shell step has no detail and no progress bar; the no-shell Details name `PS1Console.reachedShell`, as the wrong-size Details name `PS1Console.powerOn(bios:)`.
+    - The canvas wraps the First run row's seventh board and moves what is below it down 920; the Contract board is 8000 tall.
+    - The first-run flow was extended rather than a ninth added.
+    - Welcome's and the pane's columns take two new size tokens rather than the sheet's width.
+    - C47 stays verify until a `ProjectRulesTests` rule enforces it; a new standing rule needs its own ADR, so none was added here.
+  - **What stayed as it was:** `noRealHome` is not widened (ADR 0019 records its four names; the app's `getpwuid` is in `apps/`, which the rule allows); 5b's real-clock floor test is unchanged; ADRs are left as written, so ADR 0024 still names EmuKit as the player and the acknowledgements.

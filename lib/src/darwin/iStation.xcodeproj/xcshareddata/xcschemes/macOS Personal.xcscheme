@@ -73,6 +73,16 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DataLibraryTests"
+               BuildableName = "DataLibraryTests"
+               BlueprintName = "DataLibraryTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "DataTracingTests"
                BuildableName = "DataTracingTests"
                BlueprintName = "DataTracingTests"
@@ -126,6 +136,16 @@
                BlueprintIdentifier = "PresentationPlayerTests"
                BuildableName = "PresentationPlayerTests"
                BlueprintName = "PresentationPlayerTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "PresentationBIOSTests"
+               BuildableName = "PresentationBIOSTests"
+               BlueprintName = "PresentationBIOSTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>

@@ -25,6 +25,7 @@ let modules: [Module] = [
     Module(.data, "ISO9660", uses: ["InfrastructureBytes"], testSupport: ["SupportSandbox", "SupportDiscFixtures"]),
     Module(.data, "SystemCNF"),
     Module(.data, "Playlists", testSupport: ["SupportSandbox"]),
+    Module(.data, "Library", testSupport: ["SupportSandbox"]),
     Module(.data, "Tracing", testSupport: ["SupportSandbox"]),
 
     Module(.business, "R3000A", testSupport: ["SupportMIPS", "SupportR3000ATrace", "SupportSandbox"], derivedFrom: .projectPSX),
@@ -33,6 +34,7 @@ let modules: [Module] = [
 
     Module(.presentation, "Styles"),
     Module(.presentation, "Player", uses: ["BusinessPS1", "BusinessSession", "PresentationStyles"]),
+    Module(.presentation, "BIOS", uses: ["BusinessPS1", "BusinessSession", "DataLibrary", "PresentationStyles"], testSupport: ["SupportSandbox"]),
     Module(.presentation, "Acknowledgements", uses: ["PresentationStyles"]),
 ]
 
@@ -49,7 +51,7 @@ let testSupport: [Support] = [
 /// points: nothing in the package is an executable, and nothing imports an app.
 let products: [Product] = [
     .library(name: "PS1Core", targets: ["BusinessR3000A", "BusinessPS1", "BusinessSession"]),
-    .library(name: "EmuKit", targets: ["PresentationStyles", "PresentationPlayer", "PresentationAcknowledgements"]),
+    .library(name: "EmuKit", targets: ["DataLibrary", "PresentationStyles", "PresentationPlayer", "PresentationBIOS", "PresentationAcknowledgements"]),
     // Personal builds only: no app links it in its App Store routine (ADR 0016).
     .library(name: "TraceKit", targets: ["DataTracing"]),
 ]
@@ -57,6 +59,12 @@ let products: [Product] = [
 /// `PERSONAL_BUILD` guards every tool and debug view (ADR 0016). The personal routine builds the
 /// package in its debug configuration, the App Store routine in release, so release code never sees it.
 let settings: [SwiftSetting] = [.define("PERSONAL_BUILD", .when(configuration: .debug))]
+
+/// The fixtures in a module's test directory, by test target: a persisted format's recorded shapes —
+/// each released one, never edited (ADR 0016 §5) — and the made-up records its defaults are tested
+/// with. Its tests read them from the repository by `#filePath`, so SwiftPM leaves them out of the
+/// target instead of warning that they are unhandled.
+let testFixtures: [String: [String]] = ["DataLibraryTests": ["Fixtures"]]
 
 // MARK: - Targets, generated from the map
 
@@ -110,6 +118,7 @@ let package = Package(
                 name: module.target + "Tests",
                 dependencies: dependencies([module.target] + module.testSupport),
                 path: module.testPath,
+                exclude: testFixtures[module.target + "Tests"] ?? [],
                 swiftSettings: settings
             ),
         ]
